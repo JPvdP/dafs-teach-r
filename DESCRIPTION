@@ -1,0 +1,29 @@
+Package: dafsteach
+Title: Interactive R Exercises for Data Analytics For Sustainability
+Version: 0.1.0
+Authors@R:
+    person("Jan Pieter", "van der Pol", email = "j.p.g.vanderpol@uu.nl", role = c("aut", "cre"))
+Description: A browser-based learning app for the R track of the Data Analytics
+    For Sustainability course. Students work through lessons, write real R code,
+    and get instant feedback. Progress is saved on the student's own computer.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Depends:
+    R (>= 4.1.0)
+Imports:
+    bslib,
+    DBI,
+    digest,
+    htmltools,
+    httr2,
+    jsonlite,
+    processx,
+    RSQLite,
+    shiny (>= 1.8.1),
+    tools,
+    yaml
+Suggests:
+    testthat (>= 3.0.0),
+    tidyverse,
+    withr
+Config/testthat/edition: 3

@@ -1,0 +1,884 @@
+# ─────────────────────────────────────────────────────────────
+# Lesson file format (same as the Python app)
+#   title       : shown in the lesson browser
+#   description : short summary shown in the lesson card
+#   exercises   : list of exercise objects (see below)
+#
+# Each exercise:
+#   id           : unique string key (used for progress tracking)
+#   title        : exercise heading
+#   instructions : markdown-formatted prompt shown to the student
+#   starter_code : pre-filled code in the editor (optional)
+#   tests        : list of checks run after the student's code
+#     - type: output_contains  →  output must contain `value`
+#     - type: output_equals    →  output (trimmed) must equal `value`
+#     - type: assert           →  `code` is run after the student's code;
+#                                  use .check(condition, "message")
+#   hints        : list of progressive hints (revealed one at a time)
+#   solution     : reference solution (shown on request)
+# ─────────────────────────────────────────────────────────────
+
+title: R Basics
+description: Your very first steps in R — loading the tidyverse, creating and overwriting variables, text/number/logical values, vectors, matrices, lists, and reading error messages.
+
+exercises:
+
+  - id: loading_packages
+    title: "Loading Packages: the Tidyverse"
+    instructions: |
+      R comes with a large set of built-in **functions** — like `print()`, `length()`, `sum()` and `mean()`. A function is a ready-made tool that does one specific job. Think of R as a toolbox with many essential tools available right away.
+
+      For more specialised work, other people have written extra functions and shared them in **packages**. A package is like an extra toolbox full of new functions, made for a specific purpose.
+
+      In this course we use the **tidyverse**: a collection of packages that are designed to work well together. The ones you'll use most:
+
+      - **`dplyr`** — for working with data tables: selecting, filtering, grouping and summarising data
+      - **`readr`** — for reading data files, like CSV files
+      - **`ggplot2`** — for making graphs
+
+      Packages only need to be **installed once** (more on that in a later lesson). After that, you **load** them with `library()` each time you start working. `library(tidyverse)` loads all the core tidyverse packages at once:
+
+      ```r
+      library(tidyverse)
+      ```
+
+      R then shows which packages it loaded, followed by a list of **conflicts**:
+
+      ```
+      ── Conflicts ──────────────────────────────── tidyverse_conflicts() ──
+      ✖ dplyr::filter() masks stats::filter()
+      ✖ dplyr::lag()    masks stats::lag()
+      ```
+
+      This is a **message, not an error**. To understand it, you need to know one more notation.
+
+      **Saying where a function comes from: `package::function()`**
+
+      You can write a package name, two colons `::`, and a function name. Read `::` as **"from"**: `dplyr::filter()` means *"the `filter()` function **from** dplyr"*.
+
+      The conflicts message tells you that dplyr and R's built-in `stats` package both have a function called `filter()`. Since you loaded dplyr last, from now on `filter()` means dplyr's version — dplyr's `filter()` *masks* (hides) the other one. That's what you want in this course. If you ever need the other one, you write `stats::filter()`.
+
+      **Your task:**
+      1. Load the tidyverse
+      2. Print the text `"Packages loaded!"`
+
+      (Don't worry about the `[1]` R shows in front of the output — we'll explain it in the next exercise.)
+    starter_code: |
+      # Load the tidyverse here
+
+
+      print("Packages loaded!")
+    tests:
+      - type: output_equals
+        value: '[1] "Packages loaded!"'
+      - type: assert
+        code: |
+          .check("tidyverse" %in% .packages(), "The tidyverse was not loaded. Use: library(tidyverse)")
+        description: "the tidyverse must be loaded"
+    hints:
+      - "Packages are loaded with library( )"
+      - "library(tidyverse)"
+    solution: |
+      library(tidyverse)
+
+      print("Packages loaded!")
+
+  - id: create_a_variable
+    title: "Creating Variables"
+    instructions: |
+      A **variable** is like a labeled storage box: you put a value inside it, and give it a name so you can find and reuse it later.
+
+      In R, you create a variable with the arrow `<-` (read it as "gets"):
+
+      ```r
+      score <- 10
+      ```
+
+      `score` now holds the value `10`. (You can also write `score = 10`, but `<-` is the usual style in R. In RStudio, **Alt + -** on Windows or **Option + -** on a Mac types the arrow for you.)
+
+      Why do we create variables?
+
+      - **Convenience:** Instead of typing the same value repeatedly, you store it once and use its name.
+      - **Flexibility:** If the value changes, you only update it in one place.
+      - **Reusability:** Once stored, a value can be reused as many times as you want, which makes your code cleaner.
+
+      A few rules for variable names:
+      - Names can contain letters, numbers, dots (`.`) and underscores (`_`)
+      - Names cannot start with a number
+      - Names cannot contain spaces — use `student_name`, not `student name`
+      - Names are case-sensitive: `score` and `Score` are different variables
+
+      **Showing a value**
+
+      Creating a variable doesn't show anything — R just stores the value quietly. To see a value, use `print()`, or simply write the variable's name on a line of its own:
+
+      ```r
+      city <- "Utrecht"
+      population <- 360000
+      print(city)
+      population
+      ```
+
+      produces:
+
+      ```
+      [1] "Utrecht"
+      [1] 360000
+      ```
+
+      The `[1]` means "this line starts with the **1st** value". In R, even a single number is a list of values with just one item in it (a *vector*) — you'll see why that's useful in a few exercises.
+
+      **Doing math**
+
+      | Operator | Meaning | Example | Result |
+      |----------|---------|---------|--------|
+      | `+` | addition | `5 + 2` | `7` |
+      | `-` | subtraction | `5 - 2` | `3` |
+      | `*` | multiplication | `5 * 2` | `10` |
+      | `/` | division | `5 / 2` | `2.5` |
+      | `^` | power | `5 ^ 2` | `25` |
+
+      R follows the normal order of operations (multiplication and division before addition and subtraction), and you can use parentheses `()` to control the order.
+
+      **Your task:**
+      1. Create a variable `a` with the value `45`
+      2. Create a variable `b` with the value `18`
+      3. Create `result` equal to `a + b`, `difference` equal to `a - b`, and `ratio` equal to `a / b`
+      4. Print `result`, `difference` and `ratio`, one per line
+    starter_code: |
+      # Create your variables here
+      a <-
+      b <-
+
+      result <-
+      difference <-
+      ratio <-
+
+      print(result)
+      print(difference)
+      print(ratio)
+    tests:
+      - type: output_equals
+        value: "[1] 63\n[1] 27\n[1] 2.5"
+      - type: assert
+        code: |
+          .check(a == 45, "a should be 45")
+          .check(b == 18, "b should be 18")
+          .check(result == 63, "result should be a + b")
+          .check(difference == 27, "difference should be a - b")
+          .check(ratio == 2.5, "ratio should be a / b")
+        description: "a=45, b=18, and result, difference and ratio calculated from them"
+    hints:
+      - "a <- 45 stores the value 45 in the variable a"
+      - "result <- a + b adds a and b together"
+      - "Use - for subtraction and / for division"
+    solution: |
+      a <- 45
+      b <- 18
+
+      result <- a + b
+      difference <- a - b
+      ratio <- a / b
+
+      print(result)
+      print(difference)
+      print(ratio)
+
+  - id: text_number_logical
+    title: "Text, Numbers, and Logical Values"
+    instructions: |
+      Not all values are the same kind of thing. R calls the "kind" of a value its **type**. The three types you'll use constantly are:
+
+      | Type | What it is | How you write it | Example |
+      |------|-----------|-------------------|---------|
+      | text (`character`) | A piece of text | Between quotes `"..."` | `"hello"` |
+      | number (`numeric`) | A whole or decimal number | Just the digits, no quotes | `42` or `3.14` |
+      | logical | True or false | `TRUE` or `FALSE` — all capitals, no quotes | `TRUE` |
+
+      The quotes matter a lot: `5` is a number you can do math with, but `"5"` is text — R treats it completely differently (more on that in the next exercise).
+
+      Logical values represent yes/no situations — for example "is the course open for enrollment? `TRUE`". (R also accepts `T` and `F` as short versions, but they're easy to break by accident, so always write them in full.)
+
+      **Your task:**
+      1. Create a variable `course` set to the text `"Data Analytics"`
+      2. Create a variable `n_students` set to the number `25`
+      3. Create a variable `is_open` set to `TRUE`
+      4. Print all three variables, one per line
+    starter_code: |
+      # Create the three variables
+
+
+      # Print all three, one per line
+
+    tests:
+      - type: output_equals
+        value: "[1] \"Data Analytics\"\n[1] 25\n[1] TRUE"
+      - type: assert
+        code: |
+          .check(identical(course, "Data Analytics"), 'course should be the text "Data Analytics"')
+          .check(identical(n_students, 25), "n_students should be the number 25 (no quotes)")
+          .check(isTRUE(is_open), "is_open should be TRUE")
+        description: "course=\"Data Analytics\", n_students=25, is_open=TRUE"
+    hints:
+      - "Text always needs quotes: course <- \"Data Analytics\""
+      - "Numbers never need quotes: n_students <- 25"
+      - "TRUE is written in capitals, without quotes: is_open <- TRUE"
+    solution: |
+      course <- "Data Analytics"
+      n_students <- 25
+      is_open <- TRUE
+
+      print(course)
+      print(n_students)
+      print(is_open)
+
+  - id: numbers_vs_text
+    title: "Numbers vs. Text That Looks Like a Number"
+    instructions: |
+      You've seen that `5` and `"5"` are different things. Let's see what that means in practice, because it **will** happen to you when working with data.
+
+      ```r
+      a <- 30      # a number
+      b <- "42"    # text — it only *looks* like a number
+      ```
+
+      | Code | Result |
+      |------|--------|
+      | `a * 2` | `60` |
+      | `b * 2` | `Error in b * 2 : non-numeric argument to binary operator` |
+      | `a + b` | the same error |
+
+      R refuses to do math with text. The error message says it in R's own words: one of the values around the operator (`*`, `+`, …) is not a number.
+
+      **Why this matters for data:** when you load a spreadsheet or CSV file, a column of numbers is sometimes read as text — for example because one cell contains `"n/a"`, or because the file uses a decimal comma (`"1,5"` instead of `1.5`), which is common in Dutch files.
+
+      The fix is to **convert** the text to a number with `as.numeric()`:
+
+      ```r
+      as.numeric(b)        # 42 — now a real number
+      a + as.numeric(b)    # 72
+      ```
+
+      But watch out: text that isn't a valid number becomes `NA` ("Not Available", R's way of saying *missing*), with only a **warning**:
+
+      ```r
+      as.numeric("n/a")    # NA, plus: Warning message: NAs introduced by coercion
+      as.numeric("1,5")    # NA as well — R expects a decimal point
+      ```
+
+      A warning doesn't stop your code. So always read your warnings: `NAs introduced by coercion` means some of your values just disappeared.
+
+      **Your task:**
+      1. Create a variable `a` set to the number `30`
+      2. Create a variable `b` set to the text `"42"`
+      3. Create `total` equal to `a` plus `b` converted to a number, and print it
+      4. Create `missing_value` by converting the text `"n/a"` with `as.numeric()`, and print it
+
+      Before you click Run, try to predict what each line will print! (You'll see the warning in the output — that's expected here.)
+    starter_code: |
+      # 1-2. Create a (a number) and b (text)
+
+
+      # 3. Add a and b, after converting b to a number
+      total <-
+      print(total)
+
+      # 4. Convert "n/a" to a number
+      missing_value <-
+      print(missing_value)
+    tests:
+      - type: output_equals
+        value: "[1] 72\n[1] NA"
+      - type: assert
+        code: |
+          .check(identical(a, 30), "a should be the number 30 (no quotes)")
+          .check(identical(b, "42"), 'b should be the text "42" (with quotes)')
+          .check(identical(total, 72), "total should be a + as.numeric(b)")
+          .check(length(missing_value) == 1 && is.na(missing_value), 'missing_value should be as.numeric("n/a")')
+        description: "a=30, b=\"42\", total=72, missing_value=NA"
+    hints:
+      - "a <- 30 has no quotes; b <- \"42\" has quotes"
+      - "a + b gives an error — convert b first with as.numeric(b)"
+      - "total <- a + as.numeric(b)"
+      - "missing_value <- as.numeric(\"n/a\")"
+    solution: |
+      a <- 30
+      b <- "42"
+
+      total <- a + as.numeric(b)
+      print(total)
+
+      missing_value <- as.numeric("n/a")
+      print(missing_value)
+
+  - id: overwriting_variables
+    title: "Overwriting Variables"
+    instructions: |
+      A variable holds **one** value at a time. If you assign a new value to a name that already exists, the old value is **replaced** — it's gone, and R doesn't keep a copy.
+
+      ```r
+      plop <- 10
+      print(plop)   # 10
+
+      plop <- 20
+      print(plop)   # 20 — the 10 has been overwritten
+      ```
+
+      You can also use a variable's current value to calculate its new value:
+
+      ```r
+      plop <- plop + 5
+      print(plop)   # 25
+      ```
+
+      R first works out the right-hand side (`20 + 5`), and then stores the result back in `plop`.
+
+      **Why this matters for data:** later in the course you'll often keep only part of a dataset — for example only the rows after the year 2000 — and store the result under the *same* name as the original. That's convenient, but the original data is then gone from that variable. If you make a mistake (filter the wrong rows, or run the same line twice), you can't simply "undo" it: you have to **go back and re-run your script from the beginning**, starting from loading the data.
+
+      This is especially tricky in RStudio, where you can run one line at a time (**Ctrl + Enter**, or **Cmd + Enter** on a Mac). Running `plop <- plop + 5` twice adds 5 twice! To start clean, use **Session → Restart R**, and then run the whole script from the top with the **Source** button. In this app, every click on **▶ Run** starts fresh from the top, so you won't have that problem here.
+
+      **Your task:**
+      You're tracking a factory's yearly CO₂ emissions (in tonnes).
+      1. Create `emissions` set to `120` and print it
+      2. The measurement was wrong — overwrite `emissions` with `95` and print it
+      3. A new filter reduces emissions by 15: set `emissions` to `emissions - 15` and print it
+    starter_code: |
+      # 1. Create emissions and print it
+
+
+      # 2. Overwrite emissions with 95 and print it
+
+
+      # 3. Reduce emissions by 15 and print it
+
+    tests:
+      - type: output_equals
+        value: "[1] 120\n[1] 95\n[1] 80"
+      - type: assert
+        code: |
+          .check(emissions == 80, paste("emissions should end at 80, got", emissions))
+        description: "`emissions` should end at 80"
+    hints:
+      - "Start with emissions <- 120, then print(emissions)"
+      - "Overwrite it by assigning again: emissions <- 95"
+      - "emissions <- emissions - 15 uses the current value (95) to calculate the new one"
+    solution: |
+      emissions <- 120
+      print(emissions)
+
+      emissions <- 95
+      print(emissions)
+
+      emissions <- emissions - 15
+      print(emissions)
+
+  - id: vectors_in_practice
+    title: "Vectors: Many Values in One Variable"
+    instructions: |
+      So far each variable held a single value. But data almost always comes in **many** values: a temperature for every day, an energy reading for every hour, a name for every country.
+
+      In R, you store many values in order in a **vector**. You create one with the `c()` function (*c* for *combine*), with the values separated by commas:
+
+      ```r
+      cities <- c("Utrecht", "Amsterdam", "Rotterdam")
+      ```
+
+      **Where you'll use vectors in practice:**
+      - **A column of data** — the daily rainfall measurements from a weather station are naturally a vector of numbers. Every column of a data table in R *is* a vector.
+      - **A selection** — e.g. the countries you want to include in your analysis: `c("Netherlands", "Germany", "Belgium")`
+      - **Repeating work** — later you'll *loop* over a vector to do the same calculation for every item.
+
+      A few things you can do with a vector:
+
+      ```r
+      rainfall_mm <- c(4.2, 0.0, 11.5, 3.1)
+
+      rainfall_mm[1]        # 4.2  — the first item
+      length(rainfall_mm)   # 4    — how many items there are
+      sum(rainfall_mm)      # 18.8 — all items added up
+      mean(rainfall_mm)     # 4.7  — the average
+      ```
+
+      R counts positions **from 1**: `rainfall_mm[1]` is the first item. (If you've used Python before: Python counts from 0, R from 1.)
+
+      Now the `[1]` in R's output makes sense: when a vector is too long for one line, R starts each line with the position of its first value:
+
+      ```
+       [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25
+      [26] 26 27 28 29 30
+      ```
+
+      **One type per vector:** all values in a vector have the same type. If you mix them, R quietly converts everything to text: `c(1, "a", TRUE)` becomes `"1" "a" "TRUE"`.
+
+      **Your task:**
+      A household's solar panels produced the following energy (in kWh) over five days. It's already stored in a vector called `daily_energy_kwh`.
+      1. Print the energy produced on the **first** day
+      2. Create `n_days` with the number of days in the vector (use `length()`) and print it
+      3. Create `total_energy` with the total over all days (use `sum()`) and print it
+    starter_code: |
+      daily_energy_kwh <- c(12.5, 9.8, 14.1, 11.0, 10.6)
+
+      # 1. Print the first day's energy
+
+
+      # 2. Number of days
+      n_days <-
+      print(n_days)
+
+      # 3. Total energy
+      total_energy <-
+      print(total_energy)
+    tests:
+      - type: output_equals
+        value: "[1] 12.5\n[1] 5\n[1] 58"
+      - type: assert
+        code: |
+          .check(n_days == 5, "n_days should be length(daily_energy_kwh)")
+          .check(isTRUE(all.equal(total_energy, 58)), "total_energy should be sum(daily_energy_kwh)")
+        description: "n_days=5, total_energy=58"
+    hints:
+      - "The first item is at position 1: daily_energy_kwh[1]"
+      - "n_days <- length(daily_energy_kwh)"
+      - "total_energy <- sum(daily_energy_kwh)"
+    solution: |
+      daily_energy_kwh <- c(12.5, 9.8, 14.1, 11.0, 10.6)
+
+      print(daily_energy_kwh[1])
+
+      n_days <- length(daily_energy_kwh)
+      print(n_days)
+
+      total_energy <- sum(daily_energy_kwh)
+      print(total_energy)
+
+  - id: vector_math
+    title: "Math on a Whole Vector at Once"
+    instructions: |
+      One of R's most useful features: when you do math with a vector, the calculation is applied to **every value** in it. No extra package needed — R was built for this.
+
+      ```r
+      prices <- c(10, 20, 30)
+
+      prices * 2    # 20 40 60
+      prices + 5    # 15 25 35
+      ```
+
+      Two vectors of the same length are combined value by value — the first with the first, the second with the second, and so on:
+
+      ```r
+      price <- c(10, 20, 30)
+      sold  <- c(1, 2, 3)
+      price * sold  # 10 40 90
+      ```
+
+      This is exactly how you'll calculate new columns in data tables later on — for example revenue = price × sold, for every row at once.
+
+      **What goes between the parentheses?**
+
+      `c()` is a function too. The values you give a function between its parentheses are called **arguments**. In `c(10, 20, 30)` there are three arguments, and `c()` combines them into one vector.
+
+      **Your task:**
+      A weather station measured these temperatures in °C: `12.0`, `15.5`, `9.0` and `20.0`.
+      1. Create a vector called `temps_c` containing these four values
+      2. Convert all of them to °F at once, using the formula `temps_c * 1.8 + 32`, and store the result in `temps_f`
+      3. Print `temps_f`
+    starter_code: |
+      # 1. Create the vector of temperatures in °C
+      temps_c <-
+
+      # 2. Convert to °F
+      temps_f <-
+
+      print(temps_f)
+    tests:
+      - type: output_equals
+        value: "[1] 53.6 59.9 48.2 68.0"
+      - type: assert
+        code: |
+          .check(isTRUE(all.equal(temps_c, c(12.0, 15.5, 9.0, 20.0))), "temps_c should contain 12.0, 15.5, 9.0 and 20.0, created with c()")
+          .check(isTRUE(all.equal(temps_f, temps_c * 1.8 + 32)), "temps_f should be temps_c * 1.8 + 32")
+        description: "temps_c should be the four temperatures, and temps_f the converted values"
+    hints:
+      - "Combine the values with c(): temps_c <- c(12.0, 15.5, 9.0, 20.0)"
+      - "Math on a vector is applied to every value: temps_f <- temps_c * 1.8 + 32"
+    solution: |
+      temps_c <- c(12.0, 15.5, 9.0, 20.0)
+
+      temps_f <- temps_c * 1.8 + 32
+
+      print(temps_f)
+
+  - id: creating_a_matrix
+    title: "Creating a Matrix"
+    instructions: |
+      A vector is a single row of values. A **matrix** has rows *and* columns, like a grid. You create one with the `matrix()` function:
+
+      ```r
+      small_matrix <- matrix(0, nrow = 3, ncol = 3)
+      print(small_matrix)
+      ```
+
+      ```
+           [,1] [,2] [,3]
+      [1,]    0    0    0
+      [2,]    0    0    0
+      [3,]    0    0    0
+      ```
+
+      **Arguments with names**
+
+      `matrix()` gets three arguments here:
+      - `0` — the value to fill the matrix with
+      - `nrow = 3` — the number of **rows**
+      - `ncol = 3` — the number of **columns**
+
+      `nrow` and `ncol` are **named arguments**: you write the argument's name, `=`, and its value. Names make your code easier to read, and with names the order doesn't matter: `matrix(0, ncol = 3, nrow = 3)` gives the same result. (Without names, `matrix(0, 3, 3)` also works, but then you need to remember which number is which.)
+
+      **Reading the printed matrix**
+
+      `[1,]` means "row 1" and `[,1]` means "column 1" — R always writes **rows first, then columns**. The function `dim()` gives you the size in the same order:
+
+      ```r
+      dim(small_matrix)   # 3 3 — rows, columns
+      ```
+
+      **Your task:**
+      1. Create a matrix of zeros with **2 rows and 5 columns**, stored in a variable called `small_matrix`
+      2. Print `small_matrix`
+    starter_code: |
+      # Create a matrix of zeros with 2 rows and 5 columns
+      small_matrix <-
+
+      print(small_matrix)
+    tests:
+      - type: output_contains
+        value: "[2,]"
+      - type: assert
+        code: |
+          .check(is.matrix(small_matrix), "small_matrix should be created with matrix()")
+          .check(!identical(dim(small_matrix), c(5L, 2L)), "You swapped rows and columns: nrow is the number of rows, ncol the number of columns")
+          .check(identical(dim(small_matrix), c(2L, 5L)), paste0("small_matrix should have 2 rows and 5 columns, but it has ", nrow(small_matrix), " rows and ", ncol(small_matrix), " columns"))
+          .check(all(small_matrix == 0), "all values in the matrix should be zero")
+        description: "small_matrix should be a matrix of zeros with 2 rows and 5 columns"
+    hints:
+      - "matrix() needs the value to fill it with, the number of rows, and the number of columns"
+      - "Use the named arguments nrow and ncol"
+      - "small_matrix <- matrix(0, nrow = 2, ncol = 5)"
+    solution: |
+      small_matrix <- matrix(0, nrow = 2, ncol = 5)
+      print(small_matrix)
+
+  - id: matrix_operations
+    title: "Matrix Operations: Overwrite or Keep?"
+    instructions: |
+      Just like with vectors, math on a matrix is applied to every value in it.
+
+      Remember from the "Overwriting Variables" exercise that assigning to an existing name replaces its old value. With matrices (and later with data tables) you always have a choice: **overwrite** the original variable, or **create a new one**.
+
+      ```r
+      # Overwrites small_matrix — the original (all zeros) is lost
+      small_matrix <- small_matrix + 3
+
+      # Creates a new variable — both the original and the new one are kept
+      small_matrix_3 <- small_matrix + 3
+      ```
+
+      If you use the same name on both sides of the `<-`, the variable is replaced. If you want to keep both versions, create a new variable with a different name. When working with data, keeping the original around is often the safer choice: if something goes wrong, you can compare with it, or start again from it.
+
+      **Your task:**
+      Starting from `small_matrix` (a 4×4 matrix of zeros, already provided):
+      1. Create `small_matrix_5` by adding `5` to every element of `small_matrix`, **without** changing `small_matrix`
+      2. Print `small_matrix` (should still be zeros)
+      3. Print `small_matrix_5` (should be all fives)
+    starter_code: |
+      small_matrix <- matrix(0, nrow = 4, ncol = 4)
+
+      # Create small_matrix_5 without modifying small_matrix
+      small_matrix_5 <-
+
+      print(small_matrix)
+      print(small_matrix_5)
+    tests:
+      - type: output_contains
+        value: "    0"
+      - type: output_contains
+        value: "    5"
+      - type: assert
+        code: |
+          .check(all(small_matrix == 0), "small_matrix should still be all zeros — store the result under a new name instead of overwriting it")
+          .check(all(small_matrix_5 == 5), "small_matrix_5 should be all fives")
+          .check(identical(dim(small_matrix_5), c(4L, 4L)), "small_matrix_5 should still be a 4x4 matrix")
+        description: "small_matrix stays all zeros; small_matrix_5 is all fives"
+    hints:
+      - "Adding a number to a matrix adds it to every element"
+      - "Store the result under the new name: small_matrix_5 <- small_matrix + 5"
+    solution: |
+      small_matrix <- matrix(0, nrow = 4, ncol = 4)
+
+      small_matrix_5 <- small_matrix + 5
+
+      print(small_matrix)
+      print(small_matrix_5)
+
+  - id: named_lists
+    title: "Lists: Values With Labels"
+    instructions: |
+      A vector keeps values **in order**, and you find them by position (`[1]`, `[2]`, …), and all values must have the same type. Often it's more useful to find a value by a **name**, and to store different types together. That's what a **list** does: it stores values, each with its own **name** (label).
+
+      ```r
+      station <- list(
+        name = "De Bilt",
+        temperature = 14.3,
+        is_active = TRUE
+      )
+      ```
+
+      You look up a value with a dollar sign `$` and its name (or with double square brackets):
+
+      ```r
+      print(station$name)               # "De Bilt"
+      print(station[["temperature"]])   # 14.3
+      ```
+
+      And just like a normal variable, you can overwrite a value:
+
+      ```r
+      station$temperature <- 15.0
+      ```
+
+      **Why you need this for the next lesson:** the values in a list can also be vectors. A list of vectors that all have the same length is exactly what a **data frame** (a data table) is in R. You create one with `data.frame()`, in the same way:
+
+      ```r
+      data <- data.frame(
+        city = c("Utrecht", "Amsterdam", "Rotterdam"),
+        bike_lanes_km = c(420, 513, 300)
+      )
+      print(data)
+      ```
+
+      ```
+             city bike_lanes_km
+      1   Utrecht           420
+      2 Amsterdam           513
+      3 Rotterdam           300
+      ```
+
+      Read it as: "the column `city` contains these three values, the column `bike_lanes_km` contains those three values". And `data$city` gives you that column — with the same `$` as for a list.
+
+      **Your task:**
+      1. Create a list called `country` with three named values: `name` set to `"Netherlands"`, `capital` set to `"Amsterdam"`, and `renewable_share` set to `15`
+      2. Print the value stored under `name`
+      3. New figures are in: overwrite `renewable_share` with `17`
+      4. Print the value stored under `renewable_share`
+    starter_code: |
+      # 1. Create the list
+      country <- list(
+
+      )
+
+      # 2. Print the name
+
+
+      # 3. Update renewable_share to 17
+
+
+      # 4. Print renewable_share
+
+    tests:
+      - type: output_equals
+        value: "[1] \"Netherlands\"\n[1] 17"
+      - type: assert
+        code: |
+          .check(is.list(country), "country should be a list, created with list()")
+          .check(identical(country$name, "Netherlands"), 'country$name should be "Netherlands"')
+          .check(identical(country$capital, "Amsterdam"), 'country$capital should be "Amsterdam"')
+          .check(identical(country$renewable_share, 17), "country$renewable_share should be updated to 17")
+        description: "country should have name, capital and renewable_share=17"
+    hints:
+      - "Inside list( ), write each value as name = value, separated by commas"
+      - "country <- list(name = \"Netherlands\", capital = \"Amsterdam\", renewable_share = 15)"
+      - "Look up a value with print(country$name)"
+      - "Overwrite a value with country$renewable_share <- 17"
+    solution: |
+      country <- list(
+        name = "Netherlands",
+        capital = "Amsterdam",
+        renewable_share = 15
+      )
+
+      print(country$name)
+
+      country$renewable_share <- 17
+
+      print(country$renewable_share)
+
+  - id: reading_error_messages
+    title: "Reading Error Messages"
+    instructions: |
+      Making mistakes is a normal part of programming — even experienced programmers see error messages every day. Learning to **read** one is one of the most useful skills you can build early on.
+
+      R error messages usually look like this:
+
+      ```
+      Error in <where it happened> : <what went wrong>
+      ```
+
+      Two very common beginner mistakes:
+
+      **1. A missing bracket**
+
+      ```r
+      print("Hello"
+      ```
+
+      ```
+      Error: unexpected end of input
+      ```
+
+      R reached the end of your code while it was still waiting for the closing `)`. The fix is to make sure every bracket you open is closed.
+
+      **2. Doing math with text**
+
+      ```r
+      age <- 25
+      print("Age: " + age)
+      ```
+
+      ```
+      Error in "Age: " + age : non-numeric argument to binary operator
+      ```
+
+      You've seen this one before: `+` only works on numbers. To glue text and values together, use `paste()`, which joins its arguments with a space:
+
+      ```r
+      print(paste("Age:", age))   # "Age: 25"
+      ```
+
+      **Your task:**
+      The code below has **two bugs**: a missing closing bracket, and text being combined with a number using `+`. Click Run, read the error message, fix the first bug, run again, read the next error, and fix that one too — until the code prints `Price: 12`.
+    starter_code: |
+      price <- 12
+
+      print("Price: " + price
+    tests:
+      - type: output_contains
+        value: "Price: 12"
+    hints:
+      - "Run the code first and read the error message carefully"
+      - "The first error, 'unexpected end of input', means a bracket is not closed. Add the missing ) at the end"
+      - "The next error says you can't use + with text. Use paste() to combine text and a number"
+      - "print(paste(\"Price:\", price))"
+    solution: |
+      price <- 12
+
+      print(paste("Price:", price))
+
+  - id: reading_error_messages_not_found
+    title: "Reading Error Messages: Object or Function Not Found"
+    instructions: |
+      Two other errors you'll see a lot are about **names** R doesn't recognise.
+
+      **`object '...' not found`** — you used a name that isn't an existing variable. Usually a typo, or text you forgot to put in quotes:
+
+      ```r
+      favorite_color <- blue
+      ```
+
+      ```
+      Error: object 'blue' not found
+      ```
+
+      Without quotes, R assumes `blue` is a variable — and since no variable called `blue` exists, it gives up. The fix is to add quotes: `favorite_color <- "blue"`.
+
+      **`could not find function "..."`** — you called a function that doesn't exist. Usually a typo in the function name, or a function from a package you forgot to load with `library()`:
+
+      ```r
+      prnt(favorite_color)
+      ```
+
+      ```
+      Error in prnt(favorite_color) : could not find function "prnt"
+      ```
+
+      **Your task:**
+      The code below should print the city name, but it has **two bugs**. Click Run, read the error, fix it, and repeat until the code prints `"Amsterdam"`.
+    starter_code: |
+      city <- Amsterdam
+
+      prnt(city)
+    tests:
+      - type: output_equals
+        value: "[1] \"Amsterdam\""
+    hints:
+      - "Read the error: which name couldn't R find?"
+      - "object 'Amsterdam' not found means R thinks Amsterdam is a variable, not text. Add quotes"
+      - "could not find function \"prnt\" means the function name has a typo"
+      - "city <- \"Amsterdam\" and print(city)"
+    solution: |
+      city <- "Amsterdam"
+
+      print(city)
+
+  - id: silent_problems
+    title: "Silent Problems: Inf, NaN and NA"
+    instructions: |
+      Some mistakes don't give an error at all. R keeps running, but the result is wrong. These are the tricky ones, because nothing tells you something went wrong — you have to notice it in the output.
+
+      **Dividing by zero**
+
+      Many programming languages stop with an error when you divide by zero. R doesn't:
+
+      ```r
+      90 / 0    # Inf  — "infinity"
+      0 / 0     # NaN  — "Not a Number"
+      ```
+
+      If you see `Inf` or `NaN` in your results, something was divided by zero — often because a variable unexpectedly ended up being `0`.
+
+      **Missing values spread**
+
+      As you saw earlier, `NA` means a value is missing. Any calculation with a missing value gives a missing result — R can't know the answer:
+
+      ```r
+      scores <- c(14, 18, NA, 16)
+      mean(scores)                 # NA
+      mean(scores, na.rm = TRUE)   # 16 — the average of the values that are there
+      ```
+
+      `na.rm = TRUE` is a named argument that means "**r**e**m**ove the **NA**s before calculating". Most summary functions have it: `sum()`, `mean()`, `max()`, `min()`, …
+
+      **Your task:**
+      1. The code calculates the average score of a class, but prints `Inf`. There are actually 5 students, not 0 — fix `n_students` so the average is correct
+      2. The second part prints `NA`, because one student's score is missing. Fix the `mean()` call so it ignores the missing value
+    starter_code: |
+      # 1. Average score of the class
+      total_score <- 90
+      n_students <- 0
+
+      average <- total_score / n_students
+      print(average)
+
+      # 2. Average of the individual scores
+      scores <- c(14, 18, NA, 16)
+      print(mean(scores))
+    tests:
+      - type: output_equals
+        value: "[1] 18\n[1] 16"
+      - type: assert
+        code: |
+          .check(n_students == 5, "n_students should be 5, not 0")
+        description: "n_students should equal 5"
+    hints:
+      - "Inf means something was divided by zero. Which variable is 0?"
+      - "n_students <- 5"
+      - "Add the named argument na.rm = TRUE inside mean( )"
+      - "print(mean(scores, na.rm = TRUE))"
+    solution: |
+      total_score <- 90
+      n_students <- 5
+
+      average <- total_score / n_students
+      print(average)
+
+      scores <- c(14, 18, NA, 16)
+      print(mean(scores, na.rm = TRUE))

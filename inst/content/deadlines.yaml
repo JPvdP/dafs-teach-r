@@ -1,0 +1,22 @@
+# ─────────────────────────────────────────────────────────────
+# Deadlines for anonymous progress reporting (same mechanism as the
+# Python app, and the same DAFS_TEACH_SYNC_URL endpoint).
+#
+# Once a deadline passes, the next time a student opens the app it
+# sends an ANONYMOUS summary of their progress on those lessons — no
+# student name is ever included.
+#
+# The ids start with "r-" so R reports can be told apart from the
+# Python track's reports in the same Google Sheet.
+#
+# TODO: replace the placeholder dates with the real course schedule
+# (ISO format, local time: YYYY-MM-DDTHH:MM:SS). Never leave dates in
+# the past before the course starts: a deadline that has already
+# passed when a student first opens the app is marked as "sent"
+# without reporting anything.
+# ─────────────────────────────────────────────────────────────
+
+- id: r-week1
+  deadline: "2099-01-01T23:59:00"
+  lessons:
+    - 01_r_basics
