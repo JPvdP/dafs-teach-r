@@ -22,7 +22,12 @@ run_file <- function(path, timeout = 10) {
   if (is.null(res) || isTRUE(res$timeout)) {
     return(list(stdout = "", stderr = "", crashed = FALSE, timed_out = TRUE))
   }
-  clean <- function(x) gsub("\r\n", "\n", x %||% "", fixed = TRUE)
+  clean <- function(x) {
+    x <- gsub("\r\n", "\n", x %||% "", fixed = TRUE)
+    # help() pages use typewriter-style bold/underline ("_\bR", "R\bR"),
+    # which is unreadable outside a terminal
+    gsub(".\b", "", x, perl = TRUE)
+  }
   list(stdout = clean(res$stdout), stderr = clean(res$stderr),
        crashed = res$status != 0, timed_out = FALSE)
 }

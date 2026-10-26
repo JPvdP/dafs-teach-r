@@ -1,0 +1,198 @@
+title: Installing Packages and Finding Help
+description: Learn the difference between installing and loading a package, what to do when R can't find one, and how to look up how a function works.
+
+exercises:
+
+  - id: loading_a_package
+    title: "Installing vs. Loading a Package"
+    instructions: |
+      In the first lesson you **loaded** the tidyverse with `library(tidyverse)`. But a package can only be loaded if it is **installed** on your computer first. These are two different steps:
+
+      | Step | Command | Where | How often |
+      |------|---------|-------|-----------|
+      | **Install** — download the package onto your computer | `install.packages("tidyverse")` | In the **Console** | **Once** per computer |
+      | **Load** — make the package available in your script | `library(tidyverse)` | At the top of your **script** | **Every** time you run the script |
+
+      Notice the quotes: `install.packages()` needs the name **in quotes**, `library()` doesn't.
+
+      Don't put `install.packages()` in your script: it would download the package again every time you run it, which is slow and fails without internet. Run it once in the Console instead. In RStudio you can also use the **Install** button in the **Packages** tab. And when you open a script that uses a package you don't have yet, RStudio often shows a yellow bar at the top offering to install it.
+
+      In this app the tidyverse is already installed, so you won't need to install anything for the exercises.
+
+      **When R can't find a package**
+
+      If you load a package that R can't find, you get:
+
+      ```
+      Error in library(ggplot) : there is no package called ‘ggplot’
+      ```
+
+      There are two possible causes:
+      1. **A typo** in the package name. Check the spelling first — remember that R is case-sensitive, so `library(Tidyverse)` doesn't work either. (In this example the package is called `ggplot2`, with a 2.)
+      2. The package is **not installed** yet. Fix it by running `install.packages("ggplot2")` in the Console, and then run your script again.
+
+      **Your task:**
+      The script below gives an error. Click **Run**, read the error message, and fix it so the script prints the table.
+    starter_code: |
+      library(tidyvers)
+
+      df <- tibble(
+        city = c("Utrecht", "Groningen"),
+        solar_panels = c(5200, 3100)
+      )
+
+      print(df)
+    tests:
+      - type: output_contains
+        value: "Groningen"
+      - type: assert
+        code: |
+          .check("tidyverse" %in% .packages(), "the tidyverse was not loaded. Check the spelling of the package name")
+        description: "the tidyverse must be loaded"
+    hints:
+      - "Read the error message: which package couldn't R find?"
+      - "The package is called tidyverse, with an e at the end"
+      - "library(tidyverse)"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        city = c("Utrecht", "Groningen"),
+        solar_panels = c(5200, 3100)
+      )
+
+      print(df)
+
+  - id: finding_help
+    title: "Finding Help With Functions"
+    instructions: |
+      Nobody memorises every function and its arguments — knowing how to **look things up** is a core programming skill. R has help built in for every function:
+
+      **1. The help page: `?function` or `help(function)`**
+
+      ```r
+      ?round
+      help(round)    # does the same
+      ```
+
+      In RStudio, the help page opens in the **Help** tab (bottom right). In this app, it's printed in the Output instead.
+
+      **2. A quick look at the arguments: `args(function)`**
+
+      ```r
+      args(round)
+      ```
+
+      ```
+      function (x, digits = 0, ...)
+      ```
+
+      This tells you `round()` takes an argument `x` (the numbers to round) and an argument `digits`, which is `0` if you don't give it.
+
+      **3. Online documentation and cheat sheets**
+
+      Every tidyverse package has a clear website with a page for each function, for example [dplyr.tidyverse.org](https://dplyr.tidyverse.org/reference/). Posit (the company behind RStudio) also makes one-page **cheat sheets** for the most important packages: search for "Posit cheat sheets". Official documentation like this is usually more reliable than random blog posts or forum answers.
+
+      **Your task:**
+      1. Show the help page of `round()` with `help(round)`, and scroll through what gets printed
+      2. Show the arguments of `round()` with `args(round)`
+    starter_code: |
+      # 1. Show the help page of round()
+
+
+      # 2. Show the arguments of round()
+
+    tests:
+      - type: output_contains
+        value: "Rounding of Numbers"
+      - type: output_contains
+        value: "digits = 0"
+    hints:
+      - "help(round)"
+      - "args(round)"
+    solution: |
+      help(round)
+
+      args(round)
+
+  - id: using_the_docs
+    title: "Using the Documentation to Learn a New Function"
+    instructions: |
+      Now let's use the help page for what it's really for: finding out how to use a function properly.
+
+      An R help page always has the same sections. The most useful ones are:
+
+      - **Usage** — how to call the function, with all its **arguments**. `round(x, digits = 0, ...)` means: the first argument is `x`, and there's an argument called `digits` that is `0` unless you give it.
+      - **Arguments** — an explanation of every argument.
+      - **Details** — how the function behaves in special cases. Easy to skip, but this is where the surprises are.
+      - **Examples** — short pieces of code showing how it's used. Often the quickest way to understand a function. `example(round)` runs them for you.
+
+      Here are parts of the help page you get with `help(round)`:
+
+      ```
+      Usage:
+           round(x, digits = 0, ...)
+
+      Arguments:
+        digits: integer indicating the number of decimal places ('round')
+                or significant digits ('signif') to be used.
+
+      Details:
+           Note that for rounding off a 5, the IEC 60559 standard (see also
+           'IEEE 754') is expected to be used, 'go to the even digit'.
+           Therefore 'round(0.5)' is '0' and 'round(-1.5)' is '-2'.
+      ```
+
+      You can give an argument by its position, `round(x, 1)`, or by its **name**, `round(x, digits = 1)`. Using the name makes your code easier to read.
+
+      **Your task:**
+      The temperatures below have far too many decimals.
+      1. Read the help page with `help(round)` (you can remove that line afterwards)
+      2. Round the `temp_c` column to **1 decimal** with `round()` and its `digits` argument, inside `mutate()`, and store the result back in `df`. Then print `df`.
+      3. Print `round(2.5)`. Is it what you expected? The **Details** section explains why.
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        station = c("De Bilt", "Eelde", "Vlissingen", "Maastricht"),
+        temp_c  = c(11.4637, 9.8251, 12.0549, 11.9912)
+      )
+
+      # 1. Read the help page
+
+
+      # 2. Round temp_c to 1 decimal
+      df <-
+      print(df)
+
+      # 3. What does round(2.5) give?
+
+    tests:
+      - type: output_contains
+        value: "Vlissingen"
+      - type: output_contains
+        value: "[1] 2"
+      - type: assert
+        code: |
+          .check(is.data.frame(df) && "temp_c" %in% names(df), "df should still be the tibble, with the rounded temp_c column: df <- df |> mutate(...)")
+          .check(isTRUE(all.equal(df$temp_c, c(11.5, 9.8, 12.1, 12.0))), "temp_c should be rounded to 1 decimal")
+        description: "the temp_c column should be rounded to 1 decimal"
+    hints:
+      - "help(round) shows the help page"
+      - "The argument for the number of decimals is called digits"
+      - "df <- df |> mutate(temp_c = round(temp_c, digits = 1))"
+      - "print(round(2.5))"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        station = c("De Bilt", "Eelde", "Vlissingen", "Maastricht"),
+        temp_c  = c(11.4637, 9.8251, 12.0549, 11.9912)
+      )
+
+      help(round)
+
+      df <- df |> mutate(temp_c = round(temp_c, digits = 1))
+      print(df)
+
+      print(round(2.5))
