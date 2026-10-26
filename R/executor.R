@@ -45,21 +45,24 @@ last_error <- function(stderr) {
   if (length(start)) paste(lines[start:length(lines)], collapse = "\n") else utils::tail(lines, 1)
 }
 
-run_result <- function(stdout, stderr, timed_out, passed, feedback) {
-  list(stdout = stdout, stderr = stderr, timed_out = timed_out, passed = passed, feedback = feedback)
+run_result <- function(stdout, stderr, timed_out, passed, feedback, crashed = FALSE) {
+  list(stdout = stdout, stderr = stderr, timed_out = timed_out, passed = passed,
+       feedback = feedback, crashed = crashed)
 }
 
 run_code <- function(student_code, tests, timeout = 10) {
   run <- run_source(student_code, timeout)
   stdout <- run$stdout
   stderr <- run$stderr
+  # `crashed` lets the app tell real errors apart from messages and warnings
+  result <- function(...) run_result(stdout, stderr, ..., crashed = run$crashed)
 
   if (run$timed_out) {
     return(run_result("", "", TRUE, FALSE,
                       "Your code timed out after 10 seconds. Check for infinite loops."))
   }
   if (run$crashed && !nzchar(trimws(stdout))) {
-    return(run_result(stdout, stderr, FALSE, FALSE,
+    return(result(FALSE, FALSE,
                       paste0("Your code raised an error:\n\n```\n", trimws(stderr), "\n```")))
   }
 
@@ -68,21 +71,21 @@ run_code <- function(student_code, tests, timeout = 10) {
   for (test in tests) {
     type <- test$type
     if (type %in% c("output_contains", "output_equals") && !nzchar(trimws(stdout))) {
-      return(run_result(stdout, stderr, FALSE, FALSE, paste(
+      return(result(FALSE, FALSE, paste(
         "Your code ran, but didn't show anything. To see a value, put `print( )`",
         "around it, or write the variable's name on a line of its own."
       )))
     }
     if (type == "output_contains") {
       if (!grepl(test$value, stdout, fixed = TRUE)) {
-        return(run_result(stdout, stderr, FALSE, FALSE, paste0(
+        return(result(FALSE, FALSE, paste0(
           "Expected the output to contain **`", test$value, "`**, but it didn't.\n\n",
           "Your output:\n```\n", shown(stdout), "\n```"
         )))
       }
     } else if (type == "output_equals") {
       if (trimws(stdout) != trimws(test$value)) {
-        return(run_result(stdout, stderr, FALSE, FALSE, paste0(
+        return(result(FALSE, FALSE, paste0(
           "Expected output:\n```\n", trimws(test$value), "\n```\n",
           "Your output:\n```\n", shown(stdout), "\n```"
         )))
@@ -90,15 +93,15 @@ run_code <- function(student_code, tests, timeout = 10) {
     } else if (type == "assert") {
       check <- run_source(paste(student_code, check_helper, test$code, sep = "\n"), timeout)
       if (check$timed_out) {
-        return(run_result(stdout, stderr, TRUE, FALSE, "Timed out while running checks."))
+        return(result(TRUE, FALSE, "Timed out while running checks."))
       }
       if (check$crashed) {
         desc <- test$description %||% test$code
-        return(run_result(stdout, stderr, FALSE, FALSE, paste0(
+        return(result(FALSE, FALSE, paste0(
           "Check failed: **", desc, "**\n\n```\n", last_error(check$stderr), "\n```"
         )))
       }
     }
   }
-  run_result(stdout, stderr, FALSE, TRUE, "All checks passed!")
+  result(FALSE, TRUE, "All checks passed!")
 }

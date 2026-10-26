@@ -342,7 +342,16 @@ app_server <- function(lessons, db, deadlines) {
           output_block <- htmltools::tagList(
             if (nzchar(res$stdout)) htmltools::tags$pre(res$stdout)
             else if (!nzchar(res$stderr)) htmltools::p(class = "text-muted fst-italic", "(no output)"),
-            if (nzchar(res$stderr)) htmltools::tags$pre(class = "text-danger-emphasis", res$stderr)
+            if (nzchar(res$stderr)) {
+              if (isTRUE(res$crashed)) {
+                htmltools::tags$pre(class = "text-danger-emphasis", res$stderr)
+              } else {
+                # Package startup messages and warnings: worth seeing, but not errors
+                htmltools::tagList(
+                  htmltools::div(class = "small text-muted mt-2", "Messages and warnings"),
+                  htmltools::tags$pre(class = "text-muted small", res$stderr))
+              }
+            }
           )
           htmltools::tagList(htmltools::hr(), bslib::layout_columns(col_widths = c(6, 6),
             htmltools::div(htmltools::strong("Output"), output_block),

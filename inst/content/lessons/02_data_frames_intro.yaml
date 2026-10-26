@@ -1,0 +1,561 @@
+title: Introduction to Data Frames
+description: Create, explore, select, filter and summarise data tables with the tidyverse — the core of data analysis in R.
+
+exercises:
+
+  - id: create_df
+    title: "Creating a Data Frame"
+    instructions: |
+      A **data frame** is R's version of a spreadsheet: a table with rows and columns. Each column can hold a different kind of data — one column of text, one of numbers, one of `TRUE`/`FALSE`.
+
+      In the previous lesson you saw that a data frame is built from vectors of the same length, one per column. The tidyverse has its own, improved version of a data frame, called a **tibble**. You create one with `tibble()`, in exactly the same way: each **name** becomes a column name, and each **vector** becomes the values in that column.
+
+      ```r
+      library(tidyverse)
+
+      df <- tibble(
+        column_a = c(1, 2, 3),
+        column_b = c("x", "y", "z")
+      )
+
+      print(df)
+      ```
+
+      Output:
+
+      ```
+      # A tibble: 3 × 2
+        column_a column_b
+           <dbl> <chr>
+      1        1 x
+      2        2 y
+      3        3 z
+      ```
+
+      A tibble tells you more than a plain data frame when you print it:
+      - The first line gives its **size**: 3 rows × 2 columns.
+      - Under each column name you see its **type**: `<dbl>` is a number (short for *double*, a number that can have decimals), `<chr>` is text (*character*). You'll also meet `<lgl>` (logical, `TRUE`/`FALSE`) and `<int>` (whole numbers).
+      - The numbers `1`, `2`, `3` on the left are the row numbers.
+
+      A few details to watch:
+      - Notice the two kinds of brackets: `tibble( ... )` is a function call, and each `c( ... )` inside it creates one column.
+      - All columns must have the same length — every column needs a value for every row.
+      - Don't put a comma after the last column. `tibble()` happens to accept it, but many other R functions, like `data.frame()`, give an error: `argument is missing, with no default`.
+
+      **Your task:**
+      Create a tibble called `df` with these columns and values:
+
+      | name    | age | city      |
+      |---------|-----|-----------|
+      | Alice   | 28  | Utrecht   |
+      | Bob     | 34  | Amsterdam |
+      | Charlie | 22  | Rotterdam |
+
+      Then print it.
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        # fill in the columns here
+      )
+
+      print(df)
+    tests:
+      - type: output_contains
+        value: "Alice"
+      - type: output_contains
+        value: "Amsterdam"
+      - type: assert
+        code: |
+          .check(inherits(df, "tbl_df"), "df should be a tibble, created with tibble()")
+          .check(identical(names(df), c("name", "age", "city")), "the columns should be name, age and city, in that order")
+          .check(nrow(df) == 3, "df should have 3 rows")
+          .check(identical(df$age, c(28, 34, 22)), "the age values are wrong")
+        description: "df should be a tibble with columns name/age/city and 3 rows"
+    hints:
+      - "Each column is name = c(...), and the columns are separated by commas"
+      - "name = c(\"Alice\", \"Bob\", \"Charlie\")"
+      - "Make sure the column names match exactly: name, age, city"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        name = c("Alice", "Bob", "Charlie"),
+        age = c(28, 34, 22),
+        city = c("Utrecht", "Amsterdam", "Rotterdam")
+      )
+
+      print(df)
+
+  - id: explore
+    title: "Exploring a Data Frame"
+    instructions: |
+      Before analysing data, you need to understand its size and contents. In R you do that with **functions**: you give the data to the function as its argument, and the function tells you something about it.
+
+      | Function | What it shows |
+      |----------|---------------|
+      | `dim(df)` | the size: number of rows, number of columns |
+      | `nrow(df)` / `ncol(df)` | only the number of rows / columns |
+      | `names(df)` | the column names |
+      | `head(df, n)` | the first `n` rows |
+      | `glimpse(df)` | a quick overview: every column with its type and first values (from the tidyverse) |
+
+      Some functions take more than one argument. In `head(df, 3)`, the first argument is the data, and the second is how many rows you want. Read it as *"the first 3 rows of `df`"*.
+
+      **Watch out: tibbles round numbers when printing**
+
+      To keep the table readable, a tibble only shows the first few significant digits of each number. A price of `999.99` may be shown as `1000.`, and `29.99` as `30.0`. **The value itself doesn't change**: it's only rounded on screen. `glimpse()` and `df$price` show the full values.
+
+      **Your task:**
+      The tibble `df` below contains sales data.
+      1. Print the **size** of `df`
+      2. Print the **column names**
+      3. Print the **first 3 rows**
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        product = c("Laptop", "Mouse", "Keyboard", "Monitor", "Webcam"),
+        price   = c(999.99, 29.99, 79.99, 349.99, 89.99),
+        sold    = c(15, 120, 60, 25, 45)
+      )
+
+      # 1. Print the size
+
+
+      # 2. Print the column names
+
+
+      # 3. Print the first 3 rows
+
+    tests:
+      - type: output_contains
+        value: "[1] 5 3"
+      - type: output_contains
+        value: "\"product\""
+      - type: output_contains
+        value: "Laptop"
+      - type: output_contains
+        value: "Keyboard"
+    hints:
+      - "print(dim(df)) prints the number of rows and columns"
+      - "print(names(df)) prints the column names"
+      - "print(head(df, 3)) prints the first 3 rows"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        product = c("Laptop", "Mouse", "Keyboard", "Monitor", "Webcam"),
+        price   = c(999.99, 29.99, 79.99, 349.99, 89.99),
+        sold    = c(15, 120, 60, 25, 45)
+      )
+
+      print(dim(df))
+      print(names(df))
+      print(head(df, 3))
+
+  - id: select_filter
+    title: "Selecting and Filtering"
+    instructions: |
+      All examples below use the products tibble from the previous exercise.
+
+      **One column: `$`**
+
+      ```r
+      df$product
+      ```
+
+      Just like with a list, `$` gives you one column. A single column is simply a **vector** — exactly like the vectors from the previous lesson:
+
+      ```
+      [1] "Laptop"   "Mouse"    "Keyboard" "Monitor"  "Webcam"
+      ```
+
+      **Several columns: `select()`**
+
+      ```r
+      select(df, product, price)
+      ```
+
+      `select()` keeps only the columns you name, and gives you a new, smaller tibble. Notice that you write the column names **without quotes**, and without `df$`: dplyr functions know that `product` and `price` are columns of the data you gave them as the first argument.
+
+      **Rows that meet a condition: `filter()`**
+
+      ```r
+      filter(df, price > 100)
+      ```
+
+      Read it as *"from `df`, keep the rows where `price` is above 100"*. Behind the scenes, `price > 100` is checked for **every** row, giving one `TRUE` or `FALSE` per row:
+
+      ```
+      [1]  TRUE FALSE FALSE  TRUE FALSE
+      ```
+
+      `filter()` keeps the rows where that is `TRUE`: the Laptop and the Monitor.
+
+      An easy way to remember the difference: **`select()` picks columns, `filter()` picks rows.**
+
+      **Doing several steps: the pipe `|>`**
+
+      Often you want to do one step after another — first filter, then select. The **pipe** `|>` passes the result of one step on to the next. Read it as **"and then"**:
+
+      ```r
+      df |>
+        filter(price > 100) |>
+        select(product)
+      ```
+
+      *"Take `df`, **and then** keep the rows with a price above 100, **and then** keep only the `product` column."* The pipe puts the data in as the first argument of the next function, which is why you don't write `df` inside `filter()` and `select()` here.
+
+      You'll also see `%>%` in many examples online. It's the older tidyverse pipe, and does the same thing.
+
+      **Your task:**
+      1. Create `expensive`: the rows of `df` with a `price` above 100
+      2. Print only the `product` column of `expensive`, as a vector (with `$`)
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        product = c("Laptop", "Mouse", "Keyboard", "Monitor", "Webcam"),
+        price   = c(999.99, 29.99, 79.99, 349.99, 89.99),
+        sold    = c(15, 120, 60, 25, 45)
+      )
+
+      # 1. Keep the rows where price is above 100
+      expensive <-
+
+      # 2. Print only the product column of expensive
+      print()
+    tests:
+      - type: output_contains
+        value: "[1] \"Laptop\""
+      - type: output_contains
+        value: "\"Monitor\""
+      - type: assert
+        code: |
+          .check(is.data.frame(expensive), "expensive should be a tibble: the result of filter()")
+          .check(nrow(expensive) == 2, "expensive should have 2 rows (Laptop and Monitor)")
+          .check(!"Mouse" %in% expensive$product, "Mouse should not be in expensive")
+        description: "`expensive` should contain only Laptop and Monitor"
+    hints:
+      - "filter() needs the data first, and then the condition"
+      - "expensive <- filter(df, price > 100)"
+      - "One column, as a vector: expensive$product"
+      - "print(expensive$product)"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        product = c("Laptop", "Mouse", "Keyboard", "Monitor", "Webcam"),
+        price   = c(999.99, 29.99, 79.99, 349.99, 89.99),
+        sold    = c(15, 120, 60, 25, 45)
+      )
+
+      expensive <- filter(df, price > 100)
+
+      print(expensive$product)
+
+  - id: aggregation
+    title: "Calculating and Summarising"
+    instructions: |
+      Now that you can select columns, you can calculate with them and summarise them.
+
+      **Calculating with columns**
+
+      Columns are vectors, so the vector math from the previous lesson works on them: calculations happen **row by row**.
+
+      ```r
+      df$price * df$sold    # row 1's price × row 1's sold, row 2's price × row 2's sold, ...
+      ```
+
+      The tidyverse way to add such a calculation as a **new column** is `mutate()`:
+
+      ```r
+      df |> mutate(revenue = price * sold)
+      ```
+
+      **Summarising**
+
+      R has functions for all the common summary statistics. You give them a vector — for example a column:
+
+      | Function | Result |
+      |----------|--------|
+      | `sum()` | Total |
+      | `mean()` | Average |
+      | `max()` | Largest value |
+      | `min()` | Smallest value |
+
+      ```r
+      max(df$sold)    # 120
+      ```
+
+      The tidyverse way is `summarise()`, which turns the whole table into **one row** of summary values. Inside it, you use the same functions:
+
+      ```r
+      df |> summarise(most_sold = max(sold), average_price = mean(price))
+      ```
+
+      `summarise()` gives you a **tibble** back (with one row), not a single number. To take the number out of it, add `|> pull()` at the end: `pull()` gives you a column as a vector. And remember that a printed tibble rounds its numbers — `pull()` or `$` shows you the exact value.
+
+      **Functions inside functions**
+
+      In `sum(df$price * df$sold)`, R first works out what's inside the parentheses (the revenue per product), and then gives that to `sum()`. Read nested functions from the **inside out**.
+
+      **Your task:**
+      1. Calculate the **total revenue** (price × sold) for all products combined, and store it as a single number in a variable called `total_revenue`. You can use `$` and vector math, or `summarise()` with `pull()`.
+      2. Print it rounded to 2 decimal places.
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        product = c("Laptop", "Mouse", "Keyboard", "Monitor", "Webcam"),
+        price   = c(999.99, 29.99, 79.99, 349.99, 89.99),
+        sold    = c(15, 120, 60, 25, 45)
+      )
+
+      # Calculate the revenue per product, then add it all up
+      total_revenue <-
+
+      print(round(total_revenue, 2))
+    tests:
+      - type: assert
+        code: |
+          .check(is.numeric(total_revenue) && length(total_revenue) == 1, "total_revenue should be a single number. If you used summarise(), add |> pull() at the end")
+          .check(abs(total_revenue - 36197.35) < 0.01, "total_revenue is not correct yet. Did you multiply price by sold for each product, and then add everything up?")
+        description: "`total_revenue` should be the combined revenue of all products"
+    hints:
+      - "Revenue per product is price × sold: df$price * df$sold gives one value per product"
+      - "Add those values up with sum()"
+      - "total_revenue <- sum(df$price * df$sold)"
+      - "Or the tidyverse way: df |> summarise(total = sum(price * sold)) |> pull()"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        product = c("Laptop", "Mouse", "Keyboard", "Monitor", "Webcam"),
+        price   = c(999.99, 29.99, 79.99, 349.99, 89.99),
+        sold    = c(15, 120, 60, 25, 45)
+      )
+
+      total_revenue <- sum(df$price * df$sold)
+
+      print(round(total_revenue, 2))
+
+  - id: practice_create_df
+    title: "Practice: Creating a Data Frame"
+    instructions: |
+      Time to practice creating a tibble from scratch, using a new example.
+
+      **Your task:**
+      Create a tibble called `books` with these columns and values:
+
+      | title       | author         | pages |
+      |-------------|----------------|-------|
+      | Dune        | Frank Herbert  | 412   |
+      | The Hobbit  | J.R.R. Tolkien | 310   |
+      | 1984        | George Orwell  | 328   |
+
+      Then print it. (Careful: is the title `1984` a number or text?)
+    starter_code: |
+      library(tidyverse)
+
+      books <- tibble(
+        # fill in the columns here
+      )
+
+      print(books)
+    tests:
+      - type: output_contains
+        value: "Dune"
+      - type: output_contains
+        value: "Tolkien"
+      - type: assert
+        code: |
+          .check(inherits(books, "tbl_df"), "books should be a tibble, created with tibble()")
+          .check(identical(names(books), c("title", "author", "pages")), "the columns should be title, author and pages, in that order")
+          .check(nrow(books) == 3, "books should have 3 rows")
+          .check(is.character(books$title), "title should be a text column: put \"1984\" in quotes too, so every title is text")
+          .check(identical(books$pages, c(412, 310, 328)), "the pages values are wrong")
+        description: "books should have columns title/author/pages and 3 rows"
+    hints:
+      - "Each column is name = c(...), separated by commas"
+      - "A vector can only hold one type. Since the other titles are text, write \"1984\" with quotes"
+      - "title = c(\"Dune\", \"The Hobbit\", \"1984\")"
+    solution: |
+      library(tidyverse)
+
+      books <- tibble(
+        title = c("Dune", "The Hobbit", "1984"),
+        author = c("Frank Herbert", "J.R.R. Tolkien", "George Orwell"),
+        pages = c(412, 310, 328)
+      )
+
+      print(books)
+
+  - id: practice_explore
+    title: "Practice: Exploring a Data Frame"
+    instructions: |
+      Let's practice exploring a tibble, and add one more function to your toolkit: `tail(df, n)` — just like `head(df, n)`, but it shows the **last** `n` rows instead of the first.
+
+      **Your task:**
+      The tibble `df` below contains weather data for several cities.
+      1. Print the **size** of `df`
+      2. Show an overview of every column and its type, with `glimpse()`
+      3. Print the **last 2 rows**
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        city        = c("Oslo", "Amsterdam", "Berlin", "Madrid", "Rome", "Athens"),
+        temperature = c(5, 10, 8, 15, 12, 18),
+        humidity    = c(80, 75, 70, 60, 65, 55)
+      )
+
+      # 1. Print the size
+
+
+      # 2. Show an overview of the columns
+
+
+      # 3. Print the last 2 rows
+
+    tests:
+      - type: output_contains
+        value: "[1] 6 3"
+      - type: output_contains
+        value: "$ temperature"
+      - type: output_contains
+        value: "Rome"
+      - type: output_contains
+        value: "Athens"
+    hints:
+      - "print(dim(df)) prints the size"
+      - "glimpse(df) prints the overview by itself, no print() needed"
+      - "print(tail(df, 2)) prints the last 2 rows"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        city        = c("Oslo", "Amsterdam", "Berlin", "Madrid", "Rome", "Athens"),
+        temperature = c(5, 10, 8, 15, 12, 18),
+        humidity    = c(80, 75, 70, 60, 65, 55)
+      )
+
+      print(dim(df))
+      glimpse(df)
+      print(tail(df, 2))
+
+  - id: practice_select_filter
+    title: "Practice: Selecting and Filtering"
+    instructions: |
+      More practice with filtering rows and selecting a column — this time with employee data, and using the pipe.
+
+      Reminder:
+      ```r
+      df |> filter(salary > 50000)   # rows where salary is above 50000
+      ```
+
+      **Your task:**
+      1. Create `high_earners`: the employees with a `salary` above 50000. Use the pipe `|>`.
+      2. Print only the `name` column of `high_earners`, as a vector (with `$`)
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        name       = c("Ana", "Ben", "Cleo", "Dan", "Emi"),
+        department = c("Sales", "IT", "Sales", "IT", "HR"),
+        salary     = c(45000, 62000, 48000, 71000, 39000)
+      )
+
+      # 1. Keep the rows where salary is above 50000
+      high_earners <-
+
+      # 2. Print only the name column of high_earners
+      print()
+    tests:
+      - type: output_contains
+        value: "[1] \"Ben\""
+      - type: output_contains
+        value: "\"Dan\""
+      - type: assert
+        code: |
+          .check(is.data.frame(high_earners), "high_earners should be a tibble: the result of filter()")
+          .check(nrow(high_earners) == 2, "high_earners should have 2 rows (Ben and Dan)")
+          .check(!"Ana" %in% high_earners$name, "Ana should not be in high_earners")
+        description: "`high_earners` should contain only Ben and Dan"
+    hints:
+      - "Start with the data, then pipe it into filter(): df |> filter(...)"
+      - "high_earners <- df |> filter(salary > 50000)"
+      - "print(high_earners$name)"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        name       = c("Ana", "Ben", "Cleo", "Dan", "Emi"),
+        department = c("Sales", "IT", "Sales", "IT", "HR"),
+        salary     = c(45000, 62000, 48000, 71000, 39000)
+      )
+
+      high_earners <- df |> filter(salary > 50000)
+
+      print(high_earners$name)
+
+  - id: practice_aggregation
+    title: "Practice: Summarising Data"
+    instructions: |
+      More practice with summary statistics — this time using `mean()`, `max()` and `min()` instead of `sum()`.
+
+      **Your task:**
+      Using the trips tibble below (distances in km):
+      1. Create `avg_distance` — the mean of `distance_km`. Print it rounded to 1 decimal place.
+      2. Create `max_distance` — the longest trip. Print it.
+      3. Create `min_distance` — the shortest trip. Print it.
+
+      Each of the three should be a single number.
+    starter_code: |
+      library(tidyverse)
+
+      trips <- tibble(
+        trip_id     = 1:5,
+        distance_km = c(12.5, 34.2, 8.1, 50.0, 22.3)
+      )
+
+      # Average distance
+      avg_distance <-
+      print(round(avg_distance, 1))
+
+      # Longest trip
+      max_distance <-
+      print(max_distance)
+
+      # Shortest trip
+      min_distance <-
+      print(min_distance)
+    tests:
+      - type: assert
+        code: |
+          .check(is.numeric(avg_distance) && length(avg_distance) == 1, "avg_distance should be a single number. If you used summarise(), add |> pull()")
+          .check(abs(avg_distance - 25.42) < 0.01, "avg_distance is not the mean of distance_km yet")
+          .check(identical(max_distance, 50), "max_distance should be the largest value in distance_km")
+          .check(identical(min_distance, 8.1), "min_distance should be the smallest value in distance_km")
+        description: "avg_distance, max_distance and min_distance should be the mean, largest and smallest distance"
+    hints:
+      - "One column as a vector: trips$distance_km"
+      - "avg_distance <- mean(trips$distance_km)"
+      - "Use max() and min() in the same way"
+    solution: |
+      library(tidyverse)
+
+      trips <- tibble(
+        trip_id     = 1:5,
+        distance_km = c(12.5, 34.2, 8.1, 50.0, 22.3)
+      )
+
+      avg_distance <- mean(trips$distance_km)
+      print(round(avg_distance, 1))
+
+      max_distance <- max(trips$distance_km)
+      print(max_distance)
+
+      min_distance <- min(trips$distance_km)
+      print(min_distance)
