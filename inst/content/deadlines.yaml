@@ -21,3 +21,4 @@
   lessons:
     - 01_r_basics
     - 02_data_frames_intro
+    - 03_data_types_and_logic

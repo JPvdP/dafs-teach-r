@@ -1,0 +1,422 @@
+title: Data Types and Logic Operators
+description: Check and convert the type of a value, and use comparisons and logic operators to ask yes/no questions about your data — the basis of every filter.
+
+exercises:
+
+  - id: checking_types
+    title: "Checking Types"
+    instructions: |
+      Every value in R has a **type**. In the first lesson you met text, numbers and logical values, and saw that `42` and `"42"` behave very differently. Here are R's names for the core types:
+
+      | Type | Description | Example | In a tibble |
+      |------|-------------|---------|-------------|
+      | `numeric` | Numbers, with or without decimals | `42`, `-0.5` | `<dbl>` |
+      | `integer` | Whole numbers only | `42L`, `1:3` | `<int>` |
+      | `character` | Text | `"hello"` | `<chr>` |
+      | `logical` | `TRUE` or `FALSE` | `TRUE` | `<lgl>` |
+
+      The last column shows how each type appears under a column name when you print a tibble (lesson 2).
+
+      You'll rarely need to create integers yourself: when you type `42`, R makes it a `numeric`. Integers appear when you count, for example `1:3` (the numbers 1, 2, 3), or when R reads a file with whole numbers. The `L` in `42L` is how you'd write one explicitly.
+
+      You can check the type of a value in two ways:
+      - `class(x)` — returns the name of the type, like `"numeric"`
+      - `is.numeric(x)`, `is.character(x)`, `is.logical(x)` — return `TRUE` or `FALSE`
+
+      ```r
+      class("42")          # "character"
+      is.numeric("42")     # FALSE
+      ```
+
+      Checking types is especially useful right after loading data: if a column you expected to contain numbers turns out to be `character`, calculations on it will fail.
+
+      **Your task:**
+      1. Create a variable `my_value` with the number `42`
+      2. Print the class of `my_value`
+      3. Print whether `my_value` is numeric, using `is.numeric()`
+    starter_code: |
+      # Create the variable
+      my_value <-
+
+      # Print its class
+
+
+      # Print whether it is numeric
+
+    tests:
+      - type: output_equals
+        value: "[1] \"numeric\"\n[1] TRUE"
+      - type: assert
+        code: |
+          .check(identical(my_value, 42), "my_value should be the number 42 (no quotes)")
+        description: "my_value should be the number 42"
+    hints:
+      - "my_value <- 42"
+      - "print(class(my_value))"
+      - "print(is.numeric(my_value))"
+    solution: |
+      my_value <- 42
+
+      print(class(my_value))
+      print(is.numeric(my_value))
+
+  - id: type_conversion
+    title: "Converting Between Types"
+    instructions: |
+      It often happens that when you load data into R, a column doesn't get the type you expected. Numbers are, for example, often read as text.
+
+      You can **convert** between types with the `as.` functions:
+
+      | Function | Example | Result |
+      |----------|---------|--------|
+      | `as.character()` | `as.character(42)` | `"42"` |
+      | `as.numeric()` | `as.numeric("3.14")` | `3.14` |
+      | `as.integer()` | `as.integer("150")` | `150` |
+      | `as.logical()` | `as.logical("TRUE")` | `TRUE` |
+
+      Two things to watch out for:
+      - Text that can't be converted becomes `NA`, with a warning: `as.numeric("n/a")` and `as.logical("yes")` both give `NA`.
+      - `as.integer()` **cuts off** the decimals, it doesn't round: `as.integer(3.9)` is `3`. Use `round()` if you want rounding.
+
+      To convert a whole column of a tibble, you use the same functions inside `mutate()`:
+
+      ```r
+      df <- df |> mutate(year = as.numeric(year))
+      ```
+
+      **Your task:**
+      1. Create `my_number <- 42` (already done for you)
+      2. Convert it to text and store it in `my_text`
+      3. Print whether `my_text` is text, using `is.character()`
+      4. Print the class of `my_text`
+    starter_code: |
+      my_number <- 42
+
+      # Convert to text
+      my_text <-
+
+      # Is it text?
+
+
+      # Print its class
+
+    tests:
+      - type: output_equals
+        value: "[1] TRUE\n[1] \"character\""
+      - type: assert
+        code: |
+          .check(identical(my_text, "42"), 'my_text should be the text "42", made with as.character()')
+        description: "my_text should be the text \"42\""
+    hints:
+      - "my_text <- as.character(my_number)"
+      - "print(is.character(my_text))"
+      - "print(class(my_text))"
+    solution: |
+      my_number <- 42
+
+      my_text <- as.character(my_number)
+
+      print(is.character(my_text))
+      print(class(my_text))
+
+  - id: logic_operators
+    title: "Comparisons and Logic Operators"
+    instructions: |
+      Data analysis is full of yes/no questions: *Was this measurement taken after 2000? Is this country in Europe? Is the temperature above 20 degrees?* In R you ask them with **comparisons**, and the answer is always `TRUE` or `FALSE`.
+
+      | Operator | Meaning | Example |
+      |----------|---------|---------|
+      | `==` | equal to | `x == 4` |
+      | `!=` | not equal to | `x != 4` |
+      | `>` / `<` | greater / less than | `x > 4` |
+      | `>=` / `<=` | greater / less than or equal to | `x >= 4` |
+
+      You can combine yes/no answers with **logic operators**:
+
+      | Operator | Meaning | Example |
+      |----------|---------|---------|
+      | `&` | **and**: both must be `TRUE` | `x == 4 & y == 8` |
+      | `\|` | **or**: at least one must be `TRUE` | `x == 4 \| y == 8` |
+      | `!` | **not**: turns `TRUE` into `FALSE` and the other way around | `!(x == 4)` |
+
+      **`=` is not `==`!** A single `=` stores a value (like `<-`); a double `==` compares two values. Mixing them up is one of the most common mistakes, and R doesn't always warn you.
+
+      (You may also come across `&&` and `||`. They do the same as `&` and `|`, but only work on single values. You'll see them in the lesson on `if` statements.)
+
+      **Your task:**
+      Using `x <- 4` and `y <- 8` (already created for you), print the result of each question below:
+      1. Is `x` equal to 4?
+      2. Is `x` equal to `y`?
+      3. Is `x` equal to 4 **and** `y` equal to 8?
+      4. Is `x` equal to 5 **or** `y` equal to 8?
+    starter_code: |
+      x <- 4
+      y <- 8
+
+      # 1. Is x equal to 4?
+
+
+      # 2. Is x equal to y?
+
+
+      # 3. Is x equal to 4 and y equal to 8?
+
+
+      # 4. Is x equal to 5 or y equal to 8?
+
+    tests:
+      - type: output_equals
+        value: "[1] TRUE\n[1] FALSE\n[1] TRUE\n[1] TRUE"
+    hints:
+      - "Put each comparison inside print( ), for example: print(x == 4)"
+      - "Use & when both conditions must be true: print(x == 4 & y == 8)"
+      - "Use | when one true condition is enough: print(x == 5 | y == 8)"
+    solution: |
+      x <- 4
+      y <- 8
+
+      print(x == 4)
+      print(x == y)
+      print(x == 4 & y == 8)
+      print(x == 5 | y == 8)
+
+  - id: multiple_conditions
+    title: "Conditions on a Whole Column"
+    instructions: |
+      Just like math, comparisons work on **whole vectors** at once: you get one `TRUE` or `FALSE` per value.
+
+      ```r
+      temperature <- c(25, 18, 22)
+      temperature > 20      # TRUE FALSE TRUE
+      ```
+
+      And `&` and `|` combine two vectors value by value — the first with the first, the second with the second. That's how you ask a question about **every row** of a dataset at once.
+
+      Two useful tricks:
+      - **Counting with `sum()`:** when you add up `TRUE`/`FALSE` values, R counts `TRUE` as 1 and `FALSE` as 0. So `sum(temperature > 20)` tells you *how many* values are above 20.
+      - **Brackets** control which conditions belong together, just like in math: `x == 4 & (y == 8 | z == 10)`.
+
+      This is exactly what happens inside `filter()` from the previous lesson: the condition gives one `TRUE`/`FALSE` per row, and `filter()` keeps the rows that are `TRUE`. Inside `filter()`, you can also separate conditions with a comma, which means **and**:
+
+      ```r
+      filter(weather, temperature > 20 & humidity < 50)
+      filter(weather, temperature > 20, humidity < 50)    # the same
+      ```
+
+      **Your task:**
+      A day is comfortable for fieldwork when the temperature is above 20 **and** the humidity is below 50.
+      1. Create `comfortable`: for every day, whether it is comfortable (use the columns of `weather` with `$`), and print it
+      2. Create `n_comfortable`: the **number** of comfortable days, and print it
+      3. Create `comfortable_days`: the rows of `weather` for the comfortable days, using `filter()`, and print its `day` column
+    starter_code: |
+      library(tidyverse)
+
+      weather <- tibble(
+        day         = c("Mon", "Tue", "Wed", "Thu", "Fri"),
+        temperature = c(25, 18, 22, 27, 21),
+        humidity    = c(40, 45, 60, 35, 48)
+      )
+
+      # 1. Comfortable or not, for every day
+      comfortable <-
+      print(comfortable)
+
+      # 2. Number of comfortable days
+      n_comfortable <-
+      print(n_comfortable)
+
+      # 3. The rows of the comfortable days
+      comfortable_days <-
+      print(comfortable_days$day)
+    tests:
+      - type: output_contains
+        value: "[1]  TRUE FALSE FALSE  TRUE  TRUE"
+      - type: assert
+        code: |
+          .check(is.logical(comfortable) && length(comfortable) == 5, "comfortable should have one TRUE or FALSE per day: compare the columns weather$temperature and weather$humidity")
+          .check(identical(comfortable, c(TRUE, FALSE, FALSE, TRUE, TRUE)), "comfortable is not right yet: the temperature must be above 20 AND the humidity below 50")
+          .check(identical(as.numeric(n_comfortable), 3), "n_comfortable should count the TRUE values in comfortable, with sum()")
+          .check(is.data.frame(comfortable_days) && identical(comfortable_days$day, c("Mon", "Thu", "Fri")), "comfortable_days should be the rows of weather where both conditions are met, made with filter()")
+        description: "comfortable, n_comfortable and comfortable_days should all be based on both conditions"
+    hints:
+      - "Compare whole columns: weather$temperature > 20 gives one TRUE/FALSE per day"
+      - "comfortable <- weather$temperature > 20 & weather$humidity < 50"
+      - "n_comfortable <- sum(comfortable)"
+      - "comfortable_days <- filter(weather, temperature > 20 & humidity < 50)"
+    solution: |
+      library(tidyverse)
+
+      weather <- tibble(
+        day         = c("Mon", "Tue", "Wed", "Thu", "Fri"),
+        temperature = c(25, 18, 22, 27, 21),
+        humidity    = c(40, 45, 60, 35, 48)
+      )
+
+      comfortable <- weather$temperature > 20 & weather$humidity < 50
+      print(comfortable)
+
+      n_comfortable <- sum(comfortable)
+      print(n_comfortable)
+
+      comfortable_days <- filter(weather, temperature > 20 & humidity < 50)
+      print(comfortable_days$day)
+
+  - id: practice_checking_types
+    title: "Practice: Checking Types"
+    instructions: |
+      More practice checking types — this time with a decimal number and a piece of text.
+
+      **Your task:**
+      1. Create a variable `temperature` with the value `21.5`
+      2. Create a variable `station` with the text `"De Bilt"`
+      3. Print the class of `temperature`, and then the class of `station`
+    starter_code: |
+      # Create the variables
+
+
+      # Print their classes
+
+    tests:
+      - type: output_equals
+        value: "[1] \"numeric\"\n[1] \"character\""
+      - type: assert
+        code: |
+          .check(identical(temperature, 21.5), "temperature should be the number 21.5")
+          .check(identical(station, "De Bilt"), 'station should be the text "De Bilt"')
+        description: "temperature=21.5 and station=\"De Bilt\""
+    hints:
+      - "temperature <- 21.5 and station <- \"De Bilt\""
+      - "print(class(temperature))"
+    solution: |
+      temperature <- 21.5
+      station <- "De Bilt"
+
+      print(class(temperature))
+      print(class(station))
+
+  - id: practice_type_conversion
+    title: "Practice: Converting Between Types"
+    instructions: |
+      More practice converting types — this time going the other way: from text to a number.
+
+      **Your task:**
+      1. `count_text <- "150"` is already created for you
+      2. Convert it to a number and store it in `count_number`
+      3. Print whether `count_number` is numeric
+      4. Print `count_number + 50` to show that you can now calculate with it
+    starter_code: |
+      count_text <- "150"
+
+      # Convert to a number
+      count_number <-
+
+      # Is it numeric?
+
+
+      # Calculate with it
+
+    tests:
+      - type: output_equals
+        value: "[1] TRUE\n[1] 200"
+      - type: assert
+        code: |
+          .check(is.numeric(count_number) && count_number == 150, "count_number should be the number 150, converted with as.numeric()")
+        description: "count_number should be the number 150"
+    hints:
+      - "count_number <- as.numeric(count_text)"
+      - "print(is.numeric(count_number))"
+      - "print(count_number + 50)"
+    solution: |
+      count_text <- "150"
+
+      count_number <- as.numeric(count_text)
+
+      print(is.numeric(count_number))
+      print(count_number + 50)
+
+  - id: practice_logic_operators
+    title: "Practice: Logic Operators"
+    instructions: |
+      More practice with comparisons and logic operators, this time also using `!=` (not equal) and `!` (not).
+
+      **Your task:**
+      Using `a <- 10` and `b <- 3` (already created for you), print the result of each question below:
+      1. Is `a` equal to 10?
+      2. Is `a` **not** equal to `b`?
+      3. Are `a` **and** `b` both greater than 5?
+      4. Is it **not** true that `a` equals `b`? (Use `!` and brackets.)
+    starter_code: |
+      a <- 10
+      b <- 3
+
+      # 1. Is a equal to 10?
+
+
+      # 2. Is a not equal to b?
+
+
+      # 3. Are a and b both greater than 5?
+
+
+      # 4. Is it not true that a equals b?
+
+    tests:
+      - type: output_equals
+        value: "[1] TRUE\n[1] TRUE\n[1] FALSE\n[1] TRUE"
+    hints:
+      - "print(a == 10)"
+      - "Not equal is written as !=: print(a != b)"
+      - "Both must be true, so use &: print(a > 5 & b > 5)"
+      - "print(!(a == b))"
+    solution: |
+      a <- 10
+      b <- 3
+
+      print(a == 10)
+      print(a != b)
+      print(a > 5 & b > 5)
+      print(!(a == b))
+
+  - id: practice_multiple_conditions
+    title: "Practice: Conditions on a Whole Column"
+    instructions: |
+      More practice with conditions on vectors — this time with **or**.
+
+      You're planning outdoor measurements for the next six days. A day is **unsuitable** if there is 10 mm of rain or more, **or** if the wind speed is 20 km/h or more.
+
+      **Your task:**
+      1. Create `unsuitable`: for every day, whether it is unsuitable, and print it
+      2. Create `n_unsuitable`: the number of unsuitable days, and print it
+    starter_code: |
+      rainfall_mm <- c(5, 12, 0, 3, 15, 8)
+      wind_kmh    <- c(15, 10, 25, 12, 30, 18)
+
+      # 1. Unsuitable or not, for every day
+      unsuitable <-
+      print(unsuitable)
+
+      # 2. Number of unsuitable days
+      n_unsuitable <-
+      print(n_unsuitable)
+    tests:
+      - type: output_contains
+        value: "[1] FALSE  TRUE  TRUE FALSE  TRUE FALSE"
+      - type: assert
+        code: |
+          .check(is.logical(unsuitable) && length(unsuitable) == 6, "unsuitable should have one TRUE or FALSE per day")
+          .check(identical(unsuitable, c(FALSE, TRUE, TRUE, FALSE, TRUE, FALSE)), "unsuitable is not right yet: a day is unsuitable with 10 mm of rain or more OR wind of 20 km/h or more")
+          .check(identical(as.numeric(n_unsuitable), 3), "n_unsuitable should count the TRUE values in unsuitable, with sum()")
+        description: "unsuitable and n_unsuitable should be based on either condition"
+    hints:
+      - "\"10 mm or more\" is written as >= 10"
+      - "Use | for or: rainfall_mm >= 10 | wind_kmh >= 20"
+      - "n_unsuitable <- sum(unsuitable)"
+    solution: |
+      rainfall_mm <- c(5, 12, 0, 3, 15, 8)
+      wind_kmh    <- c(15, 10, 25, 12, 30, 18)
+
+      unsuitable <- rainfall_mm >= 10 | wind_kmh >= 20
+      print(unsuitable)
+
+      n_unsuitable <- sum(unsuitable)
+      print(n_unsuitable)
