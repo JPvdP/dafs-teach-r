@@ -1,0 +1,409 @@
+title: Printing, Text and Functions
+description: Display results in readable sentences with paste(), cat() and glue(), generate random numbers, and call functions — including ones defined in the script itself.
+
+exercises:
+
+  - id: paste_and_cat
+    title: "Combining Text: paste() and cat()"
+    instructions: |
+      Printing results is how you check what your code is doing: the value of a variable, whether a step has finished, or the outcome of a calculation. Usually you want to show a result **in a sentence**, not just a bare number.
+
+      **Gluing text together: `paste()` and `paste0()`**
+
+      `paste()` combines its arguments into one piece of text, with a **space** in between. `paste0()` does the same **without** spaces:
+
+      ```r
+      plop <- 42
+      paste("The value is", plop)         # "The value is 42"
+      paste0("CO", 2, "-emissions")       # "CO2-emissions"
+      ```
+
+      **Showing text: `print()` or `cat()`**
+
+      `print()` shows text the way R stores it — with `[1]` in front and quotes around it. `cat()` (short for *concatenate*) shows just the text itself, which is nicer for messages:
+
+      ```r
+      sentence <- paste("The value is", plop)
+      print(sentence)    # [1] "The value is 42"
+      cat(sentence)      # The value is 42
+      ```
+
+      Unlike `print()`, `cat()` doesn't start a new line by itself. Add `"\n"` (the code for *new line*) at the end: `cat(sentence, "\n")`. You can also give `cat()` several pieces directly, just like `paste()`: `cat("The value is", plop, "\n")`.
+
+      **Your task:**
+      Using `station` and `temp` (already created for you):
+      1. Create `sentence` with `paste()`, so that it contains the sentence `The temperature in De Bilt is 14.3 degrees`
+      2. Show `sentence` with `cat()`
+    starter_code: |
+      station <- "De Bilt"
+      temp <- 14.3
+
+      # 1. Build the sentence
+      sentence <-
+
+      # 2. Show it with cat()
+
+    tests:
+      - type: output_contains
+        value: "The temperature in De Bilt is 14.3 degrees"
+      - type: assert
+        code: |
+          .check(identical(sentence, "The temperature in De Bilt is 14.3 degrees"), "sentence should be exactly: The temperature in De Bilt is 14.3 degrees")
+        description: "sentence should contain the full sentence"
+    hints:
+      - "paste() puts a space between its arguments, so you don't need spaces at the start or end of each piece"
+      - "sentence <- paste(\"The temperature in\", station, \"is\", temp, \"degrees\")"
+      - "cat(sentence, \"\\n\")"
+    solution: |
+      station <- "De Bilt"
+      temp <- 14.3
+
+      sentence <- paste("The temperature in", station, "is", temp, "degrees")
+
+      cat(sentence, "\n")
+
+  - id: glue_sentences
+    title: "Calculations in Sentences: glue()"
+    instructions: |
+      With many pieces, `paste()` gets hard to read: you're constantly opening and closing quotes. The **glue** package offers an easier way: you write the whole sentence as one piece of text, and put R code between **curly brackets `{ }`**:
+
+      ```r
+      library(glue)
+
+      plop <- 42
+      glue("The value is {plop}")
+      ```
+
+      ```
+      The value is 42
+      ```
+
+      Everything between `{ }` is run as R code, and its result is put into the text. So you can also **calculate** inside the brackets:
+
+      ```r
+      a <- 10
+      b <- 3
+      glue("The sum of a and b is {a + b}")    # The sum of a and b is 13
+      ```
+
+      glue is installed together with the tidyverse, but `library(tidyverse)` doesn't load it, so you load it yourself with `library(glue)`. Printing a glue result shows the text without `[1]` and quotes.
+
+      **Your task:**
+      Using `a <- 15` and `b <- 7`, print three sentences with `glue()`, calculating the values inside `{ }`:
+      1. `The sum of a and b is 22`
+      2. `The difference of a and b is 8`
+      3. `The product of a and b is 105`
+    starter_code: |
+      library(glue)
+
+      a <- 15
+      b <- 7
+
+      print(glue("The sum of a and b is {}"))
+      print(glue("The difference of a and b is {}"))
+      print(glue("The product of a and b is {}"))
+    tests:
+      - type: output_contains
+        value: "The sum of a and b is 22"
+      - type: output_contains
+        value: "The difference of a and b is 8"
+      - type: output_contains
+        value: "The product of a and b is 105"
+    hints:
+      - "Put the calculation between the curly brackets: {a + b}"
+      - "print(glue(\"The difference of a and b is {a - b}\"))"
+      - "Multiplication is written with *: {a * b}"
+    solution: |
+      library(glue)
+
+      a <- 15
+      b <- 7
+
+      print(glue("The sum of a and b is {a + b}"))
+      print(glue("The difference of a and b is {a - b}"))
+      print(glue("The product of a and b is {a * b}"))
+
+  - id: random_numbers
+    title: "Random Numbers"
+    instructions: |
+      Random numbers are useful for simulations, for picking a random sample from your data, or for making up test data. Two functions you'll use a lot:
+
+      - `runif(n, min, max)` — `n` random **decimal** numbers between `min` and `max` (the name comes from *random uniform*)
+      - `sample(x, size)` — picks `size` random values from the vector `x`. For a random **whole** number between 1 and 70: `sample(1:70, 1)`
+
+      ```r
+      x <- runif(1, min = 4, max = 87)    # one random decimal, e.g. 26.03722
+      runif(3, min = 0, max = 1)          # three of them: 0.57 0.91 0.20
+      ```
+
+      Notice that the first argument of `runif()` is **how many** numbers you want. Since R works with vectors, getting one number or a thousand is the same function call.
+
+      Every time you run the code you get different numbers. If you want the **same** "random" numbers every time — for example so others can repeat your analysis — put `set.seed()` with any number before them: `set.seed(42)`.
+
+      **Your task:**
+      1. Generate one random decimal number between `4` and `87` with `runif()`, stored in `x`
+      2. Print the sentence `The generated number is ...` with `glue()`, with `x` rounded to 2 decimals
+      3. Generate one random whole number between `1` and `70` with `sample()`, stored in `y`
+      4. Print `y`
+    starter_code: |
+      library(glue)
+
+      # 1. A random decimal between 4 and 87
+      x <-
+
+      # 2. Print it in a sentence, rounded to 2 decimals
+
+
+      # 3. A random whole number between 1 and 70
+      y <-
+
+      # 4. Print y
+
+    tests:
+      - type: output_contains
+        value: "The generated number is "
+      - type: assert
+        code: |
+          .check(is.numeric(x) && length(x) == 1, "x should be one number: runif(1, ...)")
+          .check(x >= 4 && x <= 87, paste("x should be between 4 and 87, got", x))
+          .check(x != round(x), "x should be a decimal number: use runif()")
+          .check(is.numeric(y) && length(y) == 1, "y should be one number: sample(1:70, 1)")
+          .check(y >= 1 && y <= 70 && y == round(y), paste("y should be a whole number between 1 and 70, got", y))
+        description: "x should be a decimal between 4 and 87, y a whole number between 1 and 70"
+    hints:
+      - "x <- runif(1, min = 4, max = 87)"
+      - "print(glue(\"The generated number is {round(x, 2)}\"))"
+      - "y <- sample(1:70, 1)"
+    solution: |
+      library(glue)
+
+      x <- runif(1, min = 4, max = 87)
+
+      print(glue("The generated number is {round(x, 2)}"))
+
+      y <- sample(1:70, 1)
+
+      print(y)
+
+  - id: call_function
+    title: "Calling a Function From the Script"
+    instructions: |
+      So far you've used functions that come with R or a package. You can also make your own. In R, you create a function with `function()`, and store it in a variable with `<-` — just like any other value:
+
+      ```r
+      greet <- function(name) {
+        paste0("Hi, ", name, "!")
+      }
+      ```
+
+      - `greet` is the name of the new function.
+      - `name` between the round brackets is its **argument**: the value you'll give it when you use it.
+      - Between the curly brackets `{ }` is the code that runs each time you use the function.
+      - The **last value** calculated inside the curly brackets is what the function gives back (*returns*). You can also write it explicitly: `return(paste0("Hi, ", name, "!"))`.
+
+      You don't need to write your own functions yet, but you do need to be able to **use** one when you see it in a script. You call it like any other function — with a value for its argument between the brackets:
+
+      ```r
+      greet("Alice")
+      ```
+
+      ```
+      [1] "Hi, Alice!"
+      ```
+
+      And because most R code works on vectors, the function also works on several names at once: `greet(c("Ana", "Ben"))` gives `"Hi, Ana!" "Hi, Ben!"`.
+
+      **Your task:**
+      The `greet` function is already defined below. Call it **twice**, and print each result:
+      1. With your own name
+      2. With the name `"World"`
+    starter_code: |
+      greet <- function(name) {
+        paste0("Hi, ", name, "!")
+      }
+
+      # 1. Call greet with your own name, and print the result
+
+
+      # 2. Call greet with "World", and print the result
+
+    tests:
+      - type: output_contains
+        value: "Hi, World!"
+      - type: assert
+        code: |
+          .check(identical(greet("Alice"), "Hi, Alice!"), "Keep the greet function as it is: only add the two calls below it")
+        description: "greet() should still return Hi, <name>!"
+    hints:
+      - "Call a function with its name and a value between brackets: greet(\"Sam\")"
+      - "print(greet(\"Sam\"))"
+      - "print(greet(\"World\"))"
+    solution: |
+      greet <- function(name) {
+        paste0("Hi, ", name, "!")
+      }
+
+      print(greet("Alice"))
+
+      print(greet("World"))
+
+  - id: practice_paste_and_cat
+    title: "Practice: paste() and cat()"
+    instructions: |
+      More practice building sentences — this time with `paste0()`, which doesn't add spaces.
+
+      **Your task:**
+      Using `country` and `share` (already created for you):
+      1. Create `sentence` with `paste0()`, so that it contains exactly `Renewable share of Germany: 52%`
+      2. Show `sentence` with `cat()`
+    starter_code: |
+      country <- "Germany"
+      share <- 52
+
+      # 1. Build the sentence with paste0()
+      sentence <-
+
+      # 2. Show it with cat()
+
+    tests:
+      - type: output_contains
+        value: "Renewable share of Germany: 52%"
+      - type: assert
+        code: |
+          .check(identical(sentence, "Renewable share of Germany: 52%"), "sentence should be exactly: Renewable share of Germany: 52%")
+        description: "sentence should contain the full sentence"
+    hints:
+      - "paste0() adds no spaces, so put them inside the text pieces yourself"
+      - "sentence <- paste0(\"Renewable share of \", country, \": \", share, \"%\")"
+      - "cat(sentence, \"\\n\")"
+    solution: |
+      country <- "Germany"
+      share <- 52
+
+      sentence <- paste0("Renewable share of ", country, ": ", share, "%")
+
+      cat(sentence, "\n")
+
+  - id: practice_glue_sentences
+    title: "Practice: Calculations in Sentences"
+    instructions: |
+      More practice with `glue()` — this time with a calculation on a vector.
+
+      **Your task:**
+      The vector `daily_kwh` contains a household's solar production for one week. Print two sentences with `glue()`:
+      1. `Total production this week: 68.5 kWh`
+      2. `Average per day: 9.8 kWh` (round the average to 1 decimal **inside** the `{ }`)
+    starter_code: |
+      library(glue)
+
+      daily_kwh <- c(8.5, 12.0, 10.5, 7.0, 9.5, 11.0, 10.0)
+
+      # 1. Total production
+
+      # 2. Average per day, rounded to 1 decimal
+
+    tests:
+      - type: output_contains
+        value: "Total production this week: 68.5 kWh"
+      - type: output_contains
+        value: "Average per day: 9.8 kWh"
+    hints:
+      - "You can call functions inside { }: {sum(daily_kwh)}"
+      - "print(glue(\"Total production this week: {sum(daily_kwh)} kWh\"))"
+      - "{round(mean(daily_kwh), 1)}"
+    solution: |
+      library(glue)
+
+      daily_kwh <- c(8.5, 12.0, 10.5, 7.0, 9.5, 11.0, 10.0)
+
+      print(glue("Total production this week: {sum(daily_kwh)} kWh"))
+      print(glue("Average per day: {round(mean(daily_kwh), 1)} kWh"))
+
+  - id: practice_random_numbers
+    title: "Practice: Random Numbers"
+    instructions: |
+      More practice with random numbers — this time simulating sensor readings, with `set.seed()` so the result is the same every time.
+
+      **Your task:**
+      1. Set the seed to `123` with `set.seed()`
+      2. Simulate **5** temperature readings between `10` and `25` degrees with `runif()`, stored in `readings`
+      3. Pick one random sensor ID between `100` and `999` with `sample()`, stored in `sensor_id`
+      4. Print `readings` rounded to 1 decimal, and then `sensor_id`
+    starter_code: |
+      # 1. Set the seed
+
+
+      # 2. Five readings between 10 and 25
+      readings <-
+
+      # 3. One sensor ID between 100 and 999
+      sensor_id <-
+
+      # 4. Print the rounded readings and the sensor ID
+
+    tests:
+      - type: assert
+        code: |
+          .check(is.numeric(readings) && length(readings) == 5, "readings should contain 5 numbers: runif(5, ...)")
+          .check(all(readings >= 10 & readings <= 25), "all readings should be between 10 and 25")
+          .check(is.numeric(sensor_id) && length(sensor_id) == 1, "sensor_id should be one number: sample(100:999, 1)")
+          .check(sensor_id >= 100 && sensor_id <= 999 && sensor_id == round(sensor_id), "sensor_id should be a whole number between 100 and 999")
+          set.seed(123); .r <- runif(5, 10, 25)
+          .check(isTRUE(all.equal(readings, .r)), "readings are not the expected numbers: did you call set.seed(123) first, right before runif()?")
+        description: "readings: 5 numbers between 10 and 25 after set.seed(123); sensor_id: a whole number between 100 and 999"
+    hints:
+      - "set.seed(123)"
+      - "readings <- runif(5, min = 10, max = 25)"
+      - "sensor_id <- sample(100:999, 1)"
+      - "print(round(readings, 1)) and then print(sensor_id)"
+    solution: |
+      set.seed(123)
+
+      readings <- runif(5, min = 10, max = 25)
+
+      sensor_id <- sample(100:999, 1)
+
+      print(round(readings, 1))
+      print(sensor_id)
+
+  - id: practice_call_function
+    title: "Practice: Calling a Function From the Script"
+    instructions: |
+      More practice calling a function that is defined in the script — this time one with **two** arguments.
+
+      The function `co2_saved` calculates how many kilograms of CO₂ you save by cycling instead of driving: `km` is the distance, and `kg_per_km` is how much CO₂ the car would emit per km. Give the arguments in the same order as they appear in `function(km, kg_per_km)`, or use their names.
+
+      **Your task:**
+      1. Call `co2_saved()` for a trip of **12** km with **0.12** kg per km, and print the result
+      2. Call it for a trip of **30** km with **0.2** kg per km, using the argument **names**, and print the result
+    starter_code: |
+      co2_saved <- function(km, kg_per_km) {
+        km * kg_per_km
+      }
+
+      # 1. 12 km, 0.12 kg per km
+
+
+      # 2. 30 km, 0.2 kg per km, with argument names
+
+    tests:
+      - type: output_contains
+        value: "[1] 1.44"
+      - type: output_contains
+        value: "[1] 6"
+      - type: assert
+        code: |
+          .check(isTRUE(all.equal(co2_saved(10, 0.1), 1)), "Keep the co2_saved function as it is: only add the two calls below it")
+        description: "co2_saved() should be called twice"
+    hints:
+      - "Two arguments are separated by a comma: co2_saved(12, 0.12)"
+      - "print(co2_saved(12, 0.12))"
+      - "print(co2_saved(km = 30, kg_per_km = 0.2))"
+    solution: |
+      co2_saved <- function(km, kg_per_km) {
+        km * kg_per_km
+      }
+
+      print(co2_saved(12, 0.12))
+
+      print(co2_saved(km = 30, kg_per_km = 0.2))
