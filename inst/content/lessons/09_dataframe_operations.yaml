@@ -1,0 +1,1084 @@
+title: Data Frame Operations
+description: Go deeper into dplyr — select columns, filter rows, add computed columns, join datasets, summarise per group, sort, and work with text columns. The core skills of data analysis in R.
+
+exercises:
+
+  - id: select_columns
+    title: Selecting Columns
+    instructions: |
+      In lesson 2 you used `select()` with column names. There are more ways to tell `select()` which columns you want:
+
+      ```r
+      # By name
+      df |> select(name, age)
+
+      # By position: the first two columns
+      df |> select(1:2)
+
+      # Everything EXCEPT a column: a minus sign removes, just like with vectors
+      df |> select(-gender)
+
+      # A range of columns, from name up to and including age
+      df |> select(name:age)
+      ```
+
+      Selecting by **name** is usually the best choice: if the columns in your file ever change order, `select(1:2)` silently picks the wrong ones, while `select(name, age)` still works (or gives a clear error).
+
+      **Your task:**
+      All three ways below should give the same two columns, `city` and `aqi`:
+      1. `by_name`: select `city` and `aqi` by name
+      2. `by_position`: select the first two columns by position
+      3. `without_region`: remove the `region` column with a minus sign
+
+      Then print `by_name`.
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        city   = c("Utrecht", "Amsterdam", "Rotterdam", "Groningen", "Eindhoven"),
+        aqi    = c(42, 55, 38, 29, 47),
+        region = c("Central", "North-Holland", "South-Holland", "North", "South")
+      )
+
+      # 1. By name
+      by_name <-
+
+      # 2. By position
+      by_position <-
+
+      # 3. Without region
+      without_region <-
+
+      print(by_name)
+    tests:
+      - type: output_contains
+        value: "Groningen"
+      - type: assert
+        code: |
+          .check(is.data.frame(by_name) && identical(names(by_name), c("city", "aqi")), "by_name should have the columns city and aqi: df |> select(city, aqi)")
+          .check(is.data.frame(by_position) && identical(names(by_position), c("city", "aqi")), "by_position should have the first two columns: df |> select(1:2)")
+          .check(is.data.frame(without_region) && identical(names(without_region), c("city", "aqi")), "without_region should have every column except region: df |> select(-region)")
+        description: "by_name, by_position and without_region should all have the columns city and aqi"
+    hints:
+      - "by_name <- df |> select(city, aqi)"
+      - "by_position <- df |> select(1:2)"
+      - "without_region <- df |> select(-region)"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        city   = c("Utrecht", "Amsterdam", "Rotterdam", "Groningen", "Eindhoven"),
+        aqi    = c(42, 55, 38, 29, 47),
+        region = c("Central", "North-Holland", "South-Holland", "North", "South")
+      )
+
+      by_name <- df |> select(city, aqi)
+
+      by_position <- df |> select(1:2)
+
+      without_region <- df |> select(-region)
+
+      print(by_name)
+
+  - id: filter_rows
+    title: Filtering Rows
+    instructions: |
+      `filter()` keeps the rows where a condition is `TRUE`. To keep rows where a column **equals** a value, use a **double** `==`:
+
+      ```r
+      df |> filter(year == 2023)
+      ```
+
+      A single `=` is the most common mistake here. dplyr recognises it and tells you what to do:
+
+      ```
+      Error in filter(df, year = 2023) : We detected a named input.
+      ℹ This usually means that you've used `=` instead of `==`.
+      ℹ Did you mean `year == 2023`?
+      ```
+
+      Remember from lesson 1: `=` gives a value (like `<-`), `==` **asks** whether two values are equal.
+
+      To count the rows of the result, use `nrow()`.
+
+      **Your task:**
+      1. Keep only the patents from 2023, and store them in `patents_2023`
+      2. Print `patents_2023`
+      3. Print the number of patents from 2023 with `nrow()`
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        pat_num = c("WO200214562", "WO2023738962", "EP2023778962", "FR2019272698", "FR201922671"),
+        year    = c(2002, 2023, 2023, 2019, 2019),
+        domain  = c("B60C", "B60C", "B29D", "C08K", "C08K")
+      )
+
+      # 1. Patents from 2023 only
+      patents_2023 <-
+
+      # 2. Print them
+
+
+      # 3. Print how many there are
+
+    tests:
+      - type: output_contains
+        value: "EP2023778962"
+      - type: output_contains
+        value: "[1] 2"
+      - type: assert
+        code: |
+          .check(is.data.frame(patents_2023), "patents_2023 should be a tibble: the result of filter()")
+          .check(nrow(patents_2023) == 2 && all(patents_2023$year == 2023), "patents_2023 should contain only the 2 patents from 2023")
+        description: "patents_2023 should contain exactly the 2 patents from 2023"
+    hints:
+      - "patents_2023 <- df |> filter(year == 2023)"
+      - "print(nrow(patents_2023))"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        pat_num = c("WO200214562", "WO2023738962", "EP2023778962", "FR2019272698", "FR201922671"),
+        year    = c(2002, 2023, 2023, 2019, 2019),
+        domain  = c("B60C", "B60C", "B29D", "C08K", "C08K")
+      )
+
+      patents_2023 <- df |> filter(year == 2023)
+
+      print(patents_2023)
+
+      print(nrow(patents_2023))
+
+  - id: filter_multiple
+    title: Filtering with Multiple Conditions
+    instructions: |
+      You can combine conditions with the logical operators from lesson 3:
+
+      | Operation | In `filter()` | Example |
+      |-----------|---------------|---------|
+      | and | `&` or a comma `,` | `filter(year >= 2019, domain == "B60C")` |
+      | or | `\|` | `filter(domain == "B60C" \| domain == "B29D")` |
+      | not | `!` or `!=` | `filter(domain != "B60C")` |
+      | one of several values | `%in%` | `filter(domain %in% c("B60C", "B29D"))` |
+
+      Inside `filter()`, a **comma** means "and": both conditions must be `TRUE`. `%in%` (from lesson 7) is a shorter way to write a long chain of `|`.
+
+      **Your task:**
+      1. `b60c_recent`: patents in domain `"B60C"` from 2019 or later
+      2. `not_b60c`: all patents **not** in domain `"B60C"`
+      3. Print both
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        pat_num = c("WO200214562", "WO2023738962", "EP2023778962", "FR2019272698", "FR201922671"),
+        year    = c(2002, 2023, 2023, 2019, 2019),
+        domain  = c("B60C", "B60C", "B29D", "C08K", "C08K")
+      )
+
+      # 1. B60C patents from 2019 onwards
+      b60c_recent <-
+
+      # 2. All patents NOT in B60C
+      not_b60c <-
+
+      print(b60c_recent)
+      print(not_b60c)
+    tests:
+      - type: output_contains
+        value: "WO2023738962"
+      - type: assert
+        code: |
+          .check(is.data.frame(b60c_recent) && identical(b60c_recent$pat_num, "WO2023738962"), "b60c_recent should contain 1 patent: domain B60C and year 2019 or later")
+          .check(is.data.frame(not_b60c) && nrow(not_b60c) == 3 && !any(not_b60c$domain == "B60C"), "not_b60c should contain the 3 patents outside domain B60C")
+        description: "b60c_recent should have 1 row; not_b60c should have 3 rows"
+    hints:
+      - "b60c_recent <- df |> filter(domain == \"B60C\", year >= 2019)"
+      - "not_b60c <- df |> filter(domain != \"B60C\")"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        pat_num = c("WO200214562", "WO2023738962", "EP2023778962", "FR2019272698", "FR201922671"),
+        year    = c(2002, 2023, 2023, 2019, 2019),
+        domain  = c("B60C", "B60C", "B29D", "C08K", "C08K")
+      )
+
+      b60c_recent <- df |> filter(domain == "B60C", year >= 2019)
+
+      not_b60c <- df |> filter(domain != "B60C")
+
+      print(b60c_recent)
+      print(not_b60c)
+
+  - id: add_column
+    title: Adding Computed Columns
+    instructions: |
+      You already know `mutate()` from lesson 2. Two things that make it more powerful:
+
+      **Several columns at once**, separated by commas. And a column you just created can be used **straight away** in the next line of the same `mutate()`:
+
+      ```r
+      df |> mutate(
+        revenue = price * sold,
+        big_sale = revenue > 1000     # uses the revenue column from the line above
+      )
+      ```
+
+      `mutate()` always calculates **row by row**: every product gets its own revenue.
+
+      **Your task:**
+      GDP is in billions, population in millions.
+      1. Add `gdp_per_capita` (`gdp / population`) **and** `rich` (`TRUE` when `gdp_per_capita` is above 45) in **one** `mutate()`, and store the result back in `df`
+      2. Print `df`
+      3. Calculate the average `gdp_per_capita` over all countries, rounded to 2 decimals, with `summarise()` and `pull()`, and print it
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        country    = c("NL", "DE", "FR"),
+        population = c(17, 84, 68),
+        gdp        = c(1000, 4200, 2800)
+      )
+
+      # 1. Add gdp_per_capita and rich
+      df <- df |>
+        mutate(
+
+        )
+
+      # 2. Print df
+
+
+      # 3. Average gdp_per_capita, rounded to 2 decimals
+      average_gdp_pc <-
+      print(average_gdp_pc)
+    tests:
+      - type: output_contains
+        value: "gdp_per_capita"
+      - type: output_contains
+        value: "[1] 50"
+      - type: assert
+        code: |
+          .check(is.data.frame(df) && all(c("gdp_per_capita", "rich") %in% names(df)), "df should have the new columns gdp_per_capita and rich")
+          .check(isTRUE(all.equal(df$gdp_per_capita, c(1000 / 17, 4200 / 84, 2800 / 68))), "gdp_per_capita should be gdp / population")
+          .check(identical(df$rich, c(TRUE, TRUE, FALSE)), "rich should be TRUE when gdp_per_capita is above 45")
+          .check(is.numeric(average_gdp_pc) && length(average_gdp_pc) == 1 && isTRUE(all.equal(average_gdp_pc, 50)), "average_gdp_pc should be a single number: summarise(...) |> pull()")
+        description: "gdp_per_capita and rich added; average_gdp_pc = 50"
+    hints:
+      - "Inside mutate(): gdp_per_capita = gdp / population, rich = gdp_per_capita > 45"
+      - "print(df)"
+      - "average_gdp_pc <- df |> summarise(avg = round(mean(gdp_per_capita), 2)) |> pull()"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        country    = c("NL", "DE", "FR"),
+        population = c(17, 84, 68),
+        gdp        = c(1000, 4200, 2800)
+      )
+
+      df <- df |>
+        mutate(
+          gdp_per_capita = gdp / population,
+          rich = gdp_per_capita > 45
+        )
+
+      print(df)
+
+      average_gdp_pc <- df |> summarise(avg = round(mean(gdp_per_capita), 2)) |> pull()
+      print(average_gdp_pc)
+
+  - id: groupby_agg
+    title: Grouping and Summarising
+    instructions: |
+      With real data we often want a summary **per group**: per year, per organisation, per region. For example: the earliest and latest patent **per domain**.
+
+      `summarise()` alone turns the whole table into one row. Put `group_by()` before it, and you get **one row per group**:
+
+      ```r
+      df |>
+        group_by(domain) |>
+        summarise(first = min(year), last = max(year))
+      ```
+      ```
+      # A tibble: 3 × 3
+        domain first  last
+        <chr>  <dbl> <dbl>
+      1 B29D    2023  2023
+      2 B60C    2002  2023
+      3 C08K    2019  2019
+      ```
+
+      Read it as: "take `df`, **and then** split it into groups by domain, **and then** calculate the first and last year within each group".
+
+      Counting the rows per group is so common that there's a shortcut, `count()`:
+
+      ```r
+      df |> count(domain)
+      ```
+
+      This does the same as `group_by(domain) |> summarise(n = n())`: `n()` is the number of rows in the group.
+
+      **Your task:**
+      1. `year_range`: per domain, the first (`min`) and last (`max`) year, in columns called `first` and `last`. Print it.
+      2. `counts`: the number of patents per domain, with `count()`. Print it.
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        pat_num = c("WO200214562", "WO2023738962", "EP2023778962", "FR2019272698", "FR201922671"),
+        year    = c(2002, 2023, 2023, 2019, 2019),
+        domain  = c("B60C", "B60C", "B29D", "C08K", "C08K")
+      )
+
+      # 1. First and last year per domain
+      year_range <-
+      print(year_range)
+
+      # 2. Number of patents per domain
+      counts <-
+      print(counts)
+    tests:
+      - type: output_contains
+        value: "B60C"
+      - type: output_contains
+        value: "2002"
+      - type: assert
+        code: |
+          .check(is.data.frame(year_range) && nrow(year_range) == 3 && all(c("domain", "first", "last") %in% names(year_range)), "year_range should have one row per domain, with the columns domain, first and last")
+          .b <- year_range[year_range$domain == "B60C", ]
+          .check(.b$first == 2002 && .b$last == 2023, "for B60C, first should be 2002 and last 2023")
+          .check(is.data.frame(counts) && identical(counts$n, c(1L, 2L, 2L)), "counts should have the number of patents per domain: df |> count(domain)")
+        description: "year_range should have 3 domains (B60C: 2002 to 2023); counts should come from count()"
+    hints:
+      - "year_range <- df |> group_by(domain) |> summarise(first = min(year), last = max(year))"
+      - "counts <- df |> count(domain)"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        pat_num = c("WO200214562", "WO2023738962", "EP2023778962", "FR2019272698", "FR201922671"),
+        year    = c(2002, 2023, 2023, 2019, 2019),
+        domain  = c("B60C", "B60C", "B29D", "C08K", "C08K")
+      )
+
+      year_range <- df |>
+        group_by(domain) |>
+        summarise(first = min(year), last = max(year))
+      print(year_range)
+
+      counts <- df |> count(domain)
+      print(counts)
+
+  - id: merge_dataframes
+    title: Joining Data Frames
+    instructions: |
+      We often need to combine information from different sources. For example, we want to analyse the link between population and air pollution. We find pollution data from the WHO, but population data comes from a different source, so we end up with two tables:
+
+      | country | pollution |    | country | population |
+      |---------|-----------|----|---------|------------|
+      | NL      | 21        |    | NL      | 17         |
+      | DE      | 23        |    | DE      | 84         |
+      | FR      | 17        |    | FR      | 68         |
+      |         |           |    | BE      | 12         |
+
+      We combine them with a **join**, matching rows on a **key** column that both tables have (`by = "country"`):
+
+      ```r
+      merged <- inner_join(df_pollution, df_population, by = "country")
+      ```
+
+      The type of join decides what happens with rows that have **no match**, like BE above:
+
+      | Join | Keeps |
+      |------|-------|
+      | `inner_join(x, y)` | only rows that appear in **both** tables (BE is dropped) |
+      | `left_join(x, y)` | **all** rows of `x`; missing values from `y` become `NA` |
+      | `full_join(x, y)` | all rows of **both** tables |
+
+      `left_join()` is the one you'll use most: "keep my main table, and add information from another table where it exists".
+
+      Always check the number of rows after a join: if it's not what you expected, the key values may be written differently in the two tables (`"NL"` vs `"Netherlands"`, or `"nl"`).
+
+      **Your task:**
+      1. Join `df_pollution` and `df_population` with an **inner** join on `country`, and store it in `merged`
+      2. Print `merged`: BE should not be in it
+      3. Add the column `pollution_per_capita` (`pollution / population`) to `merged`
+
+      The last lines print the country with the highest pollution per capita. (`arrange(desc(...))` sorts from high to low: more about that in the next exercise.)
+    starter_code: |
+      library(tidyverse)
+
+      df_pollution <- tibble(
+        country   = c("NL", "DE", "FR"),
+        pollution = c(21, 23, 17)
+      )
+
+      df_population <- tibble(
+        country    = c("NL", "DE", "FR", "BE"),
+        population = c(17, 84, 68, 12)
+      )
+
+      # 1. Join on country
+      merged <-
+
+      # 2. Print merged
+
+
+      # 3. Add pollution_per_capita
+      merged <- merged |> mutate()
+
+      # The country with the highest pollution per capita
+      highest <- merged |> arrange(desc(pollution_per_capita)) |> pull(country)
+      print(highest[1])
+    tests:
+      - type: output_contains
+        value: "[1] \"NL\""
+      - type: assert
+        code: |
+          .check(is.data.frame(merged) && all(c("country", "pollution", "population") %in% names(merged)), "merged should contain the columns of both tables")
+          .check(nrow(merged) == 3 && !("BE" %in% merged$country), "merged should have 3 rows: an inner join drops BE, which has no pollution data")
+          .check("pollution_per_capita" %in% names(merged) && isTRUE(all.equal(merged$pollution_per_capita[merged$country == "NL"], 21 / 17)), "pollution_per_capita should be pollution / population")
+        description: "merged should have 3 rows (no BE) and a pollution_per_capita column"
+    hints:
+      - "merged <- inner_join(df_pollution, df_population, by = \"country\")"
+      - "print(merged)"
+      - "merged <- merged |> mutate(pollution_per_capita = pollution / population)"
+    solution: |
+      library(tidyverse)
+
+      df_pollution <- tibble(
+        country   = c("NL", "DE", "FR"),
+        pollution = c(21, 23, 17)
+      )
+
+      df_population <- tibble(
+        country    = c("NL", "DE", "FR", "BE"),
+        population = c(17, 84, 68, 12)
+      )
+
+      merged <- inner_join(df_pollution, df_population, by = "country")
+
+      print(merged)
+
+      merged <- merged |> mutate(pollution_per_capita = pollution / population)
+
+      highest <- merged |> arrange(desc(pollution_per_capita)) |> pull(country)
+      print(highest[1])
+
+  - id: sort_and_rank
+    title: "Sorting and Top-N Selection"
+    instructions: |
+      `arrange()` sorts the rows of a tibble by a column, from small to large. Wrap the column in `desc()` to sort from large to small:
+
+      ```r
+      df |> arrange(score)          # low to high
+      df |> arrange(desc(score))    # high to low
+      ```
+
+      To keep only the first rows after sorting, use `slice_head()`:
+
+      ```r
+      df |> arrange(desc(score)) |> slice_head(n = 3)
+      ```
+
+      Or do both in one go with `slice_max()`: the `n` rows with the highest values.
+
+      ```r
+      df |> slice_max(score, n = 3)
+      ```
+
+      **Your task:**
+      1. `df_sorted`: `df` sorted by `renewable_pct` from **high to low**. Print it.
+      2. `top3`: the 3 countries with the highest `renewable_pct`. Print it.
+
+      The last line prints the best country.
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        country       = c("NL", "DE", "FR", "ES", "PL", "SE", "NO"),
+        renewable_pct = c(15,   40,   20,   35,    8,   65,   98),
+        total_gw      = c(20,  100,   80,   60,   50,   30,   15)
+      )
+
+      # 1. Sort by renewable_pct, high to low
+      df_sorted <-
+      print(df_sorted)
+
+      # 2. The top 3 countries
+      top3 <-
+      print(top3)
+
+      cat("Best:", top3$country[1], "\n")
+    tests:
+      - type: output_contains
+        value: "Best: NO"
+      - type: assert
+        code: |
+          .check(is.data.frame(df_sorted) && nrow(df_sorted) == 7 && identical(df_sorted$country[1:3], c("NO", "SE", "DE")), "df_sorted should contain all 7 countries, from the highest renewable_pct to the lowest")
+          .check(is.data.frame(top3) && identical(top3$country, c("NO", "SE", "DE")), "top3 should be NO, SE and DE, in that order")
+        description: "Norway (98%) is #1, Sweden (65%) #2, Germany (40%) #3"
+    hints:
+      - "df_sorted <- df |> arrange(desc(renewable_pct))"
+      - "top3 <- df_sorted |> slice_head(n = 3)"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        country       = c("NL", "DE", "FR", "ES", "PL", "SE", "NO"),
+        renewable_pct = c(15,   40,   20,   35,    8,   65,   98),
+        total_gw      = c(20,  100,   80,   60,   50,   30,   15)
+      )
+
+      df_sorted <- df |> arrange(desc(renewable_pct))
+      print(df_sorted)
+
+      top3 <- df_sorted |> slice_head(n = 3)
+      print(top3)
+
+      cat("Best:", top3$country[1], "\n")
+
+  - id: string_operations
+    title: "Working With Text Columns"
+    instructions: |
+      The **stringr** package (loaded with the tidyverse) has functions for text. They all start with `str_`, so in RStudio you can type `str_` and see the whole list. They work on every value of a column at once:
+
+      ```r
+      str_to_upper(city)          # "AMSTERDAM", ...
+      str_length(city)            # number of characters: 9, ...
+      str_detect(city, "dam")     # TRUE if the text contains "dam"
+      ```
+
+      Like any calculation on a column, you use them inside `mutate()` or `filter()`:
+
+      ```r
+      df |> mutate(city_upper = str_to_upper(city))
+      df |> filter(str_detect(city, "dam"))       # Amsterdam, Rotterdam
+      ```
+
+      **Your task:**
+      1. The column `city_upper` is already added. Add `name_length` (the number of characters in `city`) in the same `mutate()`
+      2. `long_names`: only the cities whose name is **longer than 5 characters**
+      3. Print `df`, then `long_names`
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        city       = c("Oslo", "Amsterdam", "Berlin", "Madrid", "Rome", "Copenhagen"),
+        population = c(700000, 900000, 3700000, 3300000, 2800000, 800000)
+      )
+
+      df <- df |>
+        mutate(
+          city_upper = str_to_upper(city),
+          # 1. add name_length here
+        )
+
+      # 2. Cities with a name longer than 5 characters
+      long_names <-
+
+      # 3. Print df and long_names
+
+    tests:
+      - type: output_contains
+        value: "COPENHAGEN"
+      - type: assert
+        code: |
+          .check("name_length" %in% names(df) && df$name_length[df$city == "Amsterdam"] == 9, "df should have a column name_length with the number of characters: str_length(city)")
+          .check(is.data.frame(long_names) && setequal(long_names$city, c("Amsterdam", "Berlin", "Madrid", "Copenhagen")), "long_names should contain Amsterdam, Berlin, Madrid and Copenhagen")
+        description: "name_length correct; long_names has Amsterdam, Berlin, Madrid, Copenhagen"
+    hints:
+      - "name_length = str_length(city)"
+      - "long_names <- df |> filter(name_length > 5)"
+      - "print(df) and print(long_names)"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        city       = c("Oslo", "Amsterdam", "Berlin", "Madrid", "Rome", "Copenhagen"),
+        population = c(700000, 900000, 3700000, 3300000, 2800000, 800000)
+      )
+
+      df <- df |>
+        mutate(
+          city_upper = str_to_upper(city),
+          name_length = str_length(city)
+        )
+
+      long_names <- df |> filter(name_length > 5)
+
+      print(df)
+      print(long_names)
+
+  - id: practice_select_columns
+    title: "Practice: Selecting Columns"
+    instructions: |
+      More practice with `select()` — this time energy data per province.
+
+      **Your task:**
+      1. `by_name`: select `province` and `solar_mw` by name
+      2. `first_three`: select the first three columns by position
+      3. `no_ids`: remove the `id` column with a minus sign
+      4. Print `no_ids`
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        id       = c(1, 2, 3, 4),
+        province = c("Utrecht", "Zeeland", "Groningen", "Limburg"),
+        solar_mw = c(950, 610, 1420, 1100),
+        wind_mw  = c(150, 1250, 1050, 140)
+      )
+
+      # 1. By name
+      by_name <-
+
+      # 2. First three columns
+      first_three <-
+
+      # 3. Without id
+      no_ids <-
+
+      # 4. Print no_ids
+
+    tests:
+      - type: output_contains
+        value: "Zeeland"
+      - type: assert
+        code: |
+          .check(is.data.frame(by_name) && identical(names(by_name), c("province", "solar_mw")), "by_name should have the columns province and solar_mw")
+          .check(is.data.frame(first_three) && identical(names(first_three), c("id", "province", "solar_mw")), "first_three should have the first three columns: select(1:3)")
+          .check(is.data.frame(no_ids) && identical(names(no_ids), c("province", "solar_mw", "wind_mw")), "no_ids should have every column except id: select(-id)")
+        description: "by_name, first_three and no_ids should have the right columns"
+    hints:
+      - "by_name <- df |> select(province, solar_mw)"
+      - "first_three <- df |> select(1:3)"
+      - "no_ids <- df |> select(-id)"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        id       = c(1, 2, 3, 4),
+        province = c("Utrecht", "Zeeland", "Groningen", "Limburg"),
+        solar_mw = c(950, 610, 1420, 1100),
+        wind_mw  = c(150, 1250, 1050, 140)
+      )
+
+      by_name <- df |> select(province, solar_mw)
+
+      first_three <- df |> select(1:3)
+
+      no_ids <- df |> select(-id)
+
+      print(no_ids)
+
+  - id: practice_filter_rows
+    title: "Practice: Filtering Rows"
+    instructions: |
+      More practice with `filter()` — this time air quality readings.
+
+      **Your task:**
+      1. `readings_2023`: only the readings from 2023
+      2. Print `readings_2023`, and the number of readings from 2023
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        station_id = c("ST001", "ST002", "ST003", "ST004", "ST005"),
+        year       = c(2010, 2023, 2023, 2015, 2015),
+        pollutant  = c("PM2.5", "PM2.5", "NO2", "PM2.5", "NO2")
+      )
+
+      # 1. Readings from 2023
+      readings_2023 <-
+
+      # 2. Print them, and how many there are
+
+    tests:
+      - type: output_contains
+        value: "ST003"
+      - type: output_contains
+        value: "[1] 2"
+      - type: assert
+        code: |
+          .check(is.data.frame(readings_2023) && nrow(readings_2023) == 2 && all(readings_2023$year == 2023), "readings_2023 should contain only the 2 readings from 2023")
+        description: "readings_2023 should contain exactly the 2 readings from 2023"
+    hints:
+      - "readings_2023 <- df |> filter(year == 2023)"
+      - "print(readings_2023) and print(nrow(readings_2023))"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        station_id = c("ST001", "ST002", "ST003", "ST004", "ST005"),
+        year       = c(2010, 2023, 2023, 2015, 2015),
+        pollutant  = c("PM2.5", "PM2.5", "NO2", "PM2.5", "NO2")
+      )
+
+      readings_2023 <- df |> filter(year == 2023)
+
+      print(readings_2023)
+      print(nrow(readings_2023))
+
+  - id: practice_filter_multiple
+    title: "Practice: Filtering with Multiple Conditions"
+    instructions: |
+      More practice combining conditions in `filter()`.
+
+      **Your task:**
+      1. `pm25_recent`: readings of `"PM2.5"` from 2015 or later
+      2. `not_pm25`: all readings that are **not** `"PM2.5"`
+      3. `selected_stations`: the readings from stations `"ST001"`, `"ST003"` and `"ST005"`, using `%in%`
+      4. Print all three
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        station_id = c("ST001", "ST002", "ST003", "ST004", "ST005"),
+        year       = c(2010, 2023, 2023, 2015, 2015),
+        pollutant  = c("PM2.5", "PM2.5", "NO2", "PM2.5", "NO2")
+      )
+
+      # 1. PM2.5 from 2015 onwards
+      pm25_recent <-
+
+      # 2. Everything except PM2.5
+      not_pm25 <-
+
+      # 3. Stations ST001, ST003 and ST005
+      selected_stations <-
+
+      print(pm25_recent)
+      print(not_pm25)
+      print(selected_stations)
+    tests:
+      - type: output_contains
+        value: "ST004"
+      - type: assert
+        code: |
+          .check(is.data.frame(pm25_recent) && identical(pm25_recent$station_id, c("ST002", "ST004")), "pm25_recent should contain the PM2.5 readings from 2015 or later: ST002 and ST004")
+          .check(is.data.frame(not_pm25) && identical(not_pm25$station_id, c("ST003", "ST005")), "not_pm25 should contain the readings that are not PM2.5: ST003 and ST005")
+          .check(is.data.frame(selected_stations) && identical(selected_stations$station_id, c("ST001", "ST003", "ST005")), "selected_stations should contain ST001, ST003 and ST005: filter(station_id %in% c(...))")
+        description: "pm25_recent, not_pm25 and selected_stations should contain the right readings"
+    hints:
+      - "pm25_recent <- df |> filter(pollutant == \"PM2.5\", year >= 2015)"
+      - "not_pm25 <- df |> filter(pollutant != \"PM2.5\")"
+      - "selected_stations <- df |> filter(station_id %in% c(\"ST001\", \"ST003\", \"ST005\"))"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        station_id = c("ST001", "ST002", "ST003", "ST004", "ST005"),
+        year       = c(2010, 2023, 2023, 2015, 2015),
+        pollutant  = c("PM2.5", "PM2.5", "NO2", "PM2.5", "NO2")
+      )
+
+      pm25_recent <- df |> filter(pollutant == "PM2.5", year >= 2015)
+
+      not_pm25 <- df |> filter(pollutant != "PM2.5")
+
+      selected_stations <- df |> filter(station_id %in% c("ST001", "ST003", "ST005"))
+
+      print(pm25_recent)
+      print(not_pm25)
+      print(selected_stations)
+
+  - id: practice_add_column
+    title: "Practice: Adding Computed Columns"
+    instructions: |
+      More practice with `mutate()` — this time CO₂ emissions (in Mt) and population (in millions).
+
+      **Your task:**
+      1. In one `mutate()`, add `emissions_per_capita` (`emissions / population`) **and** `above_8` (`TRUE` when `emissions_per_capita` is above 8). Store the result back in `df` and print it.
+      2. `average_epc`: the average `emissions_per_capita`, rounded to 2 decimals, as a single number. Print it.
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        country    = c("NL", "DE", "FR"),
+        population = c(17, 84, 68),
+        emissions  = c(150, 680, 310)
+      )
+
+      # 1. Add emissions_per_capita and above_8
+
+
+      # 2. Average emissions_per_capita, rounded to 2 decimals
+
+    tests:
+      - type: output_contains
+        value: "[1] 7.16"
+      - type: assert
+        code: |
+          .check(is.data.frame(df) && all(c("emissions_per_capita", "above_8") %in% names(df)), "df should have the new columns emissions_per_capita and above_8")
+          .check(isTRUE(all.equal(df$emissions_per_capita, c(150 / 17, 680 / 84, 310 / 68))), "emissions_per_capita should be emissions / population")
+          .check(identical(df$above_8, c(TRUE, TRUE, FALSE)), "above_8 should be TRUE when emissions_per_capita is above 8")
+          .check(is.numeric(average_epc) && length(average_epc) == 1 && isTRUE(all.equal(average_epc, 7.16)), "average_epc should be a single number, rounded to 2 decimals")
+        description: "emissions_per_capita and above_8 added; average_epc = 7.16"
+    hints:
+      - "df <- df |> mutate(emissions_per_capita = emissions / population, above_8 = emissions_per_capita > 8)"
+      - "average_epc <- df |> summarise(avg = round(mean(emissions_per_capita), 2)) |> pull()"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        country    = c("NL", "DE", "FR"),
+        population = c(17, 84, 68),
+        emissions  = c(150, 680, 310)
+      )
+
+      df <- df |>
+        mutate(
+          emissions_per_capita = emissions / population,
+          above_8 = emissions_per_capita > 8
+        )
+      print(df)
+
+      average_epc <- df |> summarise(avg = round(mean(emissions_per_capita), 2)) |> pull()
+      print(average_epc)
+
+  - id: practice_groupby_agg
+    title: "Practice: Grouping and Summarising"
+    instructions: |
+      More practice with `group_by()`, `summarise()` and `count()` — this time per pollutant.
+
+      **Your task:**
+      1. `year_range`: per pollutant, the first and last year (columns `first` and `last`), **and** the number of readings in a column `n`, using `n()`. Print it.
+      2. `counts`: the number of readings per pollutant, with `count()`. Print it.
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        reading_id = c("R1", "R2", "R3", "R4", "R5"),
+        year       = c(2010, 2023, 2023, 2015, 2015),
+        pollutant  = c("PM2.5", "PM2.5", "NO2", "PM2.5", "NO2")
+      )
+
+      # 1. First year, last year and number of readings per pollutant
+      year_range <-
+      print(year_range)
+
+      # 2. Number of readings per pollutant
+      counts <-
+      print(counts)
+    tests:
+      - type: output_contains
+        value: "PM2.5"
+      - type: assert
+        code: |
+          .check(is.data.frame(year_range) && nrow(year_range) == 2 && all(c("pollutant", "first", "last", "n") %in% names(year_range)), "year_range should have one row per pollutant, with the columns pollutant, first, last and n")
+          .p <- year_range[year_range$pollutant == "PM2.5", ]
+          .check(.p$first == 2010 && .p$last == 2023 && .p$n == 3, "for PM2.5, first should be 2010, last 2023 and n 3")
+          .check(is.data.frame(counts) && identical(counts$n, c(2L, 3L)), "counts should have the number of readings per pollutant: df |> count(pollutant)")
+        description: "year_range: PM2.5 from 2010 to 2023 with 3 readings; counts from count()"
+    hints:
+      - "df |> group_by(pollutant) |> summarise(first = min(year), last = max(year), n = n())"
+      - "counts <- df |> count(pollutant)"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        reading_id = c("R1", "R2", "R3", "R4", "R5"),
+        year       = c(2010, 2023, 2023, 2015, 2015),
+        pollutant  = c("PM2.5", "PM2.5", "NO2", "PM2.5", "NO2")
+      )
+
+      year_range <- df |>
+        group_by(pollutant) |>
+        summarise(first = min(year), last = max(year), n = n())
+      print(year_range)
+
+      counts <- df |> count(pollutant)
+      print(counts)
+
+  - id: practice_merge_dataframes
+    title: "Practice: Joining Data Frames"
+    instructions: |
+      More practice with joins — this time the other way around: the **main** table has a country that's missing from the second one.
+
+      **Your task:**
+      1. Join `df_emissions` and `df_area` on `country` so that **all four** countries of `df_emissions` are kept. Store it in `merged`.
+      2. Add `emissions_per_area` (`emissions / area_km2`) to `merged`, and print `merged`. What happens to PL?
+      3. `highest`: the country with the highest `emissions_per_area`, as text, using `slice_max()` and `pull()`. Print it.
+    starter_code: |
+      library(tidyverse)
+
+      df_emissions <- tibble(
+        country   = c("NL", "DE", "FR", "PL"),
+        emissions = c(150, 680, 310, 390)
+      )
+
+      df_area <- tibble(
+        country  = c("NL", "DE", "FR"),
+        area_km2 = c(41850, 357580, 551695)
+      )
+
+      # 1. Join, keeping all four countries
+      merged <-
+
+      # 2. Add emissions_per_area and print merged
+
+
+      # 3. The country with the highest emissions per area
+      highest <-
+      print(highest)
+    tests:
+      - type: output_contains
+        value: "[1] \"NL\""
+      - type: assert
+        code: |
+          .check(is.data.frame(merged) && nrow(merged) == 4, "merged should have all 4 countries of df_emissions: use left_join()")
+          .check("emissions_per_area" %in% names(merged) && isTRUE(all.equal(merged$emissions_per_area[merged$country == "NL"], 150 / 41850)), "merged should have a column emissions_per_area = emissions / area_km2")
+          .check(is.na(merged$area_km2[merged$country == "PL"]), "PL has no area in df_area, so its area_km2 should be NA")
+          .check(identical(highest, "NL"), "highest should be the text \"NL\": slice_max(emissions_per_area, n = 1) |> pull(country)")
+        description: "merged keeps all 4 countries (PL gets NA); NL has the highest emissions per area"
+    hints:
+      - "merged <- left_join(df_emissions, df_area, by = \"country\")"
+      - "merged <- merged |> mutate(emissions_per_area = emissions / area_km2)"
+      - "highest <- merged |> slice_max(emissions_per_area, n = 1) |> pull(country)"
+    solution: |
+      library(tidyverse)
+
+      df_emissions <- tibble(
+        country   = c("NL", "DE", "FR", "PL"),
+        emissions = c(150, 680, 310, 390)
+      )
+
+      df_area <- tibble(
+        country  = c("NL", "DE", "FR"),
+        area_km2 = c(41850, 357580, 551695)
+      )
+
+      merged <- left_join(df_emissions, df_area, by = "country")
+
+      merged <- merged |> mutate(emissions_per_area = emissions / area_km2)
+      print(merged)
+
+      highest <- merged |> slice_max(emissions_per_area, n = 1) |> pull(country)
+      print(highest)
+
+  - id: practice_sort_and_rank
+    title: "Practice: Sorting and Top-N Selection"
+    instructions: |
+      More practice with `arrange()` and `slice_max()` — this time recycling rates.
+
+      **Your task:**
+      1. `df_sorted`: `df` sorted by `recycling_rate` from **high to low**. Print it.
+      2. `top3`: the 3 countries with the highest `recycling_rate`, this time with `slice_max()`. Print it.
+      3. `smallest_first`: `df` sorted by `population` from **low to high**. Print it.
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        country        = c("NL", "DE", "FR", "ES", "PL", "SE", "NO"),
+        recycling_rate = c(54,   48,   41,   33,   30,   68,   62),
+        population     = c(17,   84,   68,   47,   38,   10,    5)
+      )
+
+      # 1. Sort by recycling_rate, high to low
+      df_sorted <-
+
+      # 2. Top 3 with slice_max()
+      top3 <-
+
+      # 3. Sort by population, low to high
+      smallest_first <-
+
+    tests:
+      - type: output_contains
+        value: "SE"
+      - type: assert
+        code: |
+          .check(is.data.frame(df_sorted) && nrow(df_sorted) == 7 && identical(df_sorted$country[1:3], c("SE", "NO", "NL")), "df_sorted should contain all 7 countries, from the highest recycling_rate to the lowest")
+          .check(is.data.frame(top3) && identical(top3$country, c("SE", "NO", "NL")), "top3 should be SE, NO and NL: slice_max(recycling_rate, n = 3)")
+          .check(is.data.frame(smallest_first) && identical(smallest_first$country, c("NO", "SE", "NL", "PL", "ES", "FR", "DE")), "smallest_first should be sorted by population, from low to high: arrange(population)")
+        description: "Sweden (68%) is #1, Norway (62%) #2, the Netherlands (54%) #3"
+    hints:
+      - "df_sorted <- df |> arrange(desc(recycling_rate))"
+      - "top3 <- df |> slice_max(recycling_rate, n = 3)"
+      - "smallest_first <- df |> arrange(population)"
+      - "Don't forget to print all three"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        country        = c("NL", "DE", "FR", "ES", "PL", "SE", "NO"),
+        recycling_rate = c(54,   48,   41,   33,   30,   68,   62),
+        population     = c(17,   84,   68,   47,   38,   10,    5)
+      )
+
+      df_sorted <- df |> arrange(desc(recycling_rate))
+      print(df_sorted)
+
+      top3 <- df |> slice_max(recycling_rate, n = 3)
+      print(top3)
+
+      smallest_first <- df |> arrange(population)
+      print(smallest_first)
+
+  - id: practice_string_operations
+    title: "Practice: Working With Text Columns"
+    instructions: |
+      More practice with stringr — this time Dutch provinces.
+
+      **Your task:**
+      1. Add `region_upper` (the name in capitals) and `name_length` (the number of characters) to `df` in one `mutate()`
+      2. `long_names`: the provinces whose name is **longer than 7 characters**
+      3. `land_provinces`: the provinces whose name contains `"land"`, with `str_detect()`
+      4. Print `long_names` and `land_provinces`
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        region     = c("Flevoland", "Zeeland", "Drenthe", "Overijssel", "Limburg", "Friesland"),
+        population = c(420000, 385000, 493000, 1160000, 1120000, 650000)
+      )
+
+      # 1. Add region_upper and name_length
+
+
+      # 2. Names longer than 7 characters
+      long_names <-
+
+      # 3. Names that contain "land"
+      land_provinces <-
+
+      # 4. Print both
+
+    tests:
+      - type: output_contains
+        value: "Overijssel"
+      - type: assert
+        code: |
+          .check(all(c("region_upper", "name_length") %in% names(df)), "df should have the new columns region_upper and name_length")
+          .check(identical(df$region_upper[1], "FLEVOLAND") && df$name_length[df$region == "Overijssel"] == 10, "region_upper should be str_to_upper(region) and name_length str_length(region)")
+          .check(is.data.frame(long_names) && setequal(long_names$region, c("Flevoland", "Overijssel", "Friesland")), "long_names should contain Flevoland, Overijssel and Friesland")
+          .check(is.data.frame(land_provinces) && setequal(land_provinces$region, c("Flevoland", "Zeeland", "Friesland")), "land_provinces should contain Flevoland, Zeeland and Friesland")
+        description: "long_names has Flevoland, Overijssel, Friesland; land_provinces has Flevoland, Zeeland, Friesland"
+    hints:
+      - "df <- df |> mutate(region_upper = str_to_upper(region), name_length = str_length(region))"
+      - "long_names <- df |> filter(name_length > 7)"
+      - "land_provinces <- df |> filter(str_detect(region, \"land\"))"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        region     = c("Flevoland", "Zeeland", "Drenthe", "Overijssel", "Limburg", "Friesland"),
+        population = c(420000, 385000, 493000, 1160000, 1120000, 650000)
+      )
+
+      df <- df |>
+        mutate(
+          region_upper = str_to_upper(region),
+          name_length = str_length(region)
+        )
+
+      long_names <- df |> filter(name_length > 7)
+
+      land_provinces <- df |> filter(str_detect(region, "land"))
+
+      print(long_names)
+      print(land_provinces)
