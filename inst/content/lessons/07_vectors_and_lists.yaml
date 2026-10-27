@@ -1,0 +1,753 @@
+title: "Vectors and Lists"
+description: "Go deeper into R's two essential collections: vectors for ordered values, named vectors and lists for labelled values. Select, add, remove and sort elements."
+
+exercises:
+
+  - id: create_list
+    title: "Selecting Elements From a Vector"
+    instructions: |
+      In lesson 1 you created vectors with `c()` and picked the first value with `[1]`. Why use a vector at all? Instead of creating lots of separate variables:
+
+      ```r
+      techno_1 <- "Wind Energy"
+      techno_2 <- "Solar Energy"
+      techno_3 <- "Water Energy"
+      ```
+
+      we store the same information in one object:
+
+      ```r
+      technologies <- c("Wind Energy", "Solar Energy", "Water Energy")
+      ```
+
+      Between the square brackets you put the **position(s)** you want. Positions start at **1**:
+
+      ```r
+      technologies[2]                     # "Solar Energy"  ← second element
+      technologies[length(technologies)]  # "Water Energy"  ← last element
+      technologies[c(1, 3)]               # "Wind Energy" "Water Energy" ← several at once
+      ```
+
+      `length(technologies)` is 3, so `technologies[length(technologies)]` is `technologies[3]`: the last element, however long the vector is.
+
+      ⚠️ **A minus sign removes:** `technologies[-1]` does **not** give the last element. It gives everything **except** the first:
+
+      ```r
+      technologies[-1]    # "Solar Energy" "Water Energy"
+      ```
+
+      **Your task:**
+      1. Create a vector called `technologies` with three items: `"Wind Energy"`, `"Solar Energy"`, `"Water Energy"`
+      2. Print the **second** element
+      3. Print the **last** element, using `length()`
+      4. Print the **number** of items with `length()`
+    starter_code: |
+      technologies <- c(        )
+
+      # 2. Print the second element
+
+
+      # 3. Print the last element
+
+
+      # 4. Print the number of items
+
+    tests:
+      - type: output_contains
+        value: "[1] \"Solar Energy\""
+      - type: output_contains
+        value: "[1] \"Water Energy\""
+      - type: output_contains
+        value: "[1] 3"
+      - type: assert
+        code: |
+          .check(identical(technologies, c("Wind Energy", "Solar Energy", "Water Energy")), "technologies should contain exactly these 3 items, in this order")
+        description: "technologies should have exactly these 3 items"
+    hints:
+      - "technologies <- c(\"Wind Energy\", \"Solar Energy\", \"Water Energy\")"
+      - "print(technologies[2])"
+      - "print(technologies[length(technologies)])"
+      - "print(length(technologies))"
+    solution: |
+      technologies <- c("Wind Energy", "Solar Energy", "Water Energy")
+
+      print(technologies[2])
+
+      print(technologies[length(technologies)])
+
+      print(length(technologies))
+
+  - id: list_operations
+    title: "Building a Vector Step by Step"
+    instructions: |
+      Sometimes you don't know all values in advance, and you add them one by one. You start with an **empty** vector, `c()`, and add an item by combining the old vector with the new value, and storing the result under the same name:
+
+      ```r
+      data_files <- c()
+      data_files <- c(data_files, "pollution.csv")
+      data_files <- c(data_files, "population.csv")
+      print(data_files)    # "pollution.csv" "population.csv"
+      ```
+
+      Read the second line as: "`data_files` becomes: the old `data_files`, followed by `"pollution.csv"`". This is the overwriting you practised in lesson 1. If you forget the `data_files <-` part, R shows the combined vector, but `data_files` itself doesn't change.
+
+      You'll use this pattern when collecting results in a **loop** (lesson 10).
+
+      **Your task:**
+      1. Start with an empty vector called `energy_sources`
+      2. Add these three items to it, one at a time: `"Solar"`, `"Wind"`, `"Hydro"`
+      3. Print the number of items
+      4. Print the last item
+    starter_code: |
+      # Start with an empty vector
+      energy_sources <- c()
+
+      # Add three items, one at a time
+
+
+      # Print the number of items
+
+
+      # Print the last item
+
+    tests:
+      - type: output_contains
+        value: "[1] 3"
+      - type: output_contains
+        value: "[1] \"Hydro\""
+      - type: assert
+        code: |
+          .check(identical(energy_sources, c("Solar", "Wind", "Hydro")), "energy_sources should contain Solar, Wind and Hydro, in that order. Did you store each result back in energy_sources?")
+        description: "energy_sources should contain Solar, Wind, Hydro in that order"
+    hints:
+      - "energy_sources <- c(energy_sources, \"Solar\")"
+      - "print(length(energy_sources))"
+      - "print(energy_sources[length(energy_sources)])"
+    solution: |
+      energy_sources <- c()
+
+      energy_sources <- c(energy_sources, "Solar")
+      energy_sources <- c(energy_sources, "Wind")
+      energy_sources <- c(energy_sources, "Hydro")
+
+      print(length(energy_sources))
+
+      print(energy_sources[length(energy_sources)])
+
+  - id: create_dict
+    title: "Named Vectors: Look Up a Value by Its Label"
+    instructions: |
+      With a normal vector you find a value by its **position**. Often it's more natural to find it by a **label**: you want "the efficiency of solar", not "the first number". You can give every value in a vector a name:
+
+      ```r
+      technology_efficiency <- c(Solar = 24, Wind = 19, Water = 22)
+      ```
+
+      Each element is a **name–value pair**, written as `name = value`. Now you can look up a value with its name, in quotes, between the brackets:
+
+      ```r
+      technology_efficiency["Solar"]      # keeps the label
+      ```
+      ```
+      Solar
+         24
+      ```
+      ```r
+      technology_efficiency[["Solar"]]    # just the value
+      ```
+      ```
+      [1] 24
+      ```
+
+      Single brackets `[ ]` give you a smaller piece of the vector, label included. Double brackets `[[ ]]` give you the value itself. Use `[[ ]]` when you want to calculate with the value or put it in a sentence.
+
+      `names(technology_efficiency)` gives you all labels: `"Solar" "Wind" "Water"`.
+
+      **Your task:**
+      1. Create a named vector `technology_efficiency` with: `Solar` → `24`, `Wind` → `19`, `Water` → `22`
+      2. Print the efficiency of `"Solar"` (just the value, with `[[ ]]`)
+      3. Print the efficiency of `"Wind"` (just the value, with `[[ ]]`)
+    starter_code: |
+      technology_efficiency <- c(
+        # add your name = value pairs here
+      )
+
+      # 2. Print the efficiency of Solar
+
+
+      # 3. Print the efficiency of Wind
+
+    tests:
+      - type: output_equals
+        value: "[1] 24\n[1] 19"
+      - type: assert
+        code: |
+          .check(identical(names(technology_efficiency), c("Solar", "Wind", "Water")), "technology_efficiency should have the names Solar, Wind and Water")
+          .check(identical(unname(technology_efficiency), c(24, 19, 22)), "the values should be 24, 19 and 22")
+        description: "technology_efficiency should be Solar = 24, Wind = 19, Water = 22"
+    hints:
+      - "Separate the pairs with commas: c(Solar = 24, Wind = 19, Water = 22)"
+      - "print(technology_efficiency[[\"Solar\"]])"
+    solution: |
+      technology_efficiency <- c(
+        Solar = 24,
+        Wind = 19,
+        Water = 22
+      )
+
+      print(technology_efficiency[["Solar"]])
+
+      print(technology_efficiency[["Wind"]])
+
+  - id: dict_operations
+    title: "Working With Lists: Add, Check and Remove"
+    instructions: |
+      A named vector can only hold one type. When the values have **different types** (text, numbers, `TRUE`/`FALSE`), use a **list**, which you met in lesson 1:
+
+      ```r
+      info <- list(name = "Alice", age = 30)
+      ```
+
+      Lists can change after you've created them:
+
+      ```r
+      # Add a new element: just assign to a new name
+      info$city <- "Utrecht"
+
+      # Update an existing element
+      info$age <- 31
+
+      # Remove an element: assign NULL ("nothing") to it
+      info$age <- NULL
+
+      # Which names are there, and is "city" one of them?
+      names(info)               # "name" "city"
+      "city" %in% names(info)   # TRUE
+      length(info)              # 2
+      ```
+
+      `%in%` checks whether a value appears in a vector. You'll use it a lot with `filter()`, for example `filter(country %in% c("NL", "DE"))`.
+
+      **Your task:**
+      1. Add an element `field` with the value `"Sustainability"` to `researcher`
+      2. We shouldn't store people's ages: remove `age`
+      3. Print the names that are left with `names()`
+      4. Print the number of elements with `length()`
+    starter_code: |
+      researcher <- list(
+        name = "Alice",
+        age = 30,
+        institution = "Utrecht University"
+      )
+
+      # 1. Add field
+
+
+      # 2. Remove age
+
+
+      # 3. Print the names
+
+
+      # 4. Print the number of elements
+
+    tests:
+      - type: output_contains
+        value: "\"field\""
+      - type: output_contains
+        value: "[1] 3"
+      - type: assert
+        code: |
+          .check(identical(researcher$field, "Sustainability"), "researcher$field should be \"Sustainability\"")
+          .check(!("age" %in% names(researcher)), "age should be removed: researcher$age <- NULL")
+          .check(identical(names(researcher), c("name", "institution", "field")), "researcher should have the elements name, institution and field")
+        description: "researcher should have name, institution and field, and no age"
+    hints:
+      - "researcher$field <- \"Sustainability\""
+      - "researcher$age <- NULL"
+      - "print(names(researcher)) and print(length(researcher))"
+    solution: |
+      researcher <- list(
+        name = "Alice",
+        age = 30,
+        institution = "Utrecht University"
+      )
+
+      researcher$field <- "Sustainability"
+
+      researcher$age <- NULL
+
+      print(names(researcher))
+
+      print(length(researcher))
+
+  - id: dict_iteration
+    title: "Working With All Values at Once"
+    instructions: |
+      Because R works on whole vectors at once, you often don't need to go through the values one by one. Take these CO₂ emissions per country (in millions of tons):
+
+      ```r
+      emissions <- c(NL = 150, DE = 680, FR = 310)
+      ```
+
+      `names(emissions)` gives you the labels and `emissions` gives you the values. `paste()` combines them **element by element**, just like math on vectors does, so you get one sentence per country:
+
+      ```r
+      sentences <- paste(names(emissions), "=", emissions)
+      sentences
+      ```
+      ```
+      [1] "NL = 150" "DE = 680" "FR = 310"
+      ```
+
+      To show each sentence on its own line, without `[1]` and quotes, use `writeLines()`:
+
+      ```r
+      writeLines(sentences)
+      ```
+      ```
+      NL = 150
+      DE = 680
+      FR = 310
+      ```
+
+      And functions like `sum()`, `mean()` and `max()` work on named vectors just like on normal ones.
+
+      **Your task:**
+      1. Create `sentences` with `paste()`, in the form `"DE emitted 680 Mt of CO2"`, and show them with `writeLines()`
+      2. Calculate `total`, the sum of all emissions. The last line prints `Total: 1760 Mt`
+    starter_code: |
+      emissions <- c(NL = 150, DE = 680, FR = 310, ES = 230, PL = 390)
+
+      # 1. One sentence per country
+      sentences <- paste(   )
+      writeLines(sentences)
+
+      # 2. The total
+      total <-
+
+      cat("Total:", total, "Mt\n")
+    tests:
+      - type: output_contains
+        value: "NL emitted 150 Mt of CO2"
+      - type: output_contains
+        value: "PL emitted 390 Mt of CO2"
+      - type: output_contains
+        value: "Total: 1760 Mt"
+      - type: assert
+        code: |
+          .check(length(sentences) == 5, "sentences should contain one sentence per country (5 in total)")
+          .check(isTRUE(all.equal(total, 1760)), "total should be the sum of all emissions: sum(emissions)")
+        description: "five sentences, and total = 1760"
+    hints:
+      - "paste(names(emissions), \"emitted\", emissions, \"Mt of CO2\")"
+      - "total <- sum(emissions)"
+    solution: |
+      emissions <- c(NL = 150, DE = 680, FR = 310, ES = 230, PL = 390)
+
+      sentences <- paste(names(emissions), "emitted", emissions, "Mt of CO2")
+      writeLines(sentences)
+
+      total <- sum(emissions)
+
+      cat("Total:", total, "Mt\n")
+
+  - id: list_slicing
+    title: "Ranges, Conditions and Sorting"
+    instructions: |
+      **A range of positions** — `1:3` is short for `c(1, 2, 3)`, so you can take a whole stretch of a vector at once:
+
+      ```r
+      temps <- c(22, 15, 30, 8, 25)
+      temps[1:3]          # 22 15 30   ← positions 1 to 3
+      temps[3:5]          # 30 8 25    ← positions 3 to 5
+      tail(temps, 2)      # 8 25       ← the last 2
+      head(temps, 2)      # 22 15      ← the first 2
+      ```
+
+      You know `head()` and `tail()` from data frames: they work on vectors too.
+
+      **Selecting with a condition** — you can also put a condition between the brackets. R keeps the values where the condition is `TRUE`:
+
+      ```r
+      temps > 20          # TRUE FALSE TRUE FALSE TRUE
+      temps[temps > 20]   # 22 30 25
+      ```
+
+      This is what `filter()` does for the rows of a data frame.
+
+      **Sorting** — `sort(temps)` gives a sorted copy, from small to large; `sort(temps, decreasing = TRUE)` from large to small. The original `temps` doesn't change.
+
+      **Your task:**
+      Given 12 monthly average temperatures (Jan–Dec):
+      1. Create `first_quarter` with the first 3 months, using `[ ]` and `:`
+      2. Create `last_quarter` with the last 3 months, using `tail()`
+      3. Create `warm_months` with only the temperatures **above 20**
+      4. Create `temp_range`: the warmest minus the coldest month, with `max()` and `min()`
+
+      The `cat()` lines print the results.
+    starter_code: |
+      monthly_temps <- c(3, 5, 10, 15, 20, 25, 28, 27, 22, 14, 7, 4)
+
+      # 1. First 3 months (Jan-Mar)
+      first_quarter <-
+      cat("First quarter:", first_quarter, "\n")
+
+      # 2. Last 3 months (Oct-Dec)
+      last_quarter <-
+      cat("Last quarter:", last_quarter, "\n")
+
+      # 3. Months above 20 degrees
+      warm_months <-
+      cat("Warm months:", warm_months, "\n")
+
+      # All months sorted from coldest to warmest
+      cat("Sorted:", sort(monthly_temps), "\n")
+
+      # 4. Warmest minus coldest
+      temp_range <-
+      cat("Range:", temp_range, "\n")
+    tests:
+      - type: output_contains
+        value: "First quarter: 3 5 10"
+      - type: output_contains
+        value: "Last quarter: 14 7 4"
+      - type: output_contains
+        value: "Warm months: 25 28 27 22"
+      - type: output_contains
+        value: "Range: 25"
+      - type: assert
+        code: |
+          .check(identical(first_quarter, c(3, 5, 10)), "first_quarter should be monthly_temps[1:3]")
+          .check(identical(last_quarter, c(14, 7, 4)), "last_quarter should be tail(monthly_temps, 3)")
+          .check(identical(warm_months, c(25, 28, 27, 22)), "warm_months should be the temperatures above 20 (not 20 itself)")
+          .check(identical(temp_range, 25), "temp_range should be max(monthly_temps) - min(monthly_temps)")
+        description: "first_quarter, last_quarter, warm_months and temp_range should be correct"
+    hints:
+      - "first_quarter <- monthly_temps[1:3]"
+      - "last_quarter <- tail(monthly_temps, 3)"
+      - "warm_months <- monthly_temps[monthly_temps > 20]"
+      - "temp_range <- max(monthly_temps) - min(monthly_temps)"
+    solution: |
+      monthly_temps <- c(3, 5, 10, 15, 20, 25, 28, 27, 22, 14, 7, 4)
+
+      first_quarter <- monthly_temps[1:3]
+      cat("First quarter:", first_quarter, "\n")
+
+      last_quarter <- tail(monthly_temps, 3)
+      cat("Last quarter:", last_quarter, "\n")
+
+      warm_months <- monthly_temps[monthly_temps > 20]
+      cat("Warm months:", warm_months, "\n")
+
+      cat("Sorted:", sort(monthly_temps), "\n")
+
+      temp_range <- max(monthly_temps) - min(monthly_temps)
+      cat("Range:", temp_range, "\n")
+
+  - id: practice_create_list
+    title: "Practice: Selecting Elements From a Vector"
+    instructions: |
+      More practice creating a vector and selecting from it.
+
+      **Your task:**
+      1. Create a vector called `recycling_methods` with three items: `"Composting"`, `"Glass Recycling"`, `"Paper Recycling"`
+      2. Print the **second** element
+      3. Print the **last** element, using `length()`
+      4. Print everything **except** the first element, using a minus sign
+    starter_code: |
+      recycling_methods <- c(        )
+
+      # 2. Print the second element
+
+
+      # 3. Print the last element
+
+
+      # 4. Print everything except the first element
+
+    tests:
+      - type: output_contains
+        value: "[1] \"Glass Recycling\""
+      - type: output_contains
+        value: "[1] \"Paper Recycling\""
+      - type: output_contains
+        value: "[1] \"Glass Recycling\" \"Paper Recycling\""
+      - type: assert
+        code: |
+          .check(identical(recycling_methods, c("Composting", "Glass Recycling", "Paper Recycling")), "recycling_methods should contain exactly these 3 items, in this order")
+        description: "recycling_methods should have exactly these 3 items"
+    hints:
+      - "recycling_methods <- c(\"Composting\", \"Glass Recycling\", \"Paper Recycling\")"
+      - "print(recycling_methods[length(recycling_methods)])"
+      - "print(recycling_methods[-1])"
+    solution: |
+      recycling_methods <- c("Composting", "Glass Recycling", "Paper Recycling")
+
+      print(recycling_methods[2])
+
+      print(recycling_methods[length(recycling_methods)])
+
+      print(recycling_methods[-1])
+
+  - id: practice_list_operations
+    title: "Practice: Building a Vector Step by Step"
+    instructions: |
+      More practice adding items to a vector one at a time.
+
+      **Your task:**
+      1. Start with an empty vector called `materials`
+      2. Add these three items to it, one at a time: `"Steel"`, `"Aluminum"`, `"Copper"`
+      3. Print the number of items
+      4. Print the last item
+    starter_code: |
+      # Start with an empty vector
+      materials <- c()
+
+      # Add three items, one at a time
+
+
+      # Print the number of items
+
+
+      # Print the last item
+
+    tests:
+      - type: output_contains
+        value: "[1] 3"
+      - type: output_contains
+        value: "[1] \"Copper\""
+      - type: assert
+        code: |
+          .check(identical(materials, c("Steel", "Aluminum", "Copper")), "materials should contain Steel, Aluminum and Copper, in that order. Did you store each result back in materials?")
+        description: "materials should contain Steel, Aluminum, Copper in that order"
+    hints:
+      - "materials <- c(materials, \"Steel\")"
+      - "print(length(materials))"
+      - "print(materials[length(materials)])"
+    solution: |
+      materials <- c()
+
+      materials <- c(materials, "Steel")
+      materials <- c(materials, "Aluminum")
+      materials <- c(materials, "Copper")
+
+      print(length(materials))
+
+      print(materials[length(materials)])
+
+  - id: practice_create_dict
+    title: "Practice: Named Vectors"
+    instructions: |
+      More practice creating a named vector and looking up values by name.
+
+      **Your task:**
+      1. Create a named vector `material_recyclability` with: `Steel` → `90`, `Aluminum` → `95`, `Copper` → `85`
+      2. Print the recyclability of `"Steel"` (just the value)
+      3. Print the recyclability of `"Aluminum"` (just the value)
+    starter_code: |
+      material_recyclability <- c(
+        # add your name = value pairs here
+      )
+
+      # 2. Print the recyclability of Steel
+
+
+      # 3. Print the recyclability of Aluminum
+
+    tests:
+      - type: output_equals
+        value: "[1] 90\n[1] 95"
+      - type: assert
+        code: |
+          .check(identical(names(material_recyclability), c("Steel", "Aluminum", "Copper")), "material_recyclability should have the names Steel, Aluminum and Copper")
+          .check(identical(unname(material_recyclability), c(90, 95, 85)), "the values should be 90, 95 and 85")
+        description: "material_recyclability should be Steel = 90, Aluminum = 95, Copper = 85"
+    hints:
+      - "c(Steel = 90, Aluminum = 95, Copper = 85)"
+      - "print(material_recyclability[[\"Steel\"]])"
+    solution: |
+      material_recyclability <- c(
+        Steel = 90,
+        Aluminum = 95,
+        Copper = 85
+      )
+
+      print(material_recyclability[["Steel"]])
+
+      print(material_recyclability[["Aluminum"]])
+
+  - id: practice_dict_operations
+    title: "Practice: Working With Lists"
+    instructions: |
+      More practice changing a list.
+
+      **Your task:**
+      1. Add an element `status` with the value `"In Progress"` to `project`
+      2. The budget is confidential: remove `budget`
+      3. Check whether `"lead"` is one of the names of `project` with `%in%`, and print the result
+      4. Print the number of elements with `length()`
+    starter_code: |
+      project <- list(
+        title = "Solar Rollout",
+        budget = 50000,
+        lead = "Sam"
+      )
+
+      # 1. Add status
+
+
+      # 2. Remove budget
+
+
+      # 3. Is "lead" one of the names?
+
+
+      # 4. Print the number of elements
+
+    tests:
+      - type: output_contains
+        value: "[1] TRUE"
+      - type: output_contains
+        value: "[1] 3"
+      - type: assert
+        code: |
+          .check(identical(project$status, "In Progress"), "project$status should be \"In Progress\"")
+          .check(!("budget" %in% names(project)), "budget should be removed: project$budget <- NULL")
+          .check(identical(names(project), c("title", "lead", "status")), "project should have the elements title, lead and status")
+        description: "project should have title, lead and status, and no budget"
+    hints:
+      - "project$status <- \"In Progress\""
+      - "project$budget <- NULL"
+      - "print(\"lead\" %in% names(project))"
+    solution: |
+      project <- list(
+        title = "Solar Rollout",
+        budget = 50000,
+        lead = "Sam"
+      )
+
+      project$status <- "In Progress"
+
+      project$budget <- NULL
+
+      print("lead" %in% names(project))
+
+      print(length(project))
+
+  - id: practice_dict_iteration
+    title: "Practice: Working With All Values at Once"
+    instructions: |
+      More practice with `paste()`, `writeLines()` and `sum()` on a named vector — this time annual rainfall (in mm).
+
+      **Your task:**
+      1. Create `sentences` in the form `"DE received 700 mm of rain"`, and show them with `writeLines()`
+      2. Calculate `total`, the sum of all rainfall. The last line prints `Total: 3200 mm`
+    starter_code: |
+      rainfall <- c(NL = 800, DE = 700, FR = 650, ES = 450, PL = 600)
+
+      # 1. One sentence per country
+
+
+      # 2. The total
+      total <-
+
+      cat("Total:", total, "mm\n")
+    tests:
+      - type: output_contains
+        value: "NL received 800 mm of rain"
+      - type: output_contains
+        value: "PL received 600 mm of rain"
+      - type: output_contains
+        value: "Total: 3200 mm"
+      - type: assert
+        code: |
+          .check(length(sentences) == 5, "sentences should contain one sentence per country (5 in total)")
+          .check(isTRUE(all.equal(total, 3200)), "total should be the sum of all rainfall: sum(rainfall)")
+        description: "five sentences, and total = 3200"
+    hints:
+      - "sentences <- paste(names(rainfall), \"received\", rainfall, \"mm of rain\")"
+      - "writeLines(sentences)"
+      - "total <- sum(rainfall)"
+    solution: |
+      rainfall <- c(NL = 800, DE = 700, FR = 650, ES = 450, PL = 600)
+
+      sentences <- paste(names(rainfall), "received", rainfall, "mm of rain")
+      writeLines(sentences)
+
+      total <- sum(rainfall)
+
+      cat("Total:", total, "mm\n")
+
+  - id: practice_list_slicing
+    title: "Practice: Ranges, Conditions and Sorting"
+    instructions: |
+      More practice with ranges, conditions, `sort()`, `max()` and `min()` — this time with monthly rainfall.
+
+      **Your task:**
+      Given 12 monthly rainfall totals (Jan–Dec, in mm):
+      1. Create `first_quarter` with the first 3 months, using `[ ]` and `:`
+      2. Create `last_quarter` with the last 3 months, using `tail()`
+      3. Create `wet_months` with only the totals **of 70 mm or more**
+      4. Create `rainfall_range`: the wettest minus the driest month
+      5. Print `monthly_rainfall` sorted from **wettest to driest**, with `cat("Sorted:", ...)`
+    starter_code: |
+      monthly_rainfall <- c(80, 65, 70, 55, 40, 30, 20, 25, 45, 60, 75, 90)
+
+      # 1. First 3 months (Jan-Mar)
+      first_quarter <-
+      cat("First quarter:", first_quarter, "\n")
+
+      # 2. Last 3 months (Oct-Dec)
+      last_quarter <-
+      cat("Last quarter:", last_quarter, "\n")
+
+      # 3. Months with 70 mm or more
+      wet_months <-
+      cat("Wet months:", wet_months, "\n")
+
+      # 4. Wettest minus driest
+      rainfall_range <-
+      cat("Range:", rainfall_range, "\n")
+
+      # 5. Sorted from wettest to driest
+
+    tests:
+      - type: output_contains
+        value: "First quarter: 80 65 70"
+      - type: output_contains
+        value: "Last quarter: 60 75 90"
+      - type: output_contains
+        value: "Wet months: 80 70 75 90"
+      - type: output_contains
+        value: "Range: 70"
+      - type: output_contains
+        value: "Sorted: 90 80 75 70 65 60 55 45 40 30 25 20"
+      - type: assert
+        code: |
+          .check(identical(first_quarter, c(80, 65, 70)), "first_quarter should be monthly_rainfall[1:3]")
+          .check(identical(last_quarter, c(60, 75, 90)), "last_quarter should be tail(monthly_rainfall, 3)")
+          .check(identical(wet_months, c(80, 70, 75, 90)), "wet_months should be the totals of 70 mm or more (use >=)")
+          .check(identical(rainfall_range, 70), "rainfall_range should be max(monthly_rainfall) - min(monthly_rainfall)")
+        description: "first_quarter, last_quarter, wet_months and rainfall_range should be correct"
+    hints:
+      - "first_quarter <- monthly_rainfall[1:3] and last_quarter <- tail(monthly_rainfall, 3)"
+      - "wet_months <- monthly_rainfall[monthly_rainfall >= 70]"
+      - "rainfall_range <- max(monthly_rainfall) - min(monthly_rainfall)"
+      - "cat(\"Sorted:\", sort(monthly_rainfall, decreasing = TRUE), \"\\n\")"
+    solution: |
+      monthly_rainfall <- c(80, 65, 70, 55, 40, 30, 20, 25, 45, 60, 75, 90)
+
+      first_quarter <- monthly_rainfall[1:3]
+      cat("First quarter:", first_quarter, "\n")
+
+      last_quarter <- tail(monthly_rainfall, 3)
+      cat("Last quarter:", last_quarter, "\n")
+
+      wet_months <- monthly_rainfall[monthly_rainfall >= 70]
+      cat("Wet months:", wet_months, "\n")
+
+      rainfall_range <- max(monthly_rainfall) - min(monthly_rainfall)
+      cat("Range:", rainfall_range, "\n")
+
+      cat("Sorted:", sort(monthly_rainfall, decreasing = TRUE), "\n")
