@@ -1,0 +1,458 @@
+title: For Loops
+description: Learn how to automate repetitive tasks with for loops — looping over numbers and vectors, using positions, stopping early with break, collecting results, and knowing when you don't need a loop at all.
+
+exercises:
+
+  - id: range_basics
+    title: "Your First For Loop"
+    instructions: |
+      Loops let you repeat a piece of code without writing it out again and again. A `for` loop runs its code once **for** every value in a sequence:
+
+      ```r
+      for (i in 1:5) {
+        writeLines(paste("Iteration", i))
+      }
+      ```
+
+      ```
+      Iteration 1
+      Iteration 2
+      Iteration 3
+      Iteration 4
+      Iteration 5
+      ```
+
+      The pieces:
+      - `i` is the **loop variable**: in every round it gets the next value from the sequence
+      - `1:5` is the sequence: the numbers 1, 2, 3, 4, 5 (you saw `:` in lesson 7)
+      - the code between `{ }` is the **body**: it runs once per value
+
+      Just like with `if`, the curly brackets decide what belongs to the loop. Code after the closing `}` runs **once**, after the loop has finished:
+
+      ```r
+      for (i in 1:3) {
+        writeLines(paste("Inside", i))     # runs 3 times
+      }
+      writeLines(paste("Outside", i))      # runs once: i is still 3
+      ```
+
+      **Your task:**
+      1. Inside the loop, show `Iteration 1` up to `Iteration 5`, each on its own line, with `writeLines(paste(...))`
+      2. After the loop, show `Loop finished`
+    starter_code: |
+      for (i in 1:5) {
+        # show "Iteration i" inside the loop
+
+      }
+
+      # show "Loop finished" after the loop
+
+    tests:
+      - type: output_equals
+        value: "Iteration 1\nIteration 2\nIteration 3\nIteration 4\nIteration 5\nLoop finished"
+    hints:
+      - "writeLines(paste(\"Iteration\", i)) between the curly brackets"
+      - "writeLines(\"Loop finished\") after the closing }"
+    solution: |
+      for (i in 1:5) {
+        writeLines(paste("Iteration", i))
+      }
+
+      writeLines("Loop finished")
+
+  - id: loop_list
+    title: "Looping Over a Vector"
+    instructions: |
+      You can loop over any vector, not just numbers. The loop variable then takes each **value** of the vector in turn:
+
+      ```r
+      cities <- c("Utrecht", "Delft", "Groningen")
+      for (city in cities) {
+        writeLines(paste("Downloading data for", city))
+      }
+      ```
+
+      ```
+      Downloading data for Utrecht
+      Downloading data for Delft
+      Downloading data for Groningen
+      ```
+
+      You can give the loop variable any name. Choose one that says what it holds: `city` in `cities` reads much better than `i` in `cities`.
+
+      **Your task:**
+      Loop over `fruits` and show `I like apple`, `I like banana`, and so on, each on its own line.
+    starter_code: |
+      fruits <- c("apple", "banana", "cherry", "date")
+
+      for (fruit in fruits) {
+        # show the message
+
+      }
+    tests:
+      - type: output_equals
+        value: "I like apple\nI like banana\nI like cherry\nI like date"
+    hints:
+      - "writeLines(paste(\"I like\", fruit))"
+    solution: |
+      fruits <- c("apple", "banana", "cherry", "date")
+
+      for (fruit in fruits) {
+        writeLines(paste("I like", fruit))
+      }
+
+  - id: enumerate_step
+    title: "Looping Over Positions, and Custom Steps"
+    instructions: |
+      Sometimes you need both the **position** and the **value**. Then you loop over the positions with `seq_along()`, and look up the value with `[i]`:
+
+      ```r
+      languages <- c("R", "Python", "Julia")
+      seq_along(languages)    # 1 2 3
+
+      for (i in seq_along(languages)) {
+        writeLines(paste("Language", i, "is", languages[i]))
+      }
+      ```
+
+      ```
+      Language 1 is R
+      Language 2 is Python
+      Language 3 is Julia
+      ```
+
+      You'll also see `for (i in 1:length(languages))`, which works the same, except when the vector is **empty**: then `1:length(x)` is `1:0`, which is `c(1, 0)`, and the loop runs twice on values that don't exist. `seq_along()` gives an empty sequence and the loop doesn't run at all, which is what you want.
+
+      **Custom steps with `seq()`**
+
+      `seq(from, to, by)` makes a sequence with steps other than 1:
+
+      ```r
+      seq(1, 9, by = 2)     # 1 3 5 7 9
+      seq(0, 100, by = 25)  # 0 25 50 75 100
+      ```
+
+      **Your task:**
+      1. Loop over the positions of `languages` and show `Language 1 is Python`, and so on
+      2. Then loop over `seq(1, 9, by = 2)` and show `Odd number: 1`, and so on
+    starter_code: |
+      languages <- c("Python", "Java", "C++", "Ruby")
+
+      # 1. Loop over the positions
+      for (i in seq_along(languages)) {
+        # show "Language i is ..."
+
+      }
+
+      # 2. Loop over the odd numbers
+      for (number in seq(1, 9, by = 2)) {
+        # show "Odd number: ..."
+
+      }
+    tests:
+      - type: output_equals
+        value: "Language 1 is Python\nLanguage 2 is Java\nLanguage 3 is C++\nLanguage 4 is Ruby\nOdd number: 1\nOdd number: 3\nOdd number: 5\nOdd number: 7\nOdd number: 9"
+    hints:
+      - "writeLines(paste(\"Language\", i, \"is\", languages[i]))"
+      - "writeLines(paste(\"Odd number:\", number))"
+    solution: |
+      languages <- c("Python", "Java", "C++", "Ruby")
+
+      for (i in seq_along(languages)) {
+        writeLines(paste("Language", i, "is", languages[i]))
+      }
+
+      for (number in seq(1, 9, by = 2)) {
+        writeLines(paste("Odd number:", number))
+      }
+
+  - id: break_loop
+    title: "Stopping Early: break and next"
+    instructions: |
+      Sometimes you want to **stop a loop early** when a condition is met. `break` leaves the loop immediately:
+
+      ```r
+      numbers <- c(3, 7, 1, 9, 4, 2)
+      for (num in numbers) {
+        if (num == 9) {
+          writeLines("Found 9. Exiting the loop.")
+          break
+        }
+        writeLines(paste("Processing", num))
+      }
+      ```
+
+      ```
+      Processing 3
+      Processing 7
+      Processing 1
+      Found 9. Exiting the loop.
+      ```
+
+      The numbers `4` and `2` are **never reached**, because `break` leaves the loop before them.
+
+      Its little brother is `next`: it skips the **rest of this round** and continues with the next value. For example, `if (is.na(num)) next` skips missing values.
+
+      **Your task:**
+      Run the code first. Then add a line that shows `Done` **after** the loop, to confirm that the code after the loop still runs after a `break`.
+    starter_code: |
+      numbers <- c(3, 7, 1, 9, 4, 2)
+
+      for (num in numbers) {
+        if (num == 9) {
+          writeLines("Found 9. Exiting the loop.")
+          break
+        }
+        writeLines(paste("Processing", num))
+      }
+
+      # show "Done" after the loop
+
+    tests:
+      - type: output_equals
+        value: "Processing 3\nProcessing 7\nProcessing 1\nFound 9. Exiting the loop.\nDone"
+    hints:
+      - "writeLines(\"Done\") after the last closing }: it runs after the loop, whether it ended normally or with break"
+    solution: |
+      numbers <- c(3, 7, 1, 9, 4, 2)
+
+      for (num in numbers) {
+        if (num == 9) {
+          writeLines("Found 9. Exiting the loop.")
+          break
+        }
+        writeLines(paste("Processing", num))
+      }
+
+      writeLines("Done")
+
+  - id: accumulator_loop
+    title: "Accumulating Results — Total and Maximum"
+    instructions: |
+      A very common loop pattern is the **accumulator**: you give a variable a starting value **before** the loop, and update it in **every** round:
+
+      ```r
+      numbers <- c(4, 9, 2, 7, 5)
+      total <- 0
+      for (num in numbers) {
+        total <- total + num
+      }
+      total    # 27
+      ```
+
+      `total <- total + num` means: "the new total is the old total plus this number". After the loop, `total` holds the sum of all numbers.
+
+      The same idea works for the **maximum**: start with the first value, and replace it whenever you see a bigger one.
+
+      **Your task:**
+      Given 12 monthly rainfall values (mm), complete the loop so that it calculates:
+      1. `total_rain`: the sum of all months
+      2. `max_rain`: the highest monthly value
+      3. `max_month`: the month number (1–12) with the highest rainfall
+
+      Expected output:
+      ```
+      Total rainfall: 720 mm
+      Wettest month: 4 with 95 mm
+      ```
+
+      (In R you'd normally calculate these without a loop: `sum(rainfall)`, `max(rainfall)` and `which.max(rainfall)`. Writing the loop yourself shows you what those functions do behind the scenes, and the same pattern works for things no function does for you.)
+    starter_code: |
+      rainfall <- c(45, 60, 80, 95, 75, 40, 30, 35, 55, 85, 70, 50)
+
+      total_rain <- 0
+      max_rain <- rainfall[1]
+      max_month <- 1
+
+      for (i in seq_along(rainfall)) {
+        rain <- rainfall[i]
+        # add rain to total_rain
+
+        if (rain > max_rain) {
+          # update max_rain and max_month
+
+        }
+      }
+
+      cat("Total rainfall:", total_rain, "mm\n")
+      cat("Wettest month:", max_month, "with", max_rain, "mm\n")
+    tests:
+      - type: output_contains
+        value: "Total rainfall: 720 mm"
+      - type: output_contains
+        value: "Wettest month: 4 with 95 mm"
+      - type: assert
+        code: |
+          .check(total_rain == 720, "total_rain should be 720: total_rain <- total_rain + rain")
+          .check(max_rain == 95 && max_month == 4, "the wettest month should be month 4, with 95 mm")
+        description: "total = 720, max = 95 in month 4 (April)"
+    hints:
+      - "total_rain <- total_rain + rain"
+      - "Inside the if: max_rain <- rain"
+      - "Inside the if: max_month <- i"
+    solution: |
+      rainfall <- c(45, 60, 80, 95, 75, 40, 30, 35, 55, 85, 70, 50)
+
+      total_rain <- 0
+      max_rain <- rainfall[1]
+      max_month <- 1
+
+      for (i in seq_along(rainfall)) {
+        rain <- rainfall[i]
+        total_rain <- total_rain + rain
+
+        if (rain > max_rain) {
+          max_rain <- rain
+          max_month <- i
+        }
+      }
+
+      cat("Total rainfall:", total_rain, "mm\n")
+      cat("Wettest month:", max_month, "with", max_rain, "mm\n")
+
+  - id: nested_combinations
+    title: "Nested For Loops — All Combinations"
+    instructions: |
+      A loop inside another loop pairs every value of one vector with every value of another. The inner loop runs **completely** for every single round of the outer loop:
+
+      ```r
+      colors <- c("red", "blue")
+      sizes  <- c("S", "M", "L")
+      for (color in colors) {
+        for (size in sizes) {
+          writeLines(paste(color, size))
+        }
+      }
+      ```
+
+      This shows 6 lines (2 × 3): `red S`, `red M`, `red L`, `blue S`, and so on.
+
+      (The tidyverse can also make all combinations as a tibble, without a loop: `expand_grid(color = colors, size = sizes)`.)
+
+      **Your task:**
+      1. Show all combinations of `regions` and `products` in the form `North - Solar`
+      2. Count the combinations in `count`, by adding 1 in every round of the inner loop
+
+      The last line shows `Total combinations: 12`.
+    starter_code: |
+      regions  <- c("North", "South", "East", "West")
+      products <- c("Solar", "Wind", "Hydro")
+
+      count <- 0
+
+      for (region in regions) {
+        for (product in products) {
+          # show the combination, e.g. "North - Solar"
+
+          # add 1 to count
+
+        }
+      }
+
+      cat("Total combinations:", count, "\n")
+    tests:
+      - type: output_contains
+        value: "North - Solar"
+      - type: output_contains
+        value: "West - Hydro"
+      - type: output_contains
+        value: "Total combinations: 12"
+      - type: assert
+        code: |
+          .check(count == 12, "count should be 12 (4 regions x 3 products): count <- count + 1 inside the inner loop")
+        description: "4 regions x 3 products = 12 combinations"
+    hints:
+      - "writeLines(paste(region, \"-\", product)) inside the inner loop"
+      - "count <- count + 1 inside the inner loop"
+    solution: |
+      regions  <- c("North", "South", "East", "West")
+      products <- c("Solar", "Wind", "Hydro")
+
+      count <- 0
+
+      for (region in regions) {
+        for (product in products) {
+          writeLines(paste(region, "-", product))
+          count <- count + 1
+        }
+      }
+
+      cat("Total combinations:", count, "\n")
+
+  - id: loop_or_vector
+    title: "Collecting Results — and Do You Need a Loop?"
+    instructions: |
+      In lesson 7 you built a vector step by step with `x <- c(x, new_value)`. Inside a loop, that's how you **collect results**: start with an empty vector before the loop, and add to it inside the loop.
+
+      ```r
+      emissions <- c(NL = 150, DE = 680, FR = 310)
+
+      for (country in names(emissions)) {
+        amount <- emissions[[country]]
+        writeLines(paste(country, "emitted", amount, "Mt of CO2"))
+      }
+      ```
+
+      Here the loop goes over the **names** of a named vector, and `emissions[[country]]` looks up the value (lesson 7).
+
+      **Do you need a loop?**
+
+      Many things you might write a loop for, R can do on the whole vector at once, as you've seen since lesson 1:
+
+      | With a loop | Without a loop |
+      |-------------|----------------|
+      | add up every value | `sum(x)` |
+      | a sentence per value | `paste(names(x), "emitted", x)` |
+      | keep the values that meet a condition | `x[x > 300]` or `filter()` |
+      | a new value for every row | `mutate()` |
+
+      The version without a loop is shorter, faster, and harder to get wrong. Use a loop for things that **can't** be done on a whole vector at once: reading 20 files one after another, making a separate graph per country, or a calculation where each step depends on the previous one.
+
+      **Your task:**
+      1. Complete the loop: if a country emitted **more than 300** Mt, add its name to `high_emitters`
+      2. Then do the same **without a loop**: `high_emitters_2` should be the names of the countries with more than 300 Mt, using `names()` and `[ ]` with a condition. Both are printed at the end.
+    starter_code: |
+      emissions <- c(NL = 150, DE = 680, FR = 310, ES = 230, PL = 390)
+
+      # 1. With a loop
+      high_emitters <- c()
+
+      for (country in names(emissions)) {
+        amount <- emissions[[country]]
+        # if amount is above 300, add country to high_emitters
+
+      }
+
+      # 2. Without a loop
+      high_emitters_2 <-
+
+      print(high_emitters)
+      print(high_emitters_2)
+    tests:
+      - type: output_contains
+        value: "[1] \"DE\" \"FR\" \"PL\""
+      - type: assert
+        code: |
+          .check(identical(high_emitters, c("DE", "FR", "PL")), "high_emitters should be DE, FR and PL: inside the if, high_emitters <- c(high_emitters, country)")
+          .check(identical(unname(high_emitters_2), c("DE", "FR", "PL")), "high_emitters_2 should be DE, FR and PL: names(emissions)[emissions > 300]")
+        description: "both versions should give DE, FR and PL"
+    hints:
+      - "if (amount > 300) {\n    high_emitters <- c(high_emitters, country)\n  }"
+      - "emissions > 300 gives TRUE/FALSE per country; use it to select from names(emissions)"
+      - "high_emitters_2 <- names(emissions)[emissions > 300]"
+    solution: |
+      emissions <- c(NL = 150, DE = 680, FR = 310, ES = 230, PL = 390)
+
+      high_emitters <- c()
+
+      for (country in names(emissions)) {
+        amount <- emissions[[country]]
+        if (amount > 300) {
+          high_emitters <- c(high_emitters, country)
+        }
+      }
+
+      high_emitters_2 <- names(emissions)[emissions > 300]
+
+      print(high_emitters)
+      print(high_emitters_2)
