@@ -1,0 +1,604 @@
+title: "If, Else If and Else"
+description: "Learn to make decisions in code — run different actions depending on whether a condition is TRUE or FALSE, for a single value and for a whole column."
+
+exercises:
+
+  - id: basic_if
+    title: "The If Statement"
+    instructions: |
+      We are often faced with a situation in which we need to check if a certain condition is met before we proceed with the next action. For example:
+
+      - A coffee machine should only run the water if the temperature reaches a certain level.
+      - A ticket should only be issued if the car exceeds a certain speed.
+      - A map should show red if pollution levels exceed a specific threshold.
+
+      The key word in all these examples is **if**. An `if` statement checks a condition and only runs the code inside it if the condition is `TRUE`.
+
+      ```r
+      x <- 42
+      if (x > 20) {
+        print("x is higher than 20")
+      }
+      ```
+
+      The pieces:
+      - the condition goes between **round brackets** `( )`
+      - the code that should run goes between **curly brackets** `{ }`
+
+      R doesn't care about indentation, but **you** should: indenting the code inside `{ }` by two spaces makes it easy to see what belongs to the `if`. In RStudio, select your code and press **Ctrl + I** (Mac: **Cmd + I**) to fix the indentation automatically.
+
+      You can also put an `if` inside another `if` (this is called **nesting**):
+
+      ```r
+      x <- 42
+      y <- 21
+      if (x > 20) {
+        if (y > 10) {
+          print("x is higher than 20, y is higher than 10")
+        }
+      }
+      ```
+
+      **Your task:**
+      Complete the nested `if` statement: if `x > 20` **and** `y > 10`, print `"Both conditions are met"`.
+    starter_code: |
+      x <- 42
+      y <- 21
+
+      if (x > 20) {
+        # add the inner if statement here
+
+      }
+    tests:
+      - type: output_contains
+        value: "Both conditions are met"
+      - type: assert
+        code: |
+          .check(x == 42 && y == 21, "keep x <- 42 and y <- 21")
+        description: "x and y should keep their values"
+    hints:
+      - "Inside the curly brackets of the first if, write a second if that checks y > 10"
+      - "if (y > 10) {\n    print(\"Both conditions are met\")\n  }"
+    solution: |
+      x <- 42
+      y <- 21
+
+      if (x > 20) {
+        if (y > 10) {
+          print("Both conditions are met")
+        }
+      }
+
+  - id: if_else
+    title: "If / Else — Two Outcomes"
+    instructions: |
+      The `if` statement only runs code when the condition is `TRUE` — but what about when it is `FALSE`? That is where `else` comes in.
+
+      For example, if we grade students, we want the result to be `"Admitted"` if the grade is ≥ 5.5 and `"Fail"` when the grade is lower:
+
+      ```r
+      grade <- 6.8
+      if (grade >= 5.5) {
+        print("Admitted")
+      } else {
+        print("Fail")
+      }
+      ```
+
+      ⚠️ Write `else` on the **same line** as the closing `}` of the `if`: `} else {`. If you put `else` on a new line, R thinks the `if` was already finished and gives the error `unexpected 'else'`.
+
+      **Your task:**
+      Complete the if/else statement so that it prints `"Admitted"` if the grade is ≥ 5.5, and `"Fail"` otherwise. Then click **Run**: with `grade <- 4.2` it should print `"Fail"`. Try changing the grade to check that `"Admitted"` works too, and set it back to `4.2` before you finish.
+    starter_code: |
+      grade <- 4.2
+
+      if (grade >= 5.5) {
+        # what to print if passing
+
+      } else {
+        # what to print if failing
+
+      }
+    tests:
+      - type: output_contains
+        value: "Fail"
+      - type: assert
+        code: |
+          .check(grade == 4.2, "set the grade back to 4.2")
+        description: "grade should be 4.2"
+    hints:
+      - "print(\"Admitted\") goes between the first pair of curly brackets"
+      - "print(\"Fail\") goes between the curly brackets after else"
+    solution: |
+      grade <- 4.2
+
+      if (grade >= 5.5) {
+        print("Admitted")
+      } else {
+        print("Fail")
+      }
+
+  - id: carbon_categories
+    title: "If / Else If / Else — Carbon Emissions"
+    instructions: |
+      When you need more than two outcomes, add `else if`. R checks the conditions **in order** and runs the first one that is `TRUE`; the rest is skipped:
+
+      ```r
+      z <- 7
+      if (z > 10) {
+        print("z is greater than 10")
+      } else if (z > 5) {
+        print("z is greater than 5 but not greater than 10")
+      } else {
+        print("z is not greater than 5")
+      }
+      ```
+
+      Because the conditions are checked in order, the `else if (z > 5)` doesn't need to say "and not greater than 10": if `z` were greater than 10, R would never have reached it.
+
+      if/else is often used inside a **function**. In lesson 5 you saw that a function gives back its last value. You can also say explicitly what it gives back with `return()`, which immediately stops the function:
+
+      ```r
+      check_size <- function(n) {
+        if (n > 100) {
+          return("big")
+        } else {
+          return("small")
+        }
+      }
+      check_size(250)    # "big"
+      ```
+
+      **Your task:**
+      Complete the function `categorize_emissions(emissions)`, which takes annual CO₂ emissions in tons and returns a category:
+
+      | Emissions (tons/year) | Category |
+      |----------------------|----------|
+      | Less than 2 | `"Low Emissions"` |
+      | 2 to less than 6 | `"Moderate Emissions"` |
+      | 6 to less than 15 | `"High Emissions"` |
+      | 15 or more | `"Very High Emissions"` |
+
+      The last line already calls it with `8.5` and prints the result.
+    starter_code: |
+      categorize_emissions <- function(emissions) {
+        if (emissions < 2) {
+          return("Low Emissions")
+        } else if (emissions < 6) {
+          # Moderate range
+
+        } else if (emissions < 15) {
+          # High range
+
+        } else {
+          # Very High
+
+        }
+      }
+
+      print(categorize_emissions(8.5))
+    tests:
+      - type: output_contains
+        value: "High Emissions"
+      - type: assert
+        code: |
+          .check(identical(categorize_emissions(1), "Low Emissions"), "1 ton should be Low Emissions")
+          .check(identical(categorize_emissions(4), "Moderate Emissions"), "4 tons should be Moderate Emissions")
+          .check(identical(categorize_emissions(8.5), "High Emissions"), "8.5 tons should be High Emissions")
+          .check(identical(categorize_emissions(20), "Very High Emissions"), "20 tons should be Very High Emissions")
+        description: "the function should give the right category for all four ranges"
+    hints:
+      - "Each empty block needs a return(...) with the right category"
+      - "In the Moderate block: return(\"Moderate Emissions\")"
+      - "In the else block: return(\"Very High Emissions\")"
+    solution: |
+      categorize_emissions <- function(emissions) {
+        if (emissions < 2) {
+          return("Low Emissions")
+        } else if (emissions < 6) {
+          return("Moderate Emissions")
+        } else if (emissions < 15) {
+          return("High Emissions")
+        } else {
+          return("Very High Emissions")
+        }
+      }
+
+      print(categorize_emissions(8.5))
+
+  - id: water_conservation
+    title: "If / Else If / Else — Water Conservation"
+    instructions: |
+      Now write a whole if / else if / else chain yourself.
+
+      **Your task:**
+      Write a function `rate_water_usage(daily_usage)` that takes the number of liters used per day and returns a conservation rating:
+
+      | Daily usage (liters) | Rating |
+      |----------------------|--------|
+      | Less than 50 | `"Excellent Conservation"` |
+      | 50 to less than 100 | `"Good Conservation"` |
+      | 100 to less than 150 | `"Average Conservation"` |
+      | 150 or more | `"Poor Conservation"` |
+
+      The last line already calls it with `75` and prints the result.
+    starter_code: |
+      rate_water_usage <- function(daily_usage) {
+        # write your if / else if / else here
+
+      }
+
+      print(rate_water_usage(75))
+    tests:
+      - type: output_contains
+        value: "Good Conservation"
+      - type: assert
+        code: |
+          .check(identical(rate_water_usage(30), "Excellent Conservation"), "30 liters should be Excellent Conservation")
+          .check(identical(rate_water_usage(75), "Good Conservation"), "75 liters should be Good Conservation")
+          .check(identical(rate_water_usage(120), "Average Conservation"), "120 liters should be Average Conservation")
+          .check(identical(rate_water_usage(200), "Poor Conservation"), "200 liters should be Poor Conservation")
+        description: "the function should give the right rating for all four ranges"
+    hints:
+      - "Start with: if (daily_usage < 50) { return(\"Excellent Conservation\") }"
+      - "Then: } else if (daily_usage < 100) { return(\"Good Conservation\")"
+      - "Continue with else if (daily_usage < 150) for Average, and else for Poor"
+    solution: |
+      rate_water_usage <- function(daily_usage) {
+        if (daily_usage < 50) {
+          return("Excellent Conservation")
+        } else if (daily_usage < 100) {
+          return("Good Conservation")
+        } else if (daily_usage < 150) {
+          return("Average Conservation")
+        } else {
+          return("Poor Conservation")
+        }
+      }
+
+      print(rate_water_usage(75))
+
+  - id: temperature_advice
+    title: "Decisions for a Whole Column: if_else() and case_when()"
+    instructions: |
+      An `if` statement checks **one** value. If you give it a vector, R stops with an error:
+
+      ```r
+      temp <- c(35, 22, 15)
+      if (temp >= 20) {
+        print("warm")
+      }
+      ```
+      ```
+      Error in if (temp >= 20) { : the condition has length > 1
+      ```
+
+      In data analysis you usually want to make a decision for **every row** of a column. The tidyverse has two functions for that, which you use inside `mutate()`:
+
+      **`if_else(condition, value_if_TRUE, value_if_FALSE)`** — two outcomes, like if/else:
+
+      ```r
+      df |> mutate(warm = if_else(temp >= 20, "yes", "no"))
+      ```
+
+      **`case_when()`** — more outcomes, like if / else if / else. Each line is `condition ~ value`. Just like with `else if`, the conditions are checked **in order** and each row gets the value of the first condition that is `TRUE`. `.default` is the value for rows where no condition is `TRUE` (like `else`):
+
+      ```r
+      df |> mutate(size = case_when(
+        n > 100 ~ "big",
+        n > 10  ~ "medium",
+        .default = "small"
+      ))
+      ```
+
+      Read `~` as "then": "if n > 100, then big".
+
+      **Your task:**
+      1. Add a column `frost` with `if_else()`: `"frost"` when `temp` is below 0, `"no frost"` otherwise
+      2. Complete the `case_when()` for the column `advice`:
+
+      | Temperature | Advice |
+      |-------------|--------|
+      | ≥ 30 | `"Wear light clothing and stay hydrated."` |
+      | ≥ 20 | `"A t-shirt is fine."` |
+      | ≥ 10 | `"Bring a jacket."` |
+      | ≥ 0 | `"Wear a warm coat."` |
+      | below 0 | `"It's freezing, layer up!"` |
+
+      The last line prints the table with `print(n = Inf, width = Inf)`, which shows all rows and columns in full.
+    starter_code: |
+      library(tidyverse)
+
+      forecast <- tibble(
+        day  = c("Mon", "Tue", "Wed", "Thu", "Fri"),
+        temp = c(35, 22, 15, 5, -3)
+      )
+
+      forecast <- forecast |>
+        mutate(
+          frost = ,
+          advice = case_when(
+            temp >= 30 ~ "Wear light clothing and stay hydrated.",
+            # add the other conditions here
+            .default = "It's freezing, layer up!"
+          )
+        )
+
+      print(forecast, n = Inf, width = Inf)
+    tests:
+      - type: output_contains
+        value: "Bring a jacket."
+      - type: assert
+        code: |
+          .check(is.data.frame(forecast) && all(c("frost", "advice") %in% names(forecast)), "forecast should have the columns frost and advice")
+          .check(identical(forecast$frost, c("no frost", "no frost", "no frost", "no frost", "frost")), "frost should be \"frost\" only for temperatures below 0")
+          .check(identical(forecast$advice, c("Wear light clothing and stay hydrated.", "A t-shirt is fine.", "Bring a jacket.", "Wear a warm coat.", "It's freezing, layer up!")), "the advice column doesn't match the table yet")
+        description: "the frost and advice columns should match the task"
+    hints:
+      - "frost = if_else(temp < 0, \"frost\", \"no frost\"),"
+      - "Each new line in case_when looks like: temp >= 20 ~ \"A t-shirt is fine.\","
+      - "Don't forget the comma at the end of each line inside case_when()"
+    solution: |
+      library(tidyverse)
+
+      forecast <- tibble(
+        day  = c("Mon", "Tue", "Wed", "Thu", "Fri"),
+        temp = c(35, 22, 15, 5, -3)
+      )
+
+      forecast <- forecast |>
+        mutate(
+          frost = if_else(temp < 0, "frost", "no frost"),
+          advice = case_when(
+            temp >= 30 ~ "Wear light clothing and stay hydrated.",
+            temp >= 20 ~ "A t-shirt is fine.",
+            temp >= 10 ~ "Bring a jacket.",
+            temp >= 0  ~ "Wear a warm coat.",
+            .default = "It's freezing, layer up!"
+          )
+        )
+
+      print(forecast, n = Inf, width = Inf)
+
+  - id: practice_basic_if
+    title: "Practice: The If Statement"
+    instructions: |
+      More practice with nested `if` statements — this time checking growing conditions.
+
+      **Your task:**
+      Complete the nested `if` statement: if `rainfall > 10` **and** `temperature > 20`, print `"Good growing conditions"`.
+    starter_code: |
+      rainfall <- 15
+      temperature <- 22
+
+      if (rainfall > 10) {
+        # add the inner if statement here
+
+      }
+    tests:
+      - type: output_contains
+        value: "Good growing conditions"
+      - type: assert
+        code: |
+          .check(rainfall == 15 && temperature == 22, "keep rainfall <- 15 and temperature <- 22")
+        description: "rainfall and temperature should keep their values"
+    hints:
+      - "Inside the curly brackets of the first if, write a second if that checks temperature > 20"
+      - "if (temperature > 20) {\n    print(\"Good growing conditions\")\n  }"
+    solution: |
+      rainfall <- 15
+      temperature <- 22
+
+      if (rainfall > 10) {
+        if (temperature > 20) {
+          print("Good growing conditions")
+        }
+      }
+
+  - id: practice_if_else
+    title: "Practice: If / Else — Two Outcomes"
+    instructions: |
+      More practice with if/else — this time grading an energy efficiency audit.
+
+      An audit `score` (out of 100) results in `"Pass"` if it's ≥ 60, and `"Fail"` otherwise.
+
+      **Your task:**
+      Write the if/else statement yourself: print `"Pass"` if the score is ≥ 60, and `"Fail"` otherwise. With `score <- 45` it should print `"Fail"`. Remember: `} else {` on one line.
+    starter_code: |
+      score <- 45
+
+      # write your if/else here
+
+    tests:
+      - type: output_contains
+        value: "Fail"
+      - type: assert
+        code: |
+          .check(score == 45, "keep score <- 45")
+        description: "score should be 45"
+    hints:
+      - "if (score >= 60) {\n  print(\"Pass\")\n}"
+      - "Add } else { print(\"Fail\") } after it, with else on the same line as the }"
+    solution: |
+      score <- 45
+
+      if (score >= 60) {
+        print("Pass")
+      } else {
+        print("Fail")
+      }
+
+  - id: practice_carbon_categories
+    title: "Practice: If / Else If / Else — Recycling Rates"
+    instructions: |
+      More practice with `else if` chains — this time categorising a recycling rate.
+
+      **Your task:**
+      Complete the function `categorize_recycling(rate)`, which takes a recycling rate in percent and returns a category:
+
+      | Recycling rate | Category |
+      |-----------------|----------|
+      | Less than 20 | `"Poor Recycling"` |
+      | 20 to less than 50 | `"Fair Recycling"` |
+      | 50 to less than 80 | `"Good Recycling"` |
+      | 80 or more | `"Excellent Recycling"` |
+
+      The last line already calls it with `65` and prints the result.
+    starter_code: |
+      categorize_recycling <- function(rate) {
+        if (rate < 20) {
+          return("Poor Recycling")
+        } else if (rate < 50) {
+          # Fair range
+
+        } else if (rate < 80) {
+          # Good range
+
+        } else {
+          # Excellent
+
+        }
+      }
+
+      print(categorize_recycling(65))
+    tests:
+      - type: output_contains
+        value: "Good Recycling"
+      - type: assert
+        code: |
+          .check(identical(categorize_recycling(10), "Poor Recycling"), "10% should be Poor Recycling")
+          .check(identical(categorize_recycling(35), "Fair Recycling"), "35% should be Fair Recycling")
+          .check(identical(categorize_recycling(65), "Good Recycling"), "65% should be Good Recycling")
+          .check(identical(categorize_recycling(90), "Excellent Recycling"), "90% should be Excellent Recycling")
+        description: "the function should give the right category for all four ranges"
+    hints:
+      - "Each empty block needs a return(...) with the right category"
+      - "In the Fair block: return(\"Fair Recycling\")"
+      - "In the else block: return(\"Excellent Recycling\")"
+    solution: |
+      categorize_recycling <- function(rate) {
+        if (rate < 20) {
+          return("Poor Recycling")
+        } else if (rate < 50) {
+          return("Fair Recycling")
+        } else if (rate < 80) {
+          return("Good Recycling")
+        } else {
+          return("Excellent Recycling")
+        }
+      }
+
+      print(categorize_recycling(65))
+
+  - id: practice_water_conservation
+    title: "Practice: If / Else If / Else — Energy Efficiency"
+    instructions: |
+      **Your task:**
+      Write a function `rate_energy_usage(daily_kwh)` that takes daily household energy use in kWh and returns an efficiency rating:
+
+      | Daily usage (kWh) | Rating |
+      |--------------------|--------|
+      | Less than 5 | `"Excellent Efficiency"` |
+      | 5 to less than 10 | `"Good Efficiency"` |
+      | 10 to less than 15 | `"Average Efficiency"` |
+      | 15 or more | `"Poor Efficiency"` |
+
+      The last line already calls it with `7` and prints the result.
+    starter_code: |
+      rate_energy_usage <- function(daily_kwh) {
+        # write your if / else if / else here
+
+      }
+
+      print(rate_energy_usage(7))
+    tests:
+      - type: output_contains
+        value: "Good Efficiency"
+      - type: assert
+        code: |
+          .check(identical(rate_energy_usage(3), "Excellent Efficiency"), "3 kWh should be Excellent Efficiency")
+          .check(identical(rate_energy_usage(7), "Good Efficiency"), "7 kWh should be Good Efficiency")
+          .check(identical(rate_energy_usage(12), "Average Efficiency"), "12 kWh should be Average Efficiency")
+          .check(identical(rate_energy_usage(20), "Poor Efficiency"), "20 kWh should be Poor Efficiency")
+        description: "the function should give the right rating for all four ranges"
+    hints:
+      - "Start with: if (daily_kwh < 5) { return(\"Excellent Efficiency\") }"
+      - "Then: } else if (daily_kwh < 10) { return(\"Good Efficiency\")"
+      - "Continue with else if (daily_kwh < 15) for Average, and else for Poor"
+    solution: |
+      rate_energy_usage <- function(daily_kwh) {
+        if (daily_kwh < 5) {
+          return("Excellent Efficiency")
+        } else if (daily_kwh < 10) {
+          return("Good Efficiency")
+        } else if (daily_kwh < 15) {
+          return("Average Efficiency")
+        } else {
+          return("Poor Efficiency")
+        }
+      }
+
+      print(rate_energy_usage(7))
+
+  - id: practice_temperature_advice
+    title: "Practice: if_else() and case_when() — Air Quality"
+    instructions: |
+      More practice with decisions for a whole column — this time air quality measurements from five cities.
+
+      **Your task:**
+      1. Add a column `alert` with `if_else()`: `TRUE` when `aqi` is 100 or more, `FALSE` otherwise. (Tip: the condition `aqi >= 100` itself is already `TRUE` or `FALSE`, so `alert = aqi >= 100` gives the same result. Use `if_else()` anyway for practice.)
+      2. Add a column `advice` with `case_when()`:
+
+      | AQI | Advice |
+      |-----|--------|
+      | ≥ 300 | `"Hazardous: stay indoors."` |
+      | ≥ 200 | `"Very unhealthy: limit outdoor activity."` |
+      | ≥ 100 | `"Unhealthy for sensitive groups."` |
+      | ≥ 50 | `"Moderate: acceptable air quality."` |
+      | below 50 | `"Good air quality: enjoy the outdoors."` |
+
+      Store the result back in `air` and print it with `print(air, n = Inf, width = Inf)`.
+    starter_code: |
+      library(tidyverse)
+
+      air <- tibble(
+        city = c("Delhi", "Lahore", "Beijing", "Utrecht", "Reykjavik"),
+        aqi  = c(350, 220, 150, 80, 30)
+      )
+
+      # add the columns alert and advice
+
+    tests:
+      - type: output_contains
+        value: "Unhealthy for sensitive groups."
+      - type: assert
+        code: |
+          .check(is.data.frame(air) && all(c("alert", "advice") %in% names(air)), "air should have the columns alert and advice: air <- air |> mutate(...)")
+          .check(identical(air$alert, c(TRUE, TRUE, TRUE, FALSE, FALSE)), "alert should be TRUE for an AQI of 100 or more, and FALSE otherwise")
+          .check(identical(air$advice, c("Hazardous: stay indoors.", "Very unhealthy: limit outdoor activity.", "Unhealthy for sensitive groups.", "Moderate: acceptable air quality.", "Good air quality: enjoy the outdoors.")), "the advice column doesn't match the table yet")
+        description: "the alert and advice columns should match the task"
+    hints:
+      - "air <- air |> mutate(alert = ..., advice = case_when(...))"
+      - "alert = if_else(aqi >= 100, TRUE, FALSE)"
+      - "Start the case_when with aqi >= 300 ~ \"Hazardous: stay indoors.\", and end it with .default = \"Good air quality: enjoy the outdoors.\""
+    solution: |
+      library(tidyverse)
+
+      air <- tibble(
+        city = c("Delhi", "Lahore", "Beijing", "Utrecht", "Reykjavik"),
+        aqi  = c(350, 220, 150, 80, 30)
+      )
+
+      air <- air |>
+        mutate(
+          alert = if_else(aqi >= 100, TRUE, FALSE),
+          advice = case_when(
+            aqi >= 300 ~ "Hazardous: stay indoors.",
+            aqi >= 200 ~ "Very unhealthy: limit outdoor activity.",
+            aqi >= 100 ~ "Unhealthy for sensitive groups.",
+            aqi >= 50  ~ "Moderate: acceptable air quality.",
+            .default = "Good air quality: enjoy the outdoors."
+          )
+        )
+
+      print(air, n = Inf, width = Inf)

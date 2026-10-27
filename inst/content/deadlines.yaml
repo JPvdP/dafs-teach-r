@@ -23,4 +23,9 @@
     - 02_data_frames_intro
     - 03_data_types_and_logic
     - 04_installing_packages
+
+- id: r-week2
+  deadline: "2099-01-08T23:59:00"
+  lessons:
     - 05_print_and_functions
+    - 06_if_else
