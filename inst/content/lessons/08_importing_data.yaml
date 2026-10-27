@@ -1,0 +1,559 @@
+title: Importing and Exporting Data
+description: Learn how to load data from CSV and TSV files with readr (part of the tidyverse), how to tell R where your file is, and how to export your results when you are done.
+
+exercises:
+
+  - id: read_csv_comma
+    title: Reading a CSV File
+    instructions: |
+      Data comes in many different formats. The most basic are `.txt` and `.csv`. **CSV** stands for "Comma Separated Values": each column is separated by a comma `,`.
+
+      The tidyverse reads CSV files with `read_csv()` (from the readr package, which `library(tidyverse)` loads for you):
+
+      ```r
+      library(tidyverse)
+
+      df <- read_csv("sample_data.csv")
+      print(df)
+      ```
+
+      The result is a tibble, just like the ones you made yourself in lesson 2.
+
+      **The message after reading**
+
+      `read_csv()` tells you what it found:
+
+      ```
+      Rows: 3 Columns: 3
+      ── Column specification ──────────────────────────
+      Delimiter: ","
+      chr (1): country
+      dbl (2): pollution, year
+      ```
+
+      This is not an error: it's a summary. It says which **delimiter** (separator) was used, and which type each column got: `chr` is text, `dbl` is a number. Always glance at it: if a column you expected to be numbers shows up as `chr`, something in the file isn't what you think. Once you're happy, you can hide it with `read_csv("sample_data.csv", show_col_types = FALSE)`.
+
+      **In this app**
+
+      In a real project you give `read_csv()` a file path. In these exercises the data is stored in a text variable instead, and we wrap it in `I()` ("take this text **as is**"), so `read_csv()` reads the text as if it were the contents of a file. Everything else works exactly the same.
+
+      **Your task:**
+      Load `csv_data` into a tibble called `df` with `read_csv(I(csv_data))`. The code then prints the number of rows and columns, and the column names.
+    starter_code: |
+      library(tidyverse)
+
+      csv_data <- "country,pollution,year
+      NL,21,2020
+      DE,23,2020
+      FR,17,2020"
+
+      # Load into a tibble
+      df <-
+
+      print(dim(df))
+      print(names(df))
+    tests:
+      - type: output_contains
+        value: "[1] 3 3"
+      - type: output_contains
+        value: "\"country\""
+      - type: assert
+        code: |
+          .check(is.data.frame(df), "df should be the tibble you get from read_csv(I(csv_data))")
+          .check(identical(dim(df), c(3L, 3L)), "df should have 3 rows and 3 columns")
+          .check(identical(names(df), c("country", "pollution", "year")), "df should have the columns country, pollution and year")
+        description: "df should have 3 rows and the columns country, pollution, year"
+    hints:
+      - "df <- read_csv(I(csv_data))"
+    solution: |
+      library(tidyverse)
+
+      csv_data <- "country,pollution,year
+      NL,21,2020
+      DE,23,2020
+      FR,17,2020"
+
+      df <- read_csv(I(csv_data))
+
+      print(dim(df))
+      print(names(df))
+
+  - id: file_paths
+    title: "File Paths: Telling R Where Your File Is"
+    instructions: |
+      In `read_csv("sample_data.csv")`, the text between the quotes is a **file path**: the address of the file on your computer. R needs that address to find the file.
+
+      **What does a file path look like?**
+
+      A path lists the folders you go through to reach the file, from the top of your drive down to the file itself:
+
+      | System | Example path |
+      |--------|--------------|
+      | Windows | `C:\Users\Sam\Documents\DAFS\emissions.csv` |
+      | macOS | `/Users/sam/Documents/DAFS/emissions.csv` |
+
+      Windows separates folders with a **backslash** `\` and starts with a drive letter (`C:`). macOS and Linux use a **forward slash** `/`.
+
+      **Full path or just the file name?**
+
+      - A **full path** (like the examples above) always works, no matter where your script is.
+      - If you write **just the file name**, `read_csv("emissions.csv")`, R looks for the file only in the folder it is currently working in: the **working directory**. If the file is somewhere else, you get:
+        ```
+        Error: 'emissions.csv' does not exist in current working directory:
+        'C:/Users/Sam/Documents'.
+        ```
+        `getwd()` ("get working directory") shows which folder R is working in.
+
+      **RStudio Projects** make this easy: create a project with *File → New Project*, put your data in the project folder, and RStudio always uses that folder as the working directory. Then just the file name (or `"data/emissions.csv"` for a file in a subfolder) is enough, and your code also works on someone else's computer.
+
+      **How do I find the path of a file?**
+
+      - **RStudio:** type two quotes `""`, put your cursor between them and press **Tab**. RStudio shows the files and folders in your working directory, and you can click your way to the file.
+      - **Windows:** in File Explorer, right-click the file and choose **Copy as path**. (On Windows 10, hold **Shift** while you right-click.) The path is copied *with* quotes around it.
+      - **macOS:** in Finder, select the file and press **Option + Cmd + C**. Or right-click the file, hold the **Option** key, and choose **Copy "emissions.csv" as Pathname**.
+
+      **The Windows backslash problem**
+
+      Inside R text, a backslash `\` has a special meaning: it starts a *special character*. `\n` means "new line" and `\t` means "tab". So when you paste a Windows path, R misreads it:
+
+      ```r
+      path <- "C:\Users\Sam\data\new_emissions.csv"
+      ```
+
+      ```
+      Error: '\U' used without hex digits in character string
+      ```
+
+      Here `\U` is the problem: R thinks a special character code starts there. And even when there's no error, `\n` in `\new_emissions.csv` silently becomes a line break, so the path is wrong and R can't find the file.
+
+      There are three ways to fix this. All three work:
+
+      | Fix | Example | How it works |
+      |-----|---------|--------------|
+      | **Forward slashes** | `"C:/Users/Sam/data/new_emissions.csv"` | Windows also understands `/`, and `/` has no special meaning in R |
+      | **Double backslashes** | `"C:\\Users\\Sam\\data\\new_emissions.csv"` | `\\` means "one real backslash" |
+      | **Raw string** | `r"(C:\Users\Sam\data\new_emissions.csv)"` | `r"( ... )"` tells R to leave all backslashes alone |
+
+      Note the raw string: an `r` in front of the quotes, **and** round brackets just inside them. On macOS you don't need any of this, because paths use forward slashes. It's only **back**slashes that need doubling: forward slashes `/` never do.
+
+      One more surprise: `print()` shows a backslash **doubled**, because it shows text the way you'd type it in R. `writeLines()` shows the real text, so the code below uses that.
+
+      **Your task:**
+      The three lines below each contain the same broken Windows path. Click **Run** to see the error, then fix each line in a different way:
+      1. `path_forward`: replace the backslashes with forward slashes
+      2. `path_double`: double every backslash
+      3. `path_raw`: turn it into a raw string with `r"( ... )"`
+    starter_code: |
+      # 1. Fix with forward slashes
+      path_forward <- "C:\Users\Sam\data\new_emissions.csv"
+
+      # 2. Fix with double backslashes
+      path_double <- "C:\Users\Sam\data\new_emissions.csv"
+
+      # 3. Fix with a raw string
+      path_raw <- "C:\Users\Sam\data\new_emissions.csv"
+
+      writeLines(path_forward)
+      writeLines(path_double)
+      writeLines(path_raw)
+    tests:
+      - type: output_contains
+        value: "new_emissions.csv"
+      - type: assert
+        code: |
+          .check(identical(path_forward, "C:/Users/Sam/data/new_emissions.csv"), "path_forward should use forward slashes: \"C:/Users/...\"")
+          .check(identical(path_double, "C:\\Users\\Sam\\data\\new_emissions.csv"), "path_double should have every backslash doubled")
+          .check(identical(path_raw, "C:\\Users\\Sam\\data\\new_emissions.csv"), "path_raw should be the original path inside r\"( ... )\"")
+          .src <- readLines(sub("^--file=", "", grep("^--file=", commandArgs(), value = TRUE)), warn = FALSE)
+          .check(any(grepl("^\\s*path_raw\\s*(<-|=)\\s*[rR][\"'][-]*[(\\[{]", .src)), "path_raw should be a raw string: r\"(C:\\Users\\...)\"")
+        description: "all three paths should point to C:\\Users\\Sam\\data\\new_emissions.csv, each fixed in its own way"
+    hints:
+      - "Run the code first and read the error: R trips over the \\U in C:\\Users"
+      - "path_forward <- \"C:/Users/Sam/data/new_emissions.csv\""
+      - "path_double <- \"C:\\\\Users\\\\Sam\\\\data\\\\new_emissions.csv\""
+      - "path_raw <- r\"(C:\\Users\\Sam\\data\\new_emissions.csv)\""
+    solution: |
+      path_forward <- "C:/Users/Sam/data/new_emissions.csv"
+
+      path_double <- "C:\\Users\\Sam\\data\\new_emissions.csv"
+
+      path_raw <- r"(C:\Users\Sam\data\new_emissions.csv)"
+
+      writeLines(path_forward)
+      writeLines(path_double)
+      writeLines(path_raw)
+
+  - id: read_csv_separator
+    title: "Semicolons and Decimal Commas"
+    instructions: |
+      CSV files don't always use a comma as the separator. Files from Dutch, German or French sources (and from Excel on a computer with Dutch settings) often use a **semicolon** `;`. If you read such a file with `read_csv()`, everything ends up in one column:
+
+      ```
+      # A tibble: 3 × 1
+        `country;pollution;year`
+        <chr>
+      1 NL;21,4;2020
+      ```
+
+      Look at the column specification message: `Delimiter: ","` and a single `chr` column are the giveaway.
+
+      The reason these files use semicolons: they write decimal numbers with a **comma** (`21,4` instead of `21.4`), so the comma can't also be the separator. readr has two functions for other separators:
+
+      | Function | Separator | Decimal mark |
+      |----------|-----------|--------------|
+      | `read_delim(file, delim = ";")` | whatever you choose | `.` |
+      | `read_csv2(file)` | `;` | `,` |
+
+      ⚠️ With decimal commas, `read_delim(delim = ";")` gives you a **silent problem**: it ignores the comma and reads `21,4` as `214`. No error, just wrong numbers. For semicolon files with decimal commas, use `read_csv2()`. Whatever you use, always check a few values against the original file.
+
+      **Your task:**
+      `csv_data` uses semicolons and decimal commas. Load it into `df` so that the pollution values are read correctly. The code prints the size of `df` and the pollution value of `DE`, which should be `23.5`.
+    starter_code: |
+      library(tidyverse)
+
+      csv_data <- "country;pollution;year
+      NL;21,4;2020
+      DE;23,5;2020
+      FR;17,9;2020"
+
+      # Load with the right function
+      df <- read_csv(I(csv_data))
+
+      print(dim(df))
+      print(df$pollution[2])
+    tests:
+      - type: output_contains
+        value: "[1] 23.5"
+      - type: assert
+        code: |
+          .check(identical(dim(df), c(3L, 3L)), "df should have 3 rows and 3 columns. Did you use a function that reads semicolons?")
+          .check(isTRUE(all.equal(df$pollution, c(21.4, 23.5, 17.9))), "the pollution values should be 21.4, 23.5 and 17.9: the comma is the decimal mark")
+        description: "df should have 3 columns and pollution values 21.4, 23.5, 17.9"
+    hints:
+      - "Run it first: with read_csv() everything ends up in one column"
+      - "The file uses ; as separator and , as decimal mark"
+      - "df <- read_csv2(I(csv_data))"
+    solution: |
+      library(tidyverse)
+
+      csv_data <- "country;pollution;year
+      NL;21,4;2020
+      DE;23,5;2020
+      FR;17,9;2020"
+
+      df <- read_csv2(I(csv_data))
+
+      print(dim(df))
+      print(df$pollution[2])
+
+  - id: read_tsv
+    title: Reading a TSV File (Tab-Separated)
+    instructions: |
+      **TSV** is a plain text file where the separator is a **tab** character. In R text, a tab is written as `\t` (one of the special backslash characters from the file paths exercise).
+
+      readr has a function just for TSV files:
+
+      ```r
+      df <- read_tsv("sample_data.tsv")
+      ```
+
+      This does the same as `read_delim("sample_data.tsv", delim = "\t")`.
+
+      **Excel files**
+
+      For Excel files you use `read_excel()` from the **readxl** package. It is installed with the tidyverse, but not loaded by `library(tidyverse)`, so you need `library(readxl)` first (just like glue in lesson 5):
+
+      ```r
+      library(readxl)
+      df <- read_excel("energy.xlsx", sheet = "2023")
+      ```
+
+      **Your task:**
+      `tsv_data` is tab-separated. Load it into `df`. The code prints the size of `df` and the `country` column.
+    starter_code: |
+      library(tidyverse)
+
+      tsv_data <- "country\tpopulation\tgdp\nNL\t17\t1000\nDE\t84\t4200\nFR\t68\t2800\nBE\t11\t560"
+
+      # Load the tab-separated data
+      df <-
+
+      print(dim(df))
+      print(df$country)
+    tests:
+      - type: output_contains
+        value: "[1] 4 3"
+      - type: output_contains
+        value: "\"BE\""
+      - type: assert
+        code: |
+          .check(identical(dim(df), c(4L, 3L)), "df should have 4 rows and 3 columns")
+          .check(identical(names(df), c("country", "population", "gdp")), "df should have the columns country, population and gdp")
+        description: "df should have 4 rows and 3 columns"
+    hints:
+      - "df <- read_tsv(I(tsv_data))"
+    solution: |
+      library(tidyverse)
+
+      tsv_data <- "country\tpopulation\tgdp\nNL\t17\t1000\nDE\t84\t4200\nFR\t68\t2800\nBE\t11\t560"
+
+      df <- read_tsv(I(tsv_data))
+
+      print(dim(df))
+      print(df$country)
+
+  - id: export_csv
+    title: Exporting Data to CSV
+    instructions: |
+      Once you are done with your data operations, you often want to **export** the results to share them, save them, or use them in other software.
+
+      `write_csv()` writes a tibble (or data frame) to a CSV file. First the data, then the file path:
+
+      ```r
+      write_csv(df, "output.csv")
+      ```
+
+      Without a full path, the file is saved in the working directory (see the file paths exercise). The same family has functions for other formats:
+
+      ```r
+      write_csv2(df, "output.csv")   # semicolons and decimal commas, for Excel with Dutch settings
+      write_tsv(df, "output.tsv")    # tab-separated
+      ```
+
+      For Excel files, use `write_xlsx()` from the **writexl** package (`install.packages("writexl")`).
+
+      **Your task:**
+      1. Add a column `gdp_per_capita` (`gdp / population`) to `df` with `mutate()`
+      2. Export `df` to `output.csv`
+      3. The last lines read the file back in and print its size: it should be 3 rows and 4 columns
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        country = c("NL", "DE", "FR"),
+        population = c(17, 84, 68),
+        gdp = c(1000, 4200, 2800)
+      )
+
+      # 1. Add the gdp_per_capita column
+      df <- df |> mutate(gdp_per_capita = )
+
+      # 2. Export to output.csv
+
+
+      # 3. Read it back and print the size
+      df_check <- read_csv("output.csv", show_col_types = FALSE)
+      print(dim(df_check))
+    tests:
+      - type: output_equals
+        value: "[1] 3 4"
+      - type: assert
+        code: |
+          .df <- readr::read_csv("output.csv", show_col_types = FALSE)
+          .check("gdp_per_capita" %in% names(.df), "output.csv should contain the column gdp_per_capita")
+          .check(identical(dim(.df), c(3L, 4L)), "output.csv should have 3 rows and 4 columns")
+          .check(isTRUE(all.equal(.df$gdp_per_capita, c(1000 / 17, 4200 / 84, 2800 / 68), tolerance = 1e-6)), "gdp_per_capita should be gdp / population")
+        description: "output.csv should have 3 rows and 4 columns including gdp_per_capita"
+    hints:
+      - "df <- df |> mutate(gdp_per_capita = gdp / population)"
+      - "write_csv(df, \"output.csv\")"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        country = c("NL", "DE", "FR"),
+        population = c(17, 84, 68),
+        gdp = c(1000, 4200, 2800)
+      )
+
+      df <- df |> mutate(gdp_per_capita = gdp / population)
+
+      write_csv(df, "output.csv")
+
+      df_check <- read_csv("output.csv", show_col_types = FALSE)
+      print(dim(df_check))
+
+  - id: practice_read_csv_comma
+    title: "Practice: Reading a CSV File"
+    instructions: |
+      More practice loading comma-separated data.
+
+      **Your task:**
+      Load `csv_data` into a tibble called `df` with `read_csv()`. This time, hide the column specification message with `show_col_types = FALSE`. The code prints the size and the column names.
+    starter_code: |
+      library(tidyverse)
+
+      csv_data <- "country,energy_kwh,year
+      NL,120,2021
+      DE,150,2021
+      FR,95,2021"
+
+      # Load into a tibble, without the message
+      df <-
+
+      print(dim(df))
+      print(names(df))
+    tests:
+      - type: output_contains
+        value: "[1] 3 3"
+      - type: output_contains
+        value: "\"energy_kwh\""
+      - type: assert
+        code: |
+          .check(identical(dim(df), c(3L, 3L)), "df should have 3 rows and 3 columns")
+          .check(identical(names(df), c("country", "energy_kwh", "year")), "df should have the columns country, energy_kwh and year")
+        description: "df should have 3 rows and the columns country, energy_kwh, year"
+    hints:
+      - "read_csv(I(csv_data), show_col_types = FALSE)"
+    solution: |
+      library(tidyverse)
+
+      csv_data <- "country,energy_kwh,year
+      NL,120,2021
+      DE,150,2021
+      FR,95,2021"
+
+      df <- read_csv(I(csv_data), show_col_types = FALSE)
+
+      print(dim(df))
+      print(names(df))
+
+  - id: practice_read_csv_separator
+    title: "Practice: Semicolons and Decimal Commas"
+    instructions: |
+      More practice with semicolon files — this time waste data per person.
+
+      **Your task:**
+      1. Run the code first. `read_delim()` gets the columns right, but look at the `waste_kg` values: they are 10 times too large. Why?
+      2. Fix it so the values are read correctly. The code prints the size of `df` and the waste of `DE`, which should be `510.5`.
+    starter_code: |
+      library(tidyverse)
+
+      csv_data <- "country;waste_kg;year
+      NL;450,2;2022
+      DE;510,5;2022
+      FR;390,8;2022"
+
+      df <- read_delim(I(csv_data), delim = ";")
+
+      print(dim(df))
+      print(df$waste_kg[2])
+    tests:
+      - type: output_contains
+        value: "[1] 510.5"
+      - type: assert
+        code: |
+          .check(identical(dim(df), c(3L, 3L)), "df should have 3 rows and 3 columns")
+          .check(isTRUE(all.equal(df$waste_kg, c(450.2, 510.5, 390.8))), "the waste_kg values should be 450.2, 510.5 and 390.8: the comma is the decimal mark")
+        description: "df should have waste_kg values 450.2, 510.5, 390.8"
+    hints:
+      - "read_delim() expects a . as decimal mark, so it ignores the comma in 510,5"
+      - "df <- read_csv2(I(csv_data))"
+    solution: |
+      library(tidyverse)
+
+      csv_data <- "country;waste_kg;year
+      NL;450,2;2022
+      DE;510,5;2022
+      FR;390,8;2022"
+
+      df <- read_csv2(I(csv_data))
+
+      print(dim(df))
+      print(df$waste_kg[2])
+
+  - id: practice_read_tsv
+    title: "Practice: Reading a TSV File (Tab-Separated)"
+    instructions: |
+      More practice with tab-separated data — this time recycling rates.
+
+      **Your task:**
+      `tsv_data` is tab-separated. Load it into `df` with `read_delim()` and the right `delim`. The code prints the size of `df` and the `country` column.
+    starter_code: |
+      library(tidyverse)
+
+      tsv_data <- "country\trecycling_rate\tpopulation\nNL\t54\t17\nDE\t48\t84\nFR\t42\t68\nBE\t53\t11"
+
+      # Load with read_delim()
+      df <-
+
+      print(dim(df))
+      print(df$country)
+    tests:
+      - type: output_contains
+        value: "[1] 4 3"
+      - type: output_contains
+        value: "\"BE\""
+      - type: assert
+        code: |
+          .check(identical(dim(df), c(4L, 3L)), "df should have 4 rows and 3 columns")
+          .check(identical(names(df), c("country", "recycling_rate", "population")), "df should have the columns country, recycling_rate and population")
+        description: "df should have 4 rows and 3 columns"
+    hints:
+      - "A tab is written as \"\\t\""
+      - "df <- read_delim(I(tsv_data), delim = \"\\t\")"
+    solution: |
+      library(tidyverse)
+
+      tsv_data <- "country\trecycling_rate\tpopulation\nNL\t54\t17\nDE\t48\t84\nFR\t42\t68\nBE\t53\t11"
+
+      df <- read_delim(I(tsv_data), delim = "\t")
+
+      print(dim(df))
+      print(df$country)
+
+  - id: practice_export_csv
+    title: "Practice: Exporting Data to CSV"
+    instructions: |
+      More practice adding a computed column and exporting the result — this time water usage.
+
+      **Your task:**
+      1. Add a column `water_per_capita` (`water_liters / population`) to `df`
+      2. Export `df` to `output_water.csv`
+      3. Read the file back into `df_check` and print its size with `dim()`
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        country = c("NL", "DE", "FR"),
+        population = c(17, 84, 68),
+        water_liters = c(500, 2000, 1400)
+      )
+
+      # 1. Add the water_per_capita column
+
+
+      # 2. Export to output_water.csv
+
+
+      # 3. Read it back and print the size
+
+    tests:
+      - type: output_equals
+        value: "[1] 3 4"
+      - type: assert
+        code: |
+          .df <- readr::read_csv("output_water.csv", show_col_types = FALSE)
+          .check("water_per_capita" %in% names(.df), "output_water.csv should contain the column water_per_capita")
+          .check(identical(dim(.df), c(3L, 4L)), "output_water.csv should have 3 rows and 4 columns")
+          .check(isTRUE(all.equal(.df$water_per_capita, c(500 / 17, 2000 / 84, 1400 / 68), tolerance = 1e-6)), "water_per_capita should be water_liters / population")
+        description: "output_water.csv should have 3 rows and 4 columns including water_per_capita"
+    hints:
+      - "df <- df |> mutate(water_per_capita = water_liters / population)"
+      - "write_csv(df, \"output_water.csv\")"
+      - "df_check <- read_csv(\"output_water.csv\", show_col_types = FALSE) and then print(dim(df_check))"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        country = c("NL", "DE", "FR"),
+        population = c(17, 84, 68),
+        water_liters = c(500, 2000, 1400)
+      )
+
+      df <- df |> mutate(water_per_capita = water_liters / population)
+
+      write_csv(df, "output_water.csv")
+
+      df_check <- read_csv("output_water.csv", show_col_types = FALSE)
+      print(dim(df_check))
