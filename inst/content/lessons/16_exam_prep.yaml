@@ -1,0 +1,529 @@
+title: "Exam Preparation"
+description: "Practice the exam question types: reading code, tracing output, finding errors, writing short scripts from scratch, and slotting an unfamiliar function into existing code."
+
+exercises:
+
+  - id: dice_script
+    title: "Reading Code — Dice Roll While Loop"
+    instructions: |
+      In the exam you will be asked to read a script and explain what each line does, and/or deduce the output.
+
+      Read the following script carefully:
+
+      ```r
+      total_attempts <- 0
+      target_reached <- FALSE
+
+      while (!target_reached) {
+        die1 <- sample(1:6, 1)
+        die2 <- sample(1:6, 1)
+        sum_dice <- die1 + die2
+        total_attempts <- total_attempts + 1
+        if (sum_dice == 7) {
+          target_reached <- TRUE
+          writeLines(paste("Sum of 7 reached after", total_attempts, "attempts."))
+        } else {
+          writeLines(paste0("Attempt ", total_attempts, ": Sum = ", sum_dice))
+        }
+      }
+      ```
+
+      `sample(1:6, 1)` picks one random number from 1 to 6: one roll of a die (lesson 5).
+
+      Make sure you can answer these questions about it (think before running):
+      - What does `while (!target_reached)` mean at the start?
+      - What happens to `total_attempts` in every round?
+      - When does the loop stop?
+      - What is shown when the sum is 7?
+
+      **Your task:**
+      The code below is the same script, with `set.seed(23)` at the top so the dice give the same result every time. Run it first. Then extend it: count in `even_sums` **how many times** the sum was even before the 7 was rolled. The last line shows `even_sums`.
+    starter_code: |
+      set.seed(23)
+
+      total_attempts <- 0
+      target_reached <- FALSE
+      even_sums <- 0
+
+      while (!target_reached) {
+        die1 <- sample(1:6, 1)
+        die2 <- sample(1:6, 1)
+        sum_dice <- die1 + die2
+        total_attempts <- total_attempts + 1
+        if (sum_dice == 7) {
+          target_reached <- TRUE
+          writeLines(paste("Sum of 7 reached after", total_attempts, "attempts."))
+        } else {
+          writeLines(paste0("Attempt ", total_attempts, ": Sum = ", sum_dice))
+          # if sum_dice is even, add 1 to even_sums
+
+        }
+      }
+
+      writeLines(paste("Even sums before finding 7:", even_sums))
+    tests:
+      - type: output_contains
+        value: "Sum of 7 reached after"
+      - type: output_contains
+        value: "Even sums before finding 7: 3"
+      - type: assert
+        code: |
+          .check(isTRUE(target_reached), "target_reached should be TRUE after the loop")
+          .check(even_sums == 3, "even_sums is not correct yet. Look at the attempts that were shown: how many of those sums are even?")
+        description: "even_sums should count the even sums rolled before the 7"
+    hints:
+      - "A number is even when the remainder after dividing by 2 is 0: sum_dice %% 2 == 0"
+      - "if (sum_dice %% 2 == 0) {\n      even_sums <- even_sums + 1\n    }"
+    solution: |
+      set.seed(23)
+
+      total_attempts <- 0
+      target_reached <- FALSE
+      even_sums <- 0
+
+      while (!target_reached) {
+        die1 <- sample(1:6, 1)
+        die2 <- sample(1:6, 1)
+        sum_dice <- die1 + die2
+        total_attempts <- total_attempts + 1
+        if (sum_dice == 7) {
+          target_reached <- TRUE
+          writeLines(paste("Sum of 7 reached after", total_attempts, "attempts."))
+        } else {
+          writeLines(paste0("Attempt ", total_attempts, ": Sum = ", sum_dice))
+          if (sum_dice %% 2 == 0) {
+            even_sums <- even_sums + 1
+          }
+        }
+      }
+
+      writeLines(paste("Even sums before finding 7:", even_sums))
+
+  - id: student_grades
+    title: "Reading and Extending Code — Student Grades"
+    instructions: |
+      Another exam question type asks you to **extend** a script. Read the following code carefully, predict what it does, then run it:
+
+      ```r
+      library(tidyverse)
+
+      students <- tibble(
+        name    = c("Alice", "Bob", "Charlie"),
+        math    = c(70, 40, 65),
+        science = c(80, 50, 75),
+        english = c(60, 30, 55)
+      )
+
+      students <- students |>
+        mutate(
+          avg_score = (math + science + english) / 3,
+          passed = avg_score >= 60
+        )
+
+      print(students, width = Inf)
+      ```
+
+      **Your task:**
+      Extend the `mutate()` with a column `grade_letter`:
+
+      | Average score | Grade letter |
+      |--------------|--------------|
+      | ≥ 80 | `"A"` |
+      | ≥ 70 | `"B"` |
+      | ≥ 60 | `"C"` |
+      | < 60 | `"F"` |
+
+      Before you run it, work out which grade each student should get.
+    starter_code: |
+      library(tidyverse)
+
+      students <- tibble(
+        name    = c("Alice", "Bob", "Charlie"),
+        math    = c(70, 40, 65),
+        science = c(80, 50, 75),
+        english = c(60, 30, 55)
+      )
+
+      students <- students |>
+        mutate(
+          avg_score = (math + science + english) / 3,
+          passed = avg_score >= 60,
+          # add grade_letter here
+
+        )
+
+      print(students, width = Inf)
+    tests:
+      - type: output_contains
+        value: "grade_letter"
+      - type: assert
+        code: |
+          .check("grade_letter" %in% names(students), "students should have a column grade_letter")
+          .check(identical(students$passed, c(TRUE, FALSE, TRUE)), "keep the passed column as it was")
+          .check(identical(students$grade_letter, c("B", "F", "C")), "grade_letter is not right yet: Alice (average 70) should get B, Bob (40) F, Charlie (65) C")
+        description: "Alice = B (average 70), Bob = F (average 40), Charlie = C (average 65)"
+    hints:
+      - "Several outcomes for a whole column: that's case_when() (lesson 6)"
+      - "Check the thresholds in order: 80 first, then 70, then 60, and .default for the rest"
+      - "grade_letter = case_when(avg_score >= 80 ~ \"A\", avg_score >= 70 ~ \"B\", avg_score >= 60 ~ \"C\", .default = \"F\")"
+    solution: |
+      library(tidyverse)
+
+      students <- tibble(
+        name    = c("Alice", "Bob", "Charlie"),
+        math    = c(70, 40, 65),
+        science = c(80, 50, 75),
+        english = c(60, 30, 55)
+      )
+
+      students <- students |>
+        mutate(
+          avg_score = (math + science + english) / 3,
+          passed = avg_score >= 60,
+          grade_letter = case_when(
+            avg_score >= 80 ~ "A",
+            avg_score >= 70 ~ "B",
+            avg_score >= 60 ~ "C",
+            .default = "F"
+          )
+        )
+
+      print(students, width = Inf)
+
+  - id: login_function
+    title: "Writing Code — Login System"
+    instructions: |
+      Another exam question type asks you to **write a short script** from scratch.
+
+      **Task (from the exam):**
+
+      > You are in charge of a log-in system on a website. When the correct password is provided, show `"Success!"`. If the user has failed 3 times, stop the system and show `"Game Over!"`. Write a function that can perform this task.
+
+      In a real system, the function would wait for the user to type a password. This app can't wait for typing, so the function gets a **vector of password attempts** and the **correct password** as arguments. That's actually better practice: it makes the function easy to test.
+
+      ```r
+      login_system <- function(attempts, correct_password) {
+        # your code here
+      }
+
+      # Test cases
+      login_system(c("wrong", "test", "secret"), "secret")   # succeeds on the 3rd try
+      login_system(c("x", "y", "z"), "secret")               # fails all 3
+      ```
+
+      Expected output:
+      ```
+      Wrong password!
+      Wrong password!
+      Success!
+      ---
+      Wrong password!
+      Wrong password!
+      Game Over!
+      ```
+
+      Use `break` (lesson 10) to stop the loop as soon as the user has succeeded or failed for the third time.
+    starter_code: |
+      login_system <- function(attempts, correct_password) {
+        for (i in seq_along(attempts)) {
+          if (attempts[i] == correct_password) {
+            # show success and stop
+
+          }
+          if (i >= 3) {
+            # the 3rd attempt failed: show game over and stop
+
+          }
+          # wrong, but not yet 3 failures
+
+        }
+      }
+
+      # Test your function
+      login_system(c("wrong", "test", "secret"), "secret")
+      writeLines("---")
+      login_system(c("x", "y", "z"), "secret")
+    tests:
+      - type: output_equals
+        value: "Wrong password!\nWrong password!\nSuccess!\n---\nWrong password!\nWrong password!\nGame Over!"
+      - type: assert
+        code: |
+          .out1 <- capture.output(login_system(c("secret"), "secret"))
+          .check(identical(.out1, "Success!"), "the correct password on the 1st try should only show Success!")
+          .out2 <- capture.output(login_system(c("a", "secret", "c"), "secret"))
+          .check(identical(.out2, c("Wrong password!", "Success!")), "the correct password on the 2nd try should show Wrong password! and then Success!")
+          .out3 <- capture.output(login_system(c("a", "b", "c", "secret"), "secret"))
+          .check(identical(.out3, c("Wrong password!", "Wrong password!", "Game Over!")), "after 3 wrong attempts the system should stop, even if more attempts follow")
+        description: "Success! for the correct password, Game Over! after 3 wrong attempts"
+    hints:
+      - "writeLines(\"Success!\") and then break, inside the first if"
+      - "writeLines(\"Game Over!\") and then break, inside the second if"
+      - "writeLines(\"Wrong password!\") at the end of the loop body, without break"
+    solution: |
+      login_system <- function(attempts, correct_password) {
+        for (i in seq_along(attempts)) {
+          if (attempts[i] == correct_password) {
+            writeLines("Success!")
+            break
+          }
+          if (i >= 3) {
+            writeLines("Game Over!")
+            break
+          }
+          writeLines("Wrong password!")
+        }
+      }
+
+      login_system(c("wrong", "test", "secret"), "secret")
+      writeLines("---")
+      login_system(c("x", "y", "z"), "secret")
+
+  - id: debug_the_script
+    title: "Finding Errors — Debug the Script"
+    instructions: |
+      A key exam skill is **finding and fixing bugs in existing code**. The script below runs without any error message, but its results are wrong. Read it carefully and find the two errors:
+
+      ```r
+      scores <- c(72, 88, 55, 91, 63, 77)
+
+      total <- 0
+      for (score in scores) {
+        total <- score             # BUG 1
+      }
+
+      average <- total / length(scores)
+
+      highest <- scores[1]
+      for (score in scores) {
+        if (score < highest) {     # BUG 2
+          highest <- score
+        }
+      }
+
+      cat("Average:", round(average, 1), "\n")
+      cat("Highest:", highest, "\n")
+      ```
+
+      **Bug 1:** `total <- score` replaces the running total in every round, instead of adding to it.
+      **Bug 2:** `if (score < highest)` finds the *lowest* score, not the highest.
+
+      Before fixing: what does the script show now? Work it out, then run it to check.
+
+      **Your task:**
+      Fix both bugs. Expected output:
+      ```
+      Average: 74.3
+      Highest: 91
+      ```
+    starter_code: |
+      scores <- c(72, 88, 55, 91, 63, 77)
+
+      total <- 0
+      for (score in scores) {
+        total <- score             # fix this line
+      }
+
+      average <- total / length(scores)
+
+      highest <- scores[1]
+      for (score in scores) {
+        if (score < highest) {     # fix this condition
+          highest <- score
+        }
+      }
+
+      cat("Average:", round(average, 1), "\n")
+      cat("Highest:", highest, "\n")
+    tests:
+      - type: output_contains
+        value: "Average: 74.3"
+      - type: output_contains
+        value: "Highest: 91"
+      - type: assert
+        code: |
+          .check(isTRUE(all.equal(average, 446 / 6)), "average should be about 74.3")
+          .check(highest == 91, "highest should be 91")
+        description: "Average = 446 / 6 ≈ 74.3, Highest = 91"
+    hints:
+      - "total <- total + score: add to the old total, instead of replacing it"
+      - "if (score > highest): change < to > to find the maximum"
+    solution: |
+      scores <- c(72, 88, 55, 91, 63, 77)
+
+      total <- 0
+      for (score in scores) {
+        total <- total + score
+      }
+
+      average <- total / length(scores)
+
+      highest <- scores[1]
+      for (score in scores) {
+        if (score > highest) {
+          highest <- score
+        }
+      }
+
+      cat("Average:", round(average, 1), "\n")
+      cat("Highest:", highest, "\n")
+
+  - id: unfamiliar_function
+    title: "Using an Unfamiliar Function — Handling Missing Data"
+    instructions: |
+      In the exam — and in real datasets — you will sometimes need to use a function you haven't seen before. The skill being tested isn't memorisation: it's reading a short explanation of what a function does, and correctly slotting it into existing code — the right package, the right call, the right arguments, in the right place.
+
+      Real-world data almost always has **missing values**: a sensor that failed, a field nobody filled in. In R, missing values show up as `NA`. Here is the function you'll need, explained the way you'd find it in documentation:
+
+      **`drop_na(data, ...)`**
+      - **Package:** tidyr (loaded with `library(tidyverse)`)
+      - **What it does:** returns a **new** tibble with the rows that have a missing value **removed**. It does not change the original.
+      - **`...`** *(optional)*: one or more column names. If given, only rows with a missing value in **those** columns are dropped; missing values in other columns are ignored. If you give no columns, a row is dropped if **any** column is missing a value.
+
+      ```r
+      clean_df <- df |> drop_na(pollution)
+      ```
+
+      This keeps every row whose `pollution` value is present, regardless of what's missing elsewhere.
+
+      **Your task:**
+      The script below measures air pollution in several cities. Some `pollution` readings are missing, and separately, some `notes` are missing too (that's expected and not a problem). There's a gap in the `clean_and_average()` function, marked with a comment. Fill it in so that `clean_df` contains only the rows where `pollution` is **not missing**. Rows that only miss a note should be kept.
+
+      Expected output:
+      ```
+      Rows before cleaning: 6
+      Rows after cleaning: 4
+      Mean pollution: 21.12
+      ```
+    starter_code: |
+      library(tidyverse)
+
+      clean_and_average <- function(df) {
+        writeLines(paste("Rows before cleaning:", nrow(df)))
+
+        # Use drop_na() to remove the rows where pollution is missing,
+        # and store the result in clean_df
+
+
+        writeLines(paste("Rows after cleaning:", nrow(clean_df)))
+        return(round(mean(clean_df$pollution), 2))
+      }
+
+      df <- tibble(
+        city      = c("Utrecht", "Amsterdam", "Rotterdam", "Groningen", "Eindhoven", "Nijmegen"),
+        pollution = c(21.5, NA, 18.2, NA, 25.0, 19.8),
+        notes     = c("ok", "sensor drifting", NA, "calibration due", NA, "ok")
+      )
+
+      mean_pollution <- clean_and_average(df)
+      writeLines(paste("Mean pollution:", mean_pollution))
+    tests:
+      - type: output_equals
+        value: "Rows before cleaning: 6\nRows after cleaning: 4\nMean pollution: 21.12"
+      - type: assert
+        code: |
+          .check(isTRUE(all.equal(mean_pollution, 21.12)), "clean_and_average(df) should return 21.12: only the rows missing pollution should be dropped")
+        description: "clean_and_average(df) should return 21.12 — only rows missing pollution should be dropped"
+    hints:
+      - "The function you need is drop_na(), applied to df"
+      - "Give it the column pollution, so it only checks that column. Otherwise the rows that miss a note are dropped too"
+      - "The line goes inside the function, between the two writeLines() lines"
+      - "clean_df <- df |> drop_na(pollution)"
+    solution: |
+      library(tidyverse)
+
+      clean_and_average <- function(df) {
+        writeLines(paste("Rows before cleaning:", nrow(df)))
+
+        clean_df <- df |> drop_na(pollution)
+
+        writeLines(paste("Rows after cleaning:", nrow(clean_df)))
+        return(round(mean(clean_df$pollution), 2))
+      }
+
+      df <- tibble(
+        city      = c("Utrecht", "Amsterdam", "Rotterdam", "Groningen", "Eindhoven", "Nijmegen"),
+        pollution = c(21.5, NA, 18.2, NA, 25.0, 19.8),
+        notes     = c("ok", "sensor drifting", NA, "calibration due", NA, "ok")
+      )
+
+      mean_pollution <- clean_and_average(df)
+      writeLines(paste("Mean pollution:", mean_pollution))
+
+  - id: unfamiliar_function_2
+    title: "Using an Unfamiliar Function — Removing Duplicate Readings"
+    instructions: |
+      Another common data-cleaning problem: **duplicate rows**. A sensor might log the same reading twice, or a spreadsheet might get merged with itself by accident. Here's the function for it, again explained the way you'd find it in documentation:
+
+      **`distinct(data, ..., .keep_all = FALSE)`**
+      - **Package:** dplyr (loaded with `library(tidyverse)`)
+      - **What it does:** returns a **new** tibble without duplicate rows. Of each set of duplicates, the **first** row is kept.
+      - **`...`** *(optional)*: one or more column names. If given, rows count as duplicates when they match on **just those columns**. If you give no columns, a row only counts as a duplicate if **every column** matches.
+      - **`.keep_all`** *(optional)*: when you give column names, `distinct()` normally keeps **only those columns**. With `.keep_all = TRUE` it keeps all columns.
+
+      ```r
+      unique_df <- df |> distinct(city, .keep_all = TRUE)
+      ```
+
+      This keeps only the **first** row for each city, with all its columns, even if other columns differ between the repeats.
+
+      **Your task:**
+      The script below logs energy readings per city. Some cities were measured more than once: a couple of entries are exact repeats (a logging glitch), but others share a city with a *different* reading (an updated measurement). For this task those count as duplicates too, and only the first one should be kept. There's a gap in `dedupe_and_average()`, marked with a comment. Fill it in so that `unique_df` keeps only the **first reading per city**.
+
+      Expected output:
+      ```
+      Rows before deduping: 7
+      Rows after deduping: 4
+      Mean energy: 165
+      ```
+    starter_code: |
+      library(tidyverse)
+
+      dedupe_and_average <- function(df) {
+        writeLines(paste("Rows before deduping:", nrow(df)))
+
+        # Use distinct() to keep only the first reading per city,
+        # and store the result in unique_df
+
+
+        writeLines(paste("Rows after deduping:", nrow(unique_df)))
+        return(round(mean(unique_df$energy_kwh), 2))
+      }
+
+      df <- tibble(
+        city       = c("Utrecht", "Amsterdam", "Utrecht", "Rotterdam", "Amsterdam", "Groningen", "Utrecht"),
+        energy_kwh = c(120, 300, 120, 150, 310, 90, 125)
+      )
+
+      mean_energy <- dedupe_and_average(df)
+      writeLines(paste("Mean energy:", mean_energy))
+    tests:
+      - type: output_equals
+        value: "Rows before deduping: 7\nRows after deduping: 4\nMean energy: 165"
+      - type: assert
+        code: |
+          .check(isTRUE(all.equal(mean_energy, 165)), "dedupe_and_average(df) should return 165: keep only the first reading per city")
+        description: "dedupe_and_average(df) should return 165 — only the first reading per city should be kept"
+    hints:
+      - "The function you need is distinct(), applied to df"
+      - "Give it the column city, so duplicates are found by city alone. Otherwise only rows that match on every column are removed"
+      - "Read the .keep_all part of the documentation again: without it, is the energy_kwh column still there?"
+      - "unique_df <- df |> distinct(city, .keep_all = TRUE)"
+    solution: |
+      library(tidyverse)
+
+      dedupe_and_average <- function(df) {
+        writeLines(paste("Rows before deduping:", nrow(df)))
+
+        unique_df <- df |> distinct(city, .keep_all = TRUE)
+
+        writeLines(paste("Rows after deduping:", nrow(unique_df)))
+        return(round(mean(unique_df$energy_kwh), 2))
+      }
+
+      df <- tibble(
+        city       = c("Utrecht", "Amsterdam", "Utrecht", "Rotterdam", "Amsterdam", "Groningen", "Utrecht"),
+        energy_kwh = c(120, 300, 120, 150, 310, 90, 125)
+      )
+
+      mean_energy <- dedupe_and_average(df)
+      writeLines(paste("Mean energy:", mean_energy))
