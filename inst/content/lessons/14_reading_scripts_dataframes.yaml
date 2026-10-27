@@ -1,0 +1,330 @@
+title: "Reading Scripts: Working With Data Frames"
+description: "Practice reading and extending R scripts that combine tibbles, mutate, filter, group_by and joins — the types of questions you may encounter in the exam."
+
+exercises:
+
+  - id: waste_management
+    title: "Waste Management Analysis"
+    instructions: |
+      Read the following script carefully. For each line, make sure you understand what it does before moving on.
+
+      ```r
+      library(tidyverse)
+
+      waste_data <- tibble(
+        country        = c("CountryA", "CountryB", "CountryC", "CountryD", "CountryE"),
+        total_waste    = c(2.5, 1.8, 4.0, 3.1, 1.2),   # tons per capita
+        recycling_rate = c(65, 30, 50, 85, 20)         # percentage
+      )
+
+      waste_data <- waste_data |>
+        mutate(
+          # Low below 2 tons, High above 3 tons, Moderate in between
+          waste_level = case_when(
+            total_waste < 2 ~ "Low",
+            total_waste > 3 ~ "High",
+            .default = "Moderate"
+          ),
+          # Countries that recycle more than 50% count as sustainable
+          sustainable_practices = if_else(recycling_rate > 50, "Yes", "No")
+        )
+
+      # Countries with high waste AND no sustainable practices
+      high_waste_no_recycling <- waste_data |>
+        filter(waste_level == "High", sustainable_practices == "No")
+
+      writeLines("Countries with high waste and no sustainable practices:")
+      print(high_waste_no_recycling)
+      ```
+
+      Before you run it: which country do you expect to be printed? Check your answer by running the code.
+
+      **Your task:**
+      Extend the script:
+      1. Add a column `total_score` = `total_waste * recycling_rate` to `waste_data`
+      2. Calculate the **mean** of `total_score`, rounded to 1 decimal, as a single number in `mean_score`. Print it.
+
+      The expected mean is **140.8**.
+    starter_code: |
+      library(tidyverse)
+
+      waste_data <- tibble(
+        country        = c("CountryA", "CountryB", "CountryC", "CountryD", "CountryE"),
+        total_waste    = c(2.5, 1.8, 4.0, 3.1, 1.2),
+        recycling_rate = c(65, 30, 50, 85, 20)
+      )
+
+      waste_data <- waste_data |>
+        mutate(
+          waste_level = case_when(
+            total_waste < 2 ~ "Low",
+            total_waste > 3 ~ "High",
+            .default = "Moderate"
+          ),
+          sustainable_practices = if_else(recycling_rate > 50, "Yes", "No")
+        )
+
+      high_waste_no_recycling <- waste_data |>
+        filter(waste_level == "High", sustainable_practices == "No")
+
+      writeLines("Countries with high waste and no sustainable practices:")
+      print(high_waste_no_recycling)
+
+      # 1. Add total_score
+      waste_data <-
+
+      # 2. The mean of total_score, rounded to 1 decimal
+      mean_score <-
+      print(mean_score)
+    tests:
+      - type: output_contains
+        value: "Countries with high waste and no sustainable practices:"
+      - type: output_contains
+        value: "[1] 140.8"
+      - type: assert
+        code: |
+          .check(is.data.frame(waste_data) && "total_score" %in% names(waste_data), "waste_data should have a column total_score: waste_data <- waste_data |> mutate(...)")
+          .check(isTRUE(all.equal(waste_data$total_score, waste_data$total_waste * waste_data$recycling_rate)), "total_score should be total_waste * recycling_rate")
+          .check(is.numeric(mean_score) && length(mean_score) == 1 && isTRUE(all.equal(mean_score, 140.8)), "mean_score should be a single number: 140.8")
+        description: "total_score = total_waste * recycling_rate, mean = 140.8"
+    hints:
+      - "waste_data <- waste_data |> mutate(total_score = total_waste * recycling_rate)"
+      - "mean_score <- waste_data |> summarise(m = round(mean(total_score), 1)) |> pull()"
+      - "Or with $: mean_score <- round(mean(waste_data$total_score), 1)"
+    solution: |
+      library(tidyverse)
+
+      waste_data <- tibble(
+        country        = c("CountryA", "CountryB", "CountryC", "CountryD", "CountryE"),
+        total_waste    = c(2.5, 1.8, 4.0, 3.1, 1.2),
+        recycling_rate = c(65, 30, 50, 85, 20)
+      )
+
+      waste_data <- waste_data |>
+        mutate(
+          waste_level = case_when(
+            total_waste < 2 ~ "Low",
+            total_waste > 3 ~ "High",
+            .default = "Moderate"
+          ),
+          sustainable_practices = if_else(recycling_rate > 50, "Yes", "No")
+        )
+
+      high_waste_no_recycling <- waste_data |>
+        filter(waste_level == "High", sustainable_practices == "No")
+
+      writeLines("Countries with high waste and no sustainable practices:")
+      print(high_waste_no_recycling)
+
+      waste_data <- waste_data |> mutate(total_score = total_waste * recycling_rate)
+
+      mean_score <- waste_data |> summarise(m = round(mean(total_score), 1)) |> pull()
+      print(mean_score)
+
+  - id: solar_production
+    title: "Average Solar Energy Production"
+    instructions: |
+      In a real project, this script would load its data from a file with `read_csv("data/solar_production.csv")`. Here the data is created in the script, so you can run it without a file. The logic is identical.
+
+      The script uses three things you haven't seen yet. That's normal when you read other people's code: the explanation below tells you what they do.
+
+      - `ymd(date)` turns text like `"2017-01-01"` into a real **date** (year-month-day), and `year()` takes the year out of it. Both come from the **lubridate** package, which `library(tidyverse)` loads.
+      - `rename(new_name = old_name)` gives a column a new name.
+      - `group_by()` with **two** columns makes one group per combination (one per country per year). `.groups = "drop"` in `summarise()` removes the grouping afterwards. Without it, the result stays grouped by country and dplyr prints a message about that.
+
+      Read each line carefully:
+
+      ```r
+      library(tidyverse)
+
+      # In a real project: solar_data <- read_csv("data/solar_production.csv")
+      solar_data <- tibble(
+        country        = rep(c("Netherlands", "Germany", "France"), each = 3),
+        date           = rep(c("2017-01-01", "2018-01-01", "2019-01-01"), times = 3),
+        production_mwh = c(1200, 1500, 1800, 3000, 3500, 4000, 2000, 2200, 2500)
+      )
+
+      solar_data <- solar_data |>
+        select(country, date, production_mwh) |>
+        mutate(year = year(ymd(date)))
+
+      country_year <- solar_data |>
+        group_by(country, year) |>
+        summarise(production_mwh = mean(production_mwh), .groups = "drop") |>
+        rename(avg_production = production_mwh)
+
+      recent_data <- country_year |> filter(year >= 2018)
+      print(recent_data)
+      ```
+
+      (`rep()` repeats values: `each = 3` repeats each country three times, `times = 3` repeats the whole set of dates three times.)
+
+      **Your task:**
+      Find the **country with the highest average production over all years**, and store its name (as text) in `best_country`. Print it.
+    starter_code: |
+      library(tidyverse)
+
+      solar_data <- tibble(
+        country        = rep(c("Netherlands", "Germany", "France"), each = 3),
+        date           = rep(c("2017-01-01", "2018-01-01", "2019-01-01"), times = 3),
+        production_mwh = c(1200, 1500, 1800, 3000, 3500, 4000, 2000, 2200, 2500)
+      )
+
+      solar_data <- solar_data |>
+        select(country, date, production_mwh) |>
+        mutate(year = year(ymd(date)))
+
+      country_year <- solar_data |>
+        group_by(country, year) |>
+        summarise(production_mwh = mean(production_mwh), .groups = "drop") |>
+        rename(avg_production = production_mwh)
+
+      recent_data <- country_year |> filter(year >= 2018)
+      print(recent_data)
+
+      # The country with the highest average production over ALL years
+      best_country <-
+
+      print(best_country)
+    tests:
+      - type: output_contains
+        value: "[1] \"Germany\""
+      - type: assert
+        code: |
+          .check(identical(best_country, "Germany"), "best_country should be the text \"Germany\" (average 3500 MWh over all years)")
+        description: "best_country should be Germany (average 3500 MWh over all years)"
+    hints:
+      - "Use solar_data (all years), not recent_data (2018 and later only)"
+      - "solar_data |> group_by(country) |> summarise(avg = mean(production_mwh)) gives the average per country"
+      - "Then |> slice_max(avg, n = 1) |> pull(country)"
+    solution: |
+      library(tidyverse)
+
+      solar_data <- tibble(
+        country        = rep(c("Netherlands", "Germany", "France"), each = 3),
+        date           = rep(c("2017-01-01", "2018-01-01", "2019-01-01"), times = 3),
+        production_mwh = c(1200, 1500, 1800, 3000, 3500, 4000, 2000, 2200, 2500)
+      )
+
+      solar_data <- solar_data |>
+        select(country, date, production_mwh) |>
+        mutate(year = year(ymd(date)))
+
+      country_year <- solar_data |>
+        group_by(country, year) |>
+        summarise(production_mwh = mean(production_mwh), .groups = "drop") |>
+        rename(avg_production = production_mwh)
+
+      recent_data <- country_year |> filter(year >= 2018)
+      print(recent_data)
+
+      best_country <- solar_data |>
+        group_by(country) |>
+        summarise(avg = mean(production_mwh)) |>
+        slice_max(avg, n = 1) |>
+        pull(country)
+
+      print(best_country)
+
+  - id: wind_utilization
+    title: "Wind Energy Utilisation Rate"
+    instructions: |
+      The script below joins two datasets (wind generation and installed capacity) to calculate a **utilisation rate** per region and year:
+
+      ```
+      utilization_rate = total_generation / (capacity_mw × 8760 hours per year)
+      ```
+
+      A rate of `1.0` means the turbines ran at full power every hour of the year. In practice, rates of 0.25–0.40 are typical for wind.
+
+      In a real project both datasets would come from `read_csv()`. Here they are created in the script. Read each line carefully:
+
+      ```r
+      library(tidyverse)
+
+      wind <- tibble(
+        region         = c("North", "North", "South", "South", "East", "East"),
+        year           = c(2020, 2021, 2020, 2021, 2020, 2021),
+        generation_mwh = c(13000, 14500, 6000, 6500, 9500, 10000)
+      )
+      capacity <- tibble(
+        region      = c("North", "South", "East"),
+        capacity_mw = c(5, 3, 4)
+      )
+
+      wind_year <- wind |>
+        group_by(region, year) |>
+        summarise(total_generation = sum(generation_mwh), .groups = "drop")
+
+      merged <- left_join(wind_year, capacity, by = "region") |>
+        mutate(utilization_rate = total_generation / (capacity_mw * 8760)) |>
+        arrange(desc(utilization_rate))
+
+      print(head(merged, 5))
+      ```
+
+      **Your task:**
+      Store the **region with the highest utilisation rate** in `best_region` (as text), and print it.
+    starter_code: |
+      library(tidyverse)
+
+      wind <- tibble(
+        region         = c("North", "North", "South", "South", "East", "East"),
+        year           = c(2020, 2021, 2020, 2021, 2020, 2021),
+        generation_mwh = c(13000, 14500, 6000, 6500, 9500, 10000)
+      )
+      capacity <- tibble(
+        region      = c("North", "South", "East"),
+        capacity_mw = c(5, 3, 4)
+      )
+
+      wind_year <- wind |>
+        group_by(region, year) |>
+        summarise(total_generation = sum(generation_mwh), .groups = "drop")
+
+      merged <- left_join(wind_year, capacity, by = "region") |>
+        mutate(utilization_rate = total_generation / (capacity_mw * 8760)) |>
+        arrange(desc(utilization_rate))
+
+      print(head(merged, 5))
+
+      # The region with the highest utilisation rate
+      best_region <-
+
+      print(best_region)
+    tests:
+      - type: output_contains
+        value: "[1] \"North\""
+      - type: assert
+        code: |
+          .check(identical(best_region, "North"), "best_region should be the text \"North\"")
+        description: "best_region should be North: the highest utilisation rate, in 2021"
+    hints:
+      - "merged is already sorted from the highest utilization_rate to the lowest"
+      - "So the region in the first row is the answer: merged$region[1]"
+    solution: |
+      library(tidyverse)
+
+      wind <- tibble(
+        region         = c("North", "North", "South", "South", "East", "East"),
+        year           = c(2020, 2021, 2020, 2021, 2020, 2021),
+        generation_mwh = c(13000, 14500, 6000, 6500, 9500, 10000)
+      )
+      capacity <- tibble(
+        region      = c("North", "South", "East"),
+        capacity_mw = c(5, 3, 4)
+      )
+
+      wind_year <- wind |>
+        group_by(region, year) |>
+        summarise(total_generation = sum(generation_mwh), .groups = "drop")
+
+      merged <- left_join(wind_year, capacity, by = "region") |>
+        mutate(utilization_rate = total_generation / (capacity_mw * 8760)) |>
+        arrange(desc(utilization_rate))
+
+      print(head(merged, 5))
+
+      best_region <- merged$region[1]
+
+      print(best_region)
