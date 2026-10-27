@@ -9,6 +9,8 @@ COURSE_BANNER <- "Data Analytics For Sustainability || R Track || 2026"
 #' @param launch.browser Open the app automatically.
 #' @export
 run_app <- function(launch.browser = getOption("shiny.launch.browser", interactive())) {
+  outdated <- outdated_packages()
+  if (length(outdated)) warning(outdated_message(outdated), call. = FALSE, immediate. = TRUE)
   shiny::runApp(dafs_app(), launch.browser = launch.browser)
 }
 
@@ -97,6 +99,12 @@ app_server <- function(lessons, db, deadlines) {
       hints_shown = 0L, show_solution = FALSE, progress_version = 0L
     )
     code_cache <- new.env()   # unsent editor contents per exercise (not reactive on purpose)
+
+    # Also shown in the app, because the warning in the console is easy to miss
+    outdated <- outdated_packages()
+    if (length(outdated)) {
+      shiny::showNotification(outdated_message(outdated), type = "warning", duration = NULL)
+    }
 
     # Anonymous deadline reporting, once per app start
     for (notice in check_and_send_due_deadlines(db, deadlines, lesson_titles)) {

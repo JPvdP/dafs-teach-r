@@ -22,7 +22,7 @@ This guide shows you how to install it, start it, and keep it up to date.
 
 # What you need
 
-- **R 4.1 or newer.** Open RStudio and look at the first line of the
+- **R 4.2 or newer.** Open RStudio and look at the first line of the
   **Console** (the panel where R prints its output). It says something like
   `R version 4.4.1`. You can also type this in the Console and press Enter:
 
@@ -30,7 +30,7 @@ This guide shows you how to install it, start it, and keep it up to date.
   R.version.string
   ```
 
-  If the version is 4.1 or higher, you're fine. If it's older, or you don't
+  If the version is 4.2 or higher, you're fine. If it's older, or you don't
   have R yet, install the latest version from
   [cran.r-project.org](https://cran.r-project.org/).
 
@@ -70,6 +70,11 @@ that's normal.
   takes a long time, and isn't needed for the app.
 - **"Do you want to install from sources the packages which need
   compilation?"** Type `No` and press Enter.
+- **"Would you like to use a personal library instead?"** and then **"Would
+  you like to create a personal library ... to install packages into?"** Type
+  `yes` both times. This happens on laptops where you don't have administrator
+  rights, such as many university-managed laptops. R then installs packages in
+  a folder of your own.
 :::
 
 When the installation is finished, the Console shows the `>` prompt again,
@@ -173,8 +178,12 @@ RStudio.
 - **Your code runs separately.** The app runs your code in a separate R
   session, so variables you create in the app don't appear in RStudio's
   **Environment** panel, and code in the app can't break your own work. If
-  your code runs for more than 10 seconds (for example an endless loop), the
+  your code runs for more than 30 seconds (for example an endless loop), the
   app stops it.
+- **A file called `output.csv` appeared on my computer.** Some exercises
+  practise saving data to a file. Those files end up in R's working folder
+  (run `getwd()` to see which one; usually your Documents or home folder).
+  They're harmless, and you can delete them.
 - **Where is my progress stored?** In a folder on your own computer. You can
   see exactly where by running `tools::R_user_dir("dafsteach", "data")`.
   Nothing about you is uploaded anywhere.
@@ -192,6 +201,13 @@ RStudio.
 **`there is no package called 'remotes'`**
 : You skipped the first installation line. Run
   `install.packages("remotes")` first, then the `install_github()` line again.
+
+**`'lib = ...' is not writable`** or **`Permission denied`** during the
+installation
+: You don't have administrator rights on this laptop, and R tried to install
+  into a folder you can't write to. Restart R (*Session → Restart R*) and run
+  the installation again. When R asks whether to use a personal library, answer
+  `yes`.
 
 **`there is no package called 'dafsteach'`**
 : The installation didn't finish. Scroll up in the Console to find the first

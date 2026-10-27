@@ -31,3 +31,10 @@ test_that("completion codes match the Python app", {
   expect_equal(generate_code("Jan Pieter", "01_python_basics", secret = "s3cret"), "1EB4F-4EBA3")
   expect_true(verify_code("alice example", "01_r_basics", "b3171-5aad8", secret = "dafs-teach-default-secret-change-me"))
 })
+
+test_that("outdated or missing lesson packages are detected", {
+  expect_equal(outdated_packages(), character(0))
+  expect_equal(outdated_packages(c(dplyr = "999.0.0", readr = "0.1.0")), "dplyr")
+  expect_equal(outdated_packages(c(notapackage = "1.0.0")), "notapackage")
+  expect_match(outdated_message(c("dplyr", "readr")), 'install.packages(c("dplyr", "readr"))', fixed = TRUE)
+})

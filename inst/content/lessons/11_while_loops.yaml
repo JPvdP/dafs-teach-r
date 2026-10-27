@@ -22,7 +22,7 @@ exercises:
       - If `TRUE`: run the body, which ends by increasing `count` by 1, and check again
       - When `count` reaches 6, the condition is `FALSE` and the loop stops
 
-      ⚠️ **The danger:** if the condition never becomes `FALSE`, the loop runs **forever**. Forget the `count <- count + 1` line, and `count` stays 1. In this app your code is stopped after 10 seconds. In RStudio, click the red **Stop** button in the Console (or press **Esc**).
+      ⚠️ **The danger:** if the condition never becomes `FALSE`, the loop runs **forever**. Forget the `count <- count + 1` line, and `count` stays 1. In this app your code is stopped after 30 seconds. In RStudio, click the red **Stop** button in the Console (or press **Esc**).
 
       **Your task:**
       The loop below already increases `count`. Add the line that shows `Iteration 1` to `Iteration 5`. Make sure your line comes **before** the increase, or the numbers will be off by one.

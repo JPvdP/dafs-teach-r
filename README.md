@@ -10,7 +10,7 @@ A step-by-step guide for students, including troubleshooting, is in [`student_gu
 
 ### Installation
 
-You need R 4.1 or higher (and RStudio is recommended). In the R console, run:
+You need R 4.2 or higher (and RStudio is recommended). In the R console, run:
 
 ```r
 install.packages("remotes")

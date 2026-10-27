@@ -4,6 +4,9 @@
 # Available to every 'assert' check: .check(condition, "message shown on failure")
 check_helper <- ".check <- function(condition, message) if (!isTRUE(condition)) stop(message, call. = FALSE)"
 
+# Generous, because loading the tidyverse on a fresh (Windows) laptop can be slow
+TIMEOUT_SECONDS <- 30
+
 rscript_path <- function() {
   file.path(R.home("bin"), if (.Platform$OS.type == "windows") "Rscript.exe" else "Rscript")
 }
@@ -11,7 +14,7 @@ rscript_path <- function() {
 # Returns list(stdout, stderr, crashed, timed_out). `crashed` is based on the
 # exit status, not on stderr, so warnings and package startup messages
 # (which also go to stderr) don't count as errors.
-run_file <- function(path, timeout = 10) {
+run_file <- function(path, timeout = TIMEOUT_SECONDS) {
   res <- tryCatch(
     processx::run(
       rscript_path(), c("--no-init-file", path),
@@ -32,7 +35,7 @@ run_file <- function(path, timeout = 10) {
        crashed = res$status != 0, timed_out = FALSE)
 }
 
-run_source <- function(code, timeout = 10) {
+run_source <- function(code, timeout = TIMEOUT_SECONDS) {
   path <- tempfile(fileext = ".R")
   on.exit(unlink(path))
   con <- file(path, open = "w", encoding = "UTF-8")
@@ -55,7 +58,7 @@ run_result <- function(stdout, stderr, timed_out, passed, feedback, crashed = FA
        feedback = feedback, crashed = crashed)
 }
 
-run_code <- function(student_code, tests, timeout = 10) {
+run_code <- function(student_code, tests, timeout = TIMEOUT_SECONDS) {
   run <- run_source(student_code, timeout)
   stdout <- run$stdout
   stderr <- run$stderr
@@ -64,7 +67,7 @@ run_code <- function(student_code, tests, timeout = 10) {
 
   if (run$timed_out) {
     return(run_result("", "", TRUE, FALSE,
-                      "Your code timed out after 10 seconds. Check for infinite loops."))
+                      paste("Your code timed out after", timeout, "seconds. Check for infinite loops.")))
   }
   if (run$crashed && !nzchar(trimws(stdout))) {
     return(result(FALSE, FALSE,

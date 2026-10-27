@@ -9,7 +9,7 @@ Description: A browser-based learning app for the R track of the Data Analytics
 License: MIT + file LICENSE
 Encoding: UTF-8
 Depends:
-    R (>= 4.1.0)
+    R (>= 4.2.0)
 Imports:
     bslib,
     DBI,
@@ -23,7 +23,9 @@ Imports:
     tools,
     yaml
 Suggests:
+    dplyr (>= 1.1.0),
+    readr (>= 2.0.0),
     testthat (>= 3.0.0),
-    tidyverse,
+    tidyverse (>= 2.0.0),
     withr
 Config/testthat/edition: 3
