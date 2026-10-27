@@ -6,6 +6,8 @@ This is the R version of the [Python teaching app](https://github.com/JPvdP/dafs
 
 ## For students
 
+A step-by-step guide for students, including troubleshooting, is in [`student_guide.qmd`](student_guide.qmd) (render it with Quarto to get a single HTML file to share).
+
 ### Installation
 
 You need R 4.1 or higher (and RStudio is recommended). In the R console, run:

@@ -3,3 +3,6 @@
 ^README\.md$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^student_guide\.qmd$
+^student_guide\.html$
+^student_guide_files$

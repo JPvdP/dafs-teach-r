@@ -1,0 +1,221 @@
+---
+title: "Getting started with the DAFS Teaching App (R track)"
+subtitle: "Data Analytics For Sustainability"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-copy: true
+    embed-resources: true
+---
+
+The DAFS Teaching App is a small program that runs on your own laptop and opens
+in your web browser. It walks you through the course's R lessons: you read a
+short explanation, write code in an editor, press **Run**, and get feedback
+straight away.
+
+You install and start the app from R itself, so everything happens in R and
+RStudio, the same tools you use in the rest of the course.
+
+This guide shows you how to install it, start it, and keep it up to date.
+
+# What you need
+
+- **R 4.1 or newer.** Open RStudio and look at the first line of the
+  **Console** (the panel where R prints its output). It says something like
+  `R version 4.4.1`. You can also type this in the Console and press Enter:
+
+  ```r
+  R.version.string
+  ```
+
+  If the version is 4.1 or higher, you're fine. If it's older, or you don't
+  have R yet, install the latest version from
+  [cran.r-project.org](https://cran.r-project.org/).
+
+- **RStudio.** Not strictly required, but strongly recommended: it's what we
+  use in class. Download it for free from
+  [posit.co/download/rstudio-desktop](https://posit.co/download/rstudio-desktop/).
+
+- **An internet connection** for the installation. After that, the app works
+  offline.
+
+::: {.callout-note}
+## Where do I type the commands?
+All commands in this guide go in the RStudio **Console**: click in it, paste
+the command, and press Enter. Don't put them in a script.
+:::
+
+# Installing the app
+
+The app is not on CRAN (R's official package store), but on GitHub. To
+install packages from GitHub, you first need a small helper package called
+**remotes**. Run these two lines in the Console, one after the other:
+
+```r
+install.packages("remotes")
+remotes::install_github("JPvdP/dafs-teach-r", dependencies = TRUE)
+```
+
+This downloads the app together with everything it needs, including the
+**tidyverse** that the lessons use. If you don't have the tidyverse yet, this
+can take several minutes the first time. You'll see a lot of text scrolling by:
+that's normal.
+
+::: {.callout-tip}
+## Questions R may ask you during the installation
+- **"These packages have more recent versions available. Which would you
+  like to update?"** Type `3` (*None*) and press Enter. Updating everything
+  takes a long time, and isn't needed for the app.
+- **"Do you want to install from sources the packages which need
+  compilation?"** Type `No` and press Enter.
+:::
+
+When the installation is finished, the Console shows the `>` prompt again,
+and you can type a new command.
+
+# Starting the app
+
+In the Console, type:
+
+```r
+dafsteach::run_app()
+```
+
+After a few seconds the app opens, either in your web browser or in a window
+from RStudio, depending on your RStudio settings. If it opens in a small panel
+in RStudio, you can click **Show in new window** at the top of that panel, or
+start the app like this to always open it in your browser:
+
+```r
+dafsteach::run_app(launch.browser = TRUE)
+```
+
+::: {.callout-important}
+## The Console is busy while the app runs
+While the app is running, R is busy: you'll see a red **Stop** sign at the top
+of the Console, and you can't run other code there. When you're done, click
+that red **Stop** sign, or click in the Console and press **Esc**. Closing
+the browser tab does not stop the app.
+:::
+
+# Using the app
+
+## The first time: enter your name
+
+When you open the app for the first time it asks for your name.
+
+::: {.callout-warning}
+Use your **full name exactly as it appears on Brightspace**, and always use
+the same spelling. Your completion codes (see below) are linked to this name,
+so a typo or a nickname means your codes won't match.
+:::
+
+## Working through a lesson
+
+1. On the home page, pick a lesson and click **Open**. Lessons are numbered in
+   the order we cover them in class.
+2. Read the instructions, then write your code in the editor.
+3. Click **▶ Run** to run your code. You see what your code printed under
+   **Output**, and whether your answer passes the checks under **Feedback**.
+4. Stuck? Click **💡 Show hint** to reveal hints one at a time. Use
+   **👁 Solution** only as a last resort — you learn far more by trying first.
+5. Once an exercise passes, click **Next →** to go to the next one. Use the
+   list of exercises on the left to jump between exercises, or **← Home** to go
+   back to the list of lessons.
+
+Your progress is saved automatically on your own computer, so you can stop
+the app and carry on later where you left off.
+
+::: {.callout-note}
+## Messages and warnings are not errors
+Some code prints extra information, for example the list of packages when you
+load the tidyverse, or the column types after reading a file. The app shows
+this in grey under **Messages and warnings**. Only a real **error** (shown in
+red) means your code stopped.
+:::
+
+## "Explain this script" exercises
+
+In some lessons you don't write code: you read a script and explain in your own
+words what it does, just like on the exam. Write your explanation in the
+editor, and click **📝 Submit explanation**. The app checks that your
+explanation is long enough, and then shows a **model answer** to compare yours
+with. Be honest with yourself: did you spot everything the model answer
+mentions?
+
+## Getting your completion code
+
+When you've finished **every** exercise in a lesson, open the home page and
+click **🎓 Get completion code** on that lesson's card. Upload this code to
+Brightspace as proof you completed the module.
+
+# Updating the app
+
+New lessons and fixes are added during the course. When we announce an update,
+stop the app (red **Stop** sign) and run the installation command again:
+
+```r
+remotes::install_github("JPvdP/dafs-teach-r", dependencies = TRUE)
+```
+
+Then start the app again with `dafsteach::run_app()`. Your progress is kept.
+
+::: {.callout-tip}
+If R says that **dafsteach** is in use and asks you to restart R, click
+**Yes**. You can also restart R yourself first, via *Session → Restart R* in
+RStudio.
+:::
+
+# Good to know
+
+- **Your code runs separately.** The app runs your code in a separate R
+  session, so variables you create in the app don't appear in RStudio's
+  **Environment** panel, and code in the app can't break your own work. If
+  your code runs for more than 10 seconds (for example an endless loop), the
+  app stops it.
+- **Where is my progress stored?** In a folder on your own computer. You can
+  see exactly where by running `tools::R_user_dir("dafsteach", "data")`.
+  Nothing about you is uploaded anywhere.
+- **Anonymous progress reports.** After a weekly deadline has passed, the app
+  may send your instructor an *anonymous* summary of how the class did on that
+  week's exercises (for example, how many attempts an exercise took). Your name
+  is never included. You'll see a small notice when this happens.
+- **Settings from your instructor.** If your instructor asks you to set a
+  variable such as `DAFS_TEACH_SECRET` before starting the app, follow their
+  instructions exactly. If you haven't been told to, you don't need to do
+  anything.
+
+# Troubleshooting
+
+**`there is no package called 'remotes'`**
+: You skipped the first installation line. Run
+  `install.packages("remotes")` first, then the `install_github()` line again.
+
+**`there is no package called 'dafsteach'`**
+: The installation didn't finish. Scroll up in the Console to find the first
+  line that starts with `Error`, and run the installation command again. If it
+  fails a second time, bring that error message to the lab session.
+
+**An error mentioning `API rate limit exceeded` or `HTTP error 403`**
+: GitHub limits how often one network can download from it. This happens when
+  many students install at the same time on the same Wi-Fi. Wait a few
+  minutes, or try again from home.
+
+**An error saying a package requires a newer version of R**
+: Your R is too old. Install the latest version from
+  [cran.r-project.org](https://cran.r-project.org/), restart RStudio, and
+  install the app again.
+
+**The app doesn't open, or the page stops responding**
+: Check the Console in RStudio. If there's no red **Stop** sign, the app isn't
+  running any more: start it again with `dafsteach::run_app()`.
+
+**An exercise says `there is no package called 'tidyverse'`**
+: The tidyverse didn't get installed along with the app. Stop the app, run
+  `install.packages("tidyverse")`, and start the app again.
+
+**Something else?**
+: Copy the full error message from the Console and bring it to the lab
+  session, or post it on the course forum on Brightspace.
