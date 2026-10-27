@@ -1,0 +1,436 @@
+title: "Reading Unfamiliar Code"
+description: "Explain in your own words what a script does — including functions you haven't seen before. Each new function is explained in the exercise, just like it would be on the exam."
+
+exercises:
+
+  - id: explain_sensor_cleaning
+    type: explain
+    title: "Cleaning Air Quality Readings"
+    min_words: 40
+    script: |
+      library(tidyverse)
+
+      readings <- tibble(
+        sensor = c("A", "B", "C", "D", "E"),
+        pm25   = c(12.0, NA, 35.5, -3.0, 180.0)
+      )
+
+      readings <- readings |>
+        mutate(pm25 = replace_na(pm25, mean(pm25, na.rm = TRUE))) |>
+        mutate(pm25 = pmin(pmax(pm25, 0), 150))
+
+      print(readings)
+      cat("Average PM2.5:", round(mean(readings$pm25), 1), "\n")
+    instructions: |
+      In this lesson you won't write code. Instead, you'll **read** a script and **explain in your own words** what it does. Each script mixes things you already know with a few functions you haven't seen before. Those new functions are explained below the script — just like on the exam, where you'll also meet functions you don't know yet.
+
+      **A strategy that works:**
+      1. Read the explanation of the new functions first.
+      2. Go through the script top to bottom. After each line, ask yourself: *which variable changes, and what is in it now?*
+      3. Write down what you think gets printed — work out the actual values.
+
+      ---
+
+      This script cleans air quality measurements (PM2.5 = fine dust, in µg/m³) from five sensors.
+
+      **New functions in this script**
+
+      - **`replace_na(x, value)`** (from the tidyr package, loaded with the tidyverse) — replaces every missing value (`NA`) in `x` with `value`. All other values stay the same.
+        ```r
+        replace_na(c(1, NA, 3), 0)    # 1 0 3
+        ```
+      - **`pmax(x, value)`** and **`pmin(x, value)`** — the *parallel* maximum and minimum: they compare **every** value of `x` with `value`, and keep the larger (`pmax`) or the smaller (`pmin`) one.
+        ```r
+        pmax(c(-5, 10, 99), 0)     # 0 10 99   → nothing below 0
+        pmin(c(-5, 10, 99), 50)    # -5 10 50  → nothing above 50
+        ```
+
+      **A reminder:** `na.rm = TRUE` tells `mean()` to skip missing values (lesson 1).
+
+      **Your task:**
+      Explain what this script does. Mention what happens to **each sensor's** value, and work out what the last line prints.
+    starter_code: |
+      What does the script do overall?
+
+
+      Step by step (you can refer to line numbers):
+
+
+      What does it print at the end?
+
+    hints:
+      - "Work out the mean on line 9 yourself. With na.rm = TRUE it is calculated from the four values that are not missing"
+      - "The mean on line 9 is calculated BEFORE line 10 runs. Which values are in the column at that moment?"
+      - "Line 10 works from the inside out: first pmax(pm25, 0), then pmin(..., 150). Which sensors have a value below 0 or above 150?"
+    solution: |
+      **Overall:** the script fills in a missing measurement and removes impossible or extreme values, then prints the cleaned table and its average.
+
+      **Step by step**
+      - **Line 1:** loads the tidyverse.
+      - **Lines 3–6:** create a tibble `readings` with 5 sensors. Sensor B has a missing value (`NA`), sensor D has an impossible negative value (−3.0), and sensor E has an extreme value (180.0).
+      - **Line 9:** `mean(pm25, na.rm = TRUE)` calculates the average of the values that are **not** missing: (12.0 + 35.5 − 3.0 + 180.0) / 4 = **56.125**. `replace_na()` puts that average in the place of B's missing value. The result is stored in the same column, so the original column is overwritten.
+      - **Line 10:** first `pmax(pm25, 0)` raises every value below 0 to 0, so D's −3.0 becomes **0**. Then `pmin(..., 150)` lowers every value above 150 to 150, so E's 180.0 becomes **150**. A, B and C don't change. The result of both steps is stored back in `readings` (line 8).
+      - **Line 12:** prints the cleaned table.
+      - **Line 13:** prints the new average, rounded to 1 decimal: (12 + 56.125 + 35.5 + 0 + 150) / 5 = 50.725 → **50.7**.
+
+      **Output**
+      ```
+      # A tibble: 5 × 2
+        sensor  pm25
+        <chr>  <dbl>
+      1 A       12
+      2 B       56.1
+      3 C       35.5
+      4 D        0
+      5 E      150
+      Average PM2.5: 50.7
+      ```
+
+      **Worth noticing:**
+      - The order of lines 9 and 10 matters. The missing value is filled in with an average that still includes the "wrong" values −3.0 and 180.0, because the limits are applied only afterwards. If you swapped the two lines, B would get a different value. Spotting things like this is exactly what reading code carefully is about.
+      - The table shows B as 56.1, but the value stored is 56.125: tibbles round numbers when they print them (lesson 2).
+
+  - id: explain_energy_labels
+    type: explain
+    title: "Giving Homes an Energy Label"
+    min_words: 40
+    script: |
+      library(tidyverse)
+
+      homes <- tibble(
+        home       = c("H1", "H2", "H3", "H4", "H5", "H6"),
+        kwh_per_m2 = c(95, 210, 150, 60, 180, 125)
+      )
+
+      homes <- homes |>
+        mutate(label = cut(kwh_per_m2, breaks = c(0, 100, 150, Inf), labels = c("A", "B", "C")))
+      share <- mean(homes$label %in% c("A", "B"))
+
+      print(homes)
+      cat(round(share * 100), "% of the homes have label A or B\n", sep = "")
+    instructions: |
+      This script gives six homes an energy label, based on their yearly energy use in kWh per square metre, and calculates which share of the homes is efficient.
+
+      **New functions in this script**
+
+      - **`cut(x, breaks, labels)`** — puts every number into a **bin**. `breaks` are the borders between the bins, and `labels` the names of the bins. By default, each bin includes its **upper** border but not its lower border.
+        ```r
+        cut(c(5, 10, 15), breaks = c(0, 10, 20), labels = c("low", "high"))
+        # low low high
+        ```
+        Here the bins are "above 0 up to and including 10" (`low`) and "above 10 up to and including 20" (`high`), so 10 is still `low`. `Inf` means infinity: a border that no number is above.
+
+        `cut()` gives back a **factor**, shown as `<fct>` in a tibble: R's type for categories with a fixed set of possible values.
+      - **`sep = ""`** in `cat()` — `cat()` normally puts a space between its pieces. `sep = ""` tells it to put nothing between them.
+        ```r
+        cat(50, "%")             # 50 %
+        cat(50, "%", sep = "")   # 50%
+        ```
+
+      **A reminder:** when you calculate with `TRUE`/`FALSE`, R counts `TRUE` as `1` and `FALSE` as `0` (lesson 3). So the **mean** of `TRUE`/`FALSE` values is the **share** that is `TRUE`: `mean(c(TRUE, FALSE, TRUE, TRUE))` is 0.75.
+
+      **Your task:**
+      Explain what this script does. Which homes get which label, and what is the percentage on the last line?
+    starter_code: |
+      What does the script do overall?
+
+
+      Step by step (you can refer to line numbers):
+
+
+      What does it print at the end?
+
+    hints:
+      - "Write out the three bins of line 9: above 0 up to 100, above 100 up to 150, above 150"
+      - "Look closely at H3 (150): which bin includes 150?"
+      - "On line 10, %in% gives TRUE or FALSE for every home. What's the mean of those?"
+    solution: |
+      **Overall:** the script gives every home an energy label A, B or C based on its energy use per m², and calculates which percentage of the homes has label A or B.
+
+      **Step by step**
+      - **Lines 3–6:** create a tibble with six homes and their energy use per m².
+      - **Lines 8–9:** `cut()` puts every home into a bin: above 0 up to and including 100 → **A**, above 100 up to and including 150 → **B**, above 150 → **C**. H1 (95) and H4 (60) get **A**; H3 (150) and H6 (125) get **B**; H2 (210) and H5 (180) get **C**. The labels are stored in a new column `label`.
+      - **Line 10:** `homes$label %in% c("A", "B")` gives `TRUE`/`FALSE` per home (TRUE, FALSE, TRUE, TRUE, FALSE, TRUE). The mean of that is 4 / 6 = **0.667**, stored in `share`.
+      - **Line 12:** prints the table, now with the extra column.
+      - **Line 13:** turns 0.667 into a percentage (66.7), rounds it to **67**, and prints it in a sentence, without a space before the `%` because of `sep = ""`.
+
+      **Output**
+      ```
+      # A tibble: 6 × 3
+        home  kwh_per_m2 label
+        <chr>      <dbl> <fct>
+      1 H1            95 A
+      2 H2           210 C
+      3 H3           150 B
+      4 H4            60 A
+      5 H5           180 C
+      6 H6           125 B
+      67% of the homes have label A or B
+      ```
+
+      **Worth noticing:** H3 uses exactly 150 kWh/m² and gets label **B**, because each bin includes its upper border. If the borders had been the other way around (`cut(..., right = FALSE)`), H3 would have been C. Values exactly on a border are where mistakes hide.
+
+  - id: explain_solar_growth
+    type: explain
+    title: "Tracking Solar Production"
+    min_words: 50
+    script: |
+      library(tidyverse)
+
+      solar <- tibble(
+        month = c("Jan", "Feb", "Mar", "Apr", "May", "Jun"),
+        kwh   = c(120, 180, 310, 420, 510, 540)
+      )
+
+      solar <- solar |>
+        mutate(
+          cumulative_kwh = cumsum(kwh),
+          growth_pct = round((kwh - lag(kwh)) / lag(kwh) * 100, 1)
+        )
+
+      goal <- 1000
+      month_reached <- solar |> filter(cumulative_kwh >= goal) |> pull(month) |> first()
+
+      print(solar)
+      cat("The goal of", goal, "kWh was reached in", month_reached, "\n")
+    instructions: |
+      This script analyses the monthly production of a school's solar panels in the first half of the year.
+
+      **New functions in this script**
+
+      - **`cumsum(x)`** — the *cumulative sum*, or running total: each value is added to everything that came before it.
+        ```r
+        cumsum(c(5, 3, 2))    # 5 8 10
+        ```
+      - **`lag(x)`** (from dplyr) — shifts the values one position down, so each position gets the **previous** value. The first position has no previous value, so it gets `NA`.
+        ```r
+        lag(c(100, 150, 120))    # NA 100 150
+        ```
+      - **`first(x)`** (from dplyr) — gives the first value of a vector. It does the same as `x[1]`, but fits nicely at the end of a pipe.
+        ```r
+        first(c("b", "a", "c"))    # "b"
+        ```
+
+      **Your task:**
+      Explain what this script does. Describe what the two new columns contain, and explain how line 15 finds the month.
+    starter_code: |
+      What does the script do overall?
+
+
+      Step by step (you can refer to line numbers):
+
+
+      What does it print at the end?
+
+    hints:
+      - "Write out the running total for line 10 month by month: 120, 120 + 180, ..."
+      - "For line 11, write out lag(kwh) first: NA, 120, 180, ... Then February's growth is (180 − 120) / 120 × 100"
+      - "Line 15: which months have a cumulative total of 1000 or more? Which of those comes first?"
+    solution: |
+      **Overall:** the script calculates the running total of solar production and the growth from month to month, and finds the first month in which the total production reached 1000 kWh.
+
+      **Step by step**
+      - **Lines 3–6:** create a tibble with the production (kWh) for January to June.
+      - **Line 10:** `cumsum()` adds up the production month by month, giving a new column `cumulative_kwh`: 120, 300, 610, 1030, 1540, 2080.
+      - **Line 11:** `lag(kwh)` is the production of the month before (NA, 120, 180, 310, 420, 510). `(kwh - lag(kwh)) / lag(kwh) * 100` is the growth compared to the month before, as a percentage, rounded to 1 decimal. January has no previous month, so it gets `NA`. For example February: (180 − 120) / 120 × 100 = **50%**.
+      - **Line 14:** stores the goal, 1000 kWh, in a variable.
+      - **Line 15:** `filter(cumulative_kwh >= goal)` keeps April, May and June. `pull(month)` takes their month names out as a vector, and `first()` takes the first one: **"Apr"**.
+      - **Lines 17–18:** print the table and a sentence with the result.
+
+      **Output**
+      ```
+      # A tibble: 6 × 4
+        month   kwh cumulative_kwh growth_pct
+        <chr> <dbl>          <dbl>      <dbl>
+      1 Jan     120            120       NA
+      2 Feb     180            300       50
+      3 Mar     310            610       72.2
+      4 Apr     420           1030       35.5
+      5 May     510           1540       21.4
+      6 Jun     540           2080        5.9
+      The goal of 1000 kWh was reached in Apr
+      ```
+
+      **Worth noticing:** production keeps **rising** every month, but the growth percentage goes **down** from March onwards. "Growing more slowly" is not the same as "shrinking". This is a common trap when reading percentage changes.
+
+  - id: explain_green_trips
+    type: explain
+    title: "Comparing Green Travel Between Cities"
+    min_words: 50
+    script: |
+      library(tidyverse)
+
+      trips <- tibble(
+        city = c("Utrecht", "Utrecht", "Amsterdam", "Rotterdam",
+                 "Amsterdam", "Eindhoven", "Utrecht", "Rotterdam"),
+        mode = c("bike", "car", "bike", "car", "tram", "bike", "bike", "bike"),
+        km   = c(4.2, 12.5, 3.1, 18.0, 6.4, 5.5, 2.8, 7.1)
+      )
+
+      green_modes <- c("bike", "tram", "walk")
+
+      km_per_city <- trips |>
+        filter(mode %in% green_modes) |>
+        summarise(green_km = sum(km), modes = n_distinct(mode), .by = city)
+
+      top_two <- km_per_city |> slice_max(green_km, n = 2)
+
+      print(km_per_city)
+      print(top_two)
+    instructions: |
+      This script uses a small travel survey to compare how many kilometres people travel in a "green" way in four cities.
+
+      **New functions in this script**
+
+      - **`.by = city`** inside `summarise()` — a short way to summarise per group, without a separate `group_by()`. `summarise(total = sum(km), .by = city)` does the same as `group_by(city) |> summarise(total = sum(km))`, with one difference: the groups stay in the order in which they **first appear** in the data, instead of being sorted alphabetically.
+      - **`n_distinct(x)`** — counts how many **different** values there are in `x`.
+        ```r
+        n_distinct(c("bike", "car", "bike", "bike"))    # 2
+        ```
+
+      **Reminders:** `%in%` checks for every value whether it appears in a vector (lesson 7). `slice_max(column, n = 2)` keeps the 2 rows with the highest values, sorted from high to low (lesson 9).
+
+      **Your task:**
+      Explain what this script does. Which trips are left after line 13, and what do the two printed tables show?
+    starter_code: |
+      What does the script do overall?
+
+
+      Step by step (you can refer to line numbers):
+
+
+      What does it print at the end?
+
+    hints:
+      - "Line 13: which modes are in green_modes, and which trips have one of those modes?"
+      - "\"walk\" is in green_modes, but does any trip use it?"
+      - "For line 14, add up the km of the remaining trips per city (Utrecht: 4.2 + 2.8), and count the different modes per city. Which city appears first in the remaining trips?"
+    solution: |
+      **Overall:** the script keeps only the trips made by bike, tram or on foot, adds up the green kilometres per city (and counts how many different green modes each city uses), and shows the two cities with the most green kilometres.
+
+      **Step by step**
+      - **Lines 3–8:** create a tibble with 8 trips: the city, the mode of transport, and the distance in km.
+      - **Line 10:** a vector of the modes of transport that count as green.
+      - **Line 13:** `mode %in% green_modes` is `TRUE` for every trip by bike or tram, and `FALSE` for the two car trips. `filter()` keeps **6 trips** and removes the car trips (Utrecht 12.5 km and Rotterdam 18.0 km). Nobody walked, so `"walk"` in the vector doesn't change anything.
+      - **Line 14:** per city, adds up the km (`green_km`) and counts the different modes (`modes`): Utrecht 4.2 + 2.8 = 7.0 (1 mode: bike), Amsterdam 3.1 + 6.4 = 9.5 (2 modes: bike and tram), Eindhoven 5.5 (1), Rotterdam 7.1 (1). Because of `.by`, the cities are in the order in which they first appear among the green trips.
+      - **Line 16:** `slice_max()` keeps the two cities with the highest `green_km`: Amsterdam (9.5) and Rotterdam (7.1).
+      - **Lines 18–19:** print both tables.
+
+      **Output**
+      ```
+      # A tibble: 4 × 3
+        city      green_km modes
+        <chr>        <dbl> <int>
+      1 Utrecht        7       1
+      2 Amsterdam      9.5     2
+      3 Eindhoven      5.5     1
+      4 Rotterdam      7.1     1
+      # A tibble: 2 × 3
+        city      green_km modes
+        <chr>        <dbl> <int>
+      1 Amsterdam      9.5     2
+      2 Rotterdam      7.1     1
+      ```
+
+      **Worth noticing:** the first table is in the order of the data (that's what `.by` does), while the second is sorted by **value**, from high to low (that's what `slice_max()` does). Also, Utrecht had the most trips overall but doesn't make the top two: only kilometres count, not the number of trips.
+
+  - id: explain_emission_categories
+    type: explain
+    title: "Categorising Countries by Emissions"
+    min_words: 60
+    script: |
+      library(tidyverse)
+      library(glue)
+
+      classify_emissions <- function(tonnes) {
+        if (tonnes < 5) {
+          return("low")
+        } else if (tonnes < 10) {
+          return("medium")
+        } else {
+          return("high")
+        }
+      }
+
+      countries <- tibble(
+        country = c("netherlands", "france", "poland",
+                    "sweden", "germany", "luxembourg"),
+        co2_per_person = c(8.1, 4.6, 8.0, 3.6, 7.9, 13.1)
+      )
+
+      countries <- countries |>
+        mutate(
+          country = str_to_title(country),
+          category = map_chr(co2_per_person, classify_emissions)
+        )
+      counts <- countries |> count(category, sort = TRUE)
+
+      print(countries)
+      for (i in seq_len(nrow(counts))) {
+        print(glue("{counts$category[i]}: {counts$n[i]} countries"))
+      }
+    instructions: |
+      This script puts countries into categories based on their CO₂ emissions per person (in tonnes per year; the numbers are illustrative). It combines several new functions with a function the script defines itself.
+
+      **New functions in this script**
+
+      - **`str_to_title(x)`** — makes the first letter of every word a capital letter, and the rest lowercase. (You've already seen `str_to_upper()`, which works the same way.)
+        ```r
+        str_to_title(c("new york", "PARIS"))    # "New York" "Paris"
+        ```
+      - **`map_chr(x, f)`** — like `map()` from lesson 12, it calls the function `f` once for **every** value of `x`. `map()` gives back a list; `map_chr()` gives back a vector of text (*chr*), which you can put straight into a column. Note that you write the function's name **without** parentheses: `map_chr()` does the calling for you.
+        ```r
+        shout <- function(word) paste0(word, "!")
+        map_chr(c("hi", "bye"), shout)    # "hi!" "bye!"
+        ```
+      - **`count(x, sort = TRUE)`** — counts the rows per value, like in lesson 9. With `sort = TRUE`, the most common value comes first.
+
+      **Your task:**
+      Explain what this script does. Explain what the function on lines 4–12 does, which category every country gets, and what the loop on lines 28–30 prints.
+    starter_code: |
+      What does the script do overall?
+
+
+      Step by step (you can refer to line numbers):
+
+
+      What does it print at the end?
+
+    hints:
+      - "Lines 4–12 only define the function: nothing happens until it is called. Where is it called?"
+      - "Go through the six emission values one by one and follow the if / else if / else: which return() does each one reach?"
+      - "The loop goes through the rows of counts: in round i it shows the category and the number from row i"
+      - "Look closely at the very last line of the output. Is the sentence for 'high' grammatically correct?"
+    solution: |
+      **Overall:** the script tidies up the country names, labels each country "low", "medium" or "high" based on its CO₂ emissions per person, and counts how many countries fall into each category.
+
+      **Step by step**
+      - **Lines 1–2:** load the tidyverse and glue.
+      - **Lines 4–12:** define a function `classify_emissions` that takes one number and returns a label: below 5 → `"low"`, from 5 up to (not including) 10 → `"medium"`, 10 or more → `"high"`. Defining it doesn't run it yet.
+      - **Lines 14–18:** create a tibble with six countries (written in lowercase) and their emissions.
+      - **Line 22:** `str_to_title()` capitalises the names ("netherlands" → "Netherlands") and overwrites the `country` column.
+      - **Line 23:** `map_chr()` calls `classify_emissions` once for every emission value, and the labels are stored in a new column `category`: Netherlands, Poland and Germany → **medium**; France and Sweden → **low**; Luxembourg → **high**.
+      - **Line 25:** `count(category, sort = TRUE)` counts the labels: medium 3, low 2, high 1, from most to least common.
+      - **Line 27:** prints the table with the new column.
+      - **Lines 28–30:** the loop goes through the rows of `counts`, and prints one sentence per category with `glue()`.
+
+      **Output**
+      ```
+      # A tibble: 6 × 3
+        country     co2_per_person category
+        <chr>                <dbl> <chr>
+      1 Netherlands            8.1 medium
+      2 France                 4.6 low
+      3 Poland                 8   medium
+      4 Sweden                 3.6 low
+      5 Germany                7.9 medium
+      6 Luxembourg            13.1 high
+      medium: 3 countries
+      low: 2 countries
+      high: 1 countries
+      ```
+
+      **Worth noticing:**
+      - The last line says "1 countries": the script always adds "countries", even when there's only one. The script runs without errors, but the output isn't quite right. Reading the output critically is part of reading code.
+      - Why `map_chr()`, and not just `classify_emissions(co2_per_person)`? Because `if` can only check **one** value. Given the whole column, it stops with "the condition has length > 1" (lesson 6). `map_chr()` solves that by calling the function for one value at a time. (`case_when()` would be the other solution.)
+      - The function checks `tonnes < 5` **first**. That's why `else if (tonnes < 10)` only needs one condition: any value that reaches it is already known to be 5 or more.
