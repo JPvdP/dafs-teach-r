@@ -1,0 +1,433 @@
+title: Loops with Data
+description: Apply for and while loops to real analytical tasks — collecting numbers, going through a data frame row by row, classifying data — and learn the tidyverse alternatives, including map() for reading many files at once.
+
+exercises:
+
+  - id: multiples_for
+    title: "Finding Multiples with a For Loop"
+    instructions: |
+      Loops become powerful when you combine them with conditions. A common pattern: go through a range of numbers and **collect** the ones that meet a criterion.
+
+      Say you need all numbers from 1 to 50 that are divisible by 3 **or** 5. With `%%` (the remainder, from lesson 11) and `|` (or, from lesson 3):
+
+      ```r
+      for (i in 1:50) {
+        if (i %% 3 == 0 | i %% 5 == 0) {
+          print(i)
+        }
+      }
+      ```
+
+      Instead of printing each number, you can collect them in a vector with `c()`, as in lesson 10.
+
+      **And without a loop?** `%%` works on a whole vector at once, so you can also select the numbers directly, as in lesson 7:
+
+      ```r
+      x <- 1:50
+      x[x %% 3 == 0 | x %% 5 == 0]
+      ```
+
+      **Your task:**
+      1. Complete the loop so that every number divisible by 3 or 5 is added to `multiples`
+      2. Create `multiples_2` with the same numbers, **without** a loop
+      3. The last lines print `multiples` and its length
+    starter_code: |
+      # 1. With a loop
+      multiples <- c()
+
+      for (i in 1:50) {
+        if (i %% 3 == 0 | i %% 5 == 0) {
+          # add i to multiples
+
+        }
+      }
+
+      # 2. Without a loop
+      x <- 1:50
+      multiples_2 <-
+
+      print(multiples)
+      print(length(multiples))
+    tests:
+      - type: output_contains
+        value: "[1] 23"
+      - type: assert
+        code: |
+          .check(length(multiples) == 23 && 15 %in% multiples && 50 %in% multiples && !(7 %in% multiples), "multiples should contain the 23 numbers from 1 to 50 that are divisible by 3 or 5: multiples <- c(multiples, i)")
+          .check(isTRUE(all.equal(as.numeric(multiples_2), as.numeric(multiples))), "multiples_2 should contain the same numbers: x[x %% 3 == 0 | x %% 5 == 0]")
+        description: "multiples and multiples_2 should both contain the 23 multiples of 3 or 5"
+    hints:
+      - "multiples <- c(multiples, i)"
+      - "multiples_2 <- x[x %% 3 == 0 | x %% 5 == 0]"
+    solution: |
+      multiples <- c()
+
+      for (i in 1:50) {
+        if (i %% 3 == 0 | i %% 5 == 0) {
+          multiples <- c(multiples, i)
+        }
+      }
+
+      x <- 1:50
+      multiples_2 <- x[x %% 3 == 0 | x %% 5 == 0]
+
+      print(multiples)
+      print(length(multiples))
+
+  - id: cumulative_while
+    title: "Running Total with a While Loop"
+    instructions: |
+      Now use a `while` loop on the multiples from the previous exercise: add them up one by one, and **stop** as soon as the running total is above 200.
+
+      ```r
+      total <- 0
+      i <- 1
+      while (total <= 200) {
+        total <- total + multiples[i]
+        i <- i + 1
+      }
+      ```
+
+      `i` is the **position** of the next number to add. It starts at 1, because R counts positions from 1. In every round, the number at position `i` is added, and `i` moves one position further. The moment `total` is above 200, the condition is `FALSE` and the loop stops.
+
+      (Without a loop: `cumsum(multiples)` gives the running total after every step, so `cumsum(multiples)[cumsum(multiples) > 200][1]` gives the first running total above 200.)
+
+      **Your task:**
+      The loop below already adds the number at position `i`, but `i` never moves. Run it first: you get 201, which is 3 + 3 + 3 + … (the first number, over and over). Add the line that moves `i` to the next position, so that `total` becomes **225**.
+    starter_code: |
+      x <- 1:50
+      multiples <- x[x %% 3 == 0 | x %% 5 == 0]
+
+      total <- 0
+      i <- 1
+
+      while (total <= 200) {
+        total <- total + multiples[i]
+        # move i to the next position
+
+      }
+
+      print(total)
+    tests:
+      - type: output_equals
+        value: "[1] 225"
+      - type: assert
+        code: |
+          .check(total == 225, "total should be 225: the first running total above 200")
+        description: "total should be 225: the first time the running total is above 200"
+    hints:
+      - "i should go up by 1 in every round"
+      - "i <- i + 1"
+    solution: |
+      x <- 1:50
+      multiples <- x[x %% 3 == 0 | x %% 5 == 0]
+
+      total <- 0
+      i <- 1
+
+      while (total <= 200) {
+        total <- total + multiples[i]
+        i <- i + 1
+      }
+
+      print(total)
+
+  - id: iterrows_filter
+    title: "Going Through a Data Frame Row by Row"
+    instructions: |
+      To loop over the rows of a tibble, loop over the **row numbers** with `seq_len(nrow(df))` (1, 2, …, number of rows), and pick the value from a column with `$` and `[i]`:
+
+      ```r
+      for (i in seq_len(nrow(df))) {
+        writeLines(paste("Row", i, "is region", df$region[i]))
+      }
+      ```
+
+      `df$region[i]` reads as: "the `region` column, value number `i`".
+
+      **Your task:**
+
+      **Part 1 — for loop:** go through every row. If `sustainable` is `TRUE` **and** `energy_usage` is above 20, show `Region: A, Energy: 30` (with the values of that row).
+
+      **Part 2 — while loop:** go through the rows from the top, and add the `energy_usage` of the **sustainable** rows to `cumulative`. Stop as soon as `cumulative` is above 50, or when you run out of rows. Print `cumulative`.
+
+      (Part 1 without a loop is just `df |> filter(sustainable, energy_usage > 20)`. A loop over rows is useful when you need to **do** something per row, like download a file or make a graph, rather than calculate something.)
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        region       = c("A", "B", "A", "C", "B", "C", "A"),
+        energy_usage = c(10, 20, 30, 40, 50, 60, 70),
+        sustainable  = c(TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE)
+      )
+
+      # Part 1: for loop over the rows
+      for (i in seq_len(nrow(df))) {
+        # if row i is sustainable and uses more than 20, show "Region: ..., Energy: ..."
+
+      }
+
+      # Part 2: while loop
+      cumulative <- 0
+      i <- 1   # the row you're looking at
+
+      while (cumulative <= 50 & i <= nrow(df)) {
+        # if row i is sustainable, add its energy_usage to cumulative
+
+
+        i <- i + 1
+      }
+
+      print(cumulative)
+    tests:
+      - type: output_contains
+        value: "Region: A, Energy: 30"
+      - type: output_contains
+        value: "Region: B, Energy: 50"
+      - type: output_contains
+        value: "Region: A, Energy: 70"
+      - type: output_contains
+        value: "[1] 90"
+      - type: assert
+        code: |
+          .check(cumulative == 90, "cumulative should be 90: 10 + 30 + 50, and then it's above 50")
+        description: "Rows shown: 30, 50, 70. cumulative stops at 90 (10 + 30 + 50 > 50)"
+    hints:
+      - "Part 1: if (df$sustainable[i] & df$energy_usage[i] > 20) {"
+      - "Part 1: writeLines(paste0(\"Region: \", df$region[i], \", Energy: \", df$energy_usage[i]))"
+      - "Part 2: if (df$sustainable[i]) { cumulative <- cumulative + df$energy_usage[i] }"
+      - "Part 2: the sustainable values, in order, are 10, 30, 50, 70. 10 + 30 = 40 (50 or less: continue), + 50 = 90 (above 50: stop)"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        region       = c("A", "B", "A", "C", "B", "C", "A"),
+        energy_usage = c(10, 20, 30, 40, 50, 60, 70),
+        sustainable  = c(TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE)
+      )
+
+      for (i in seq_len(nrow(df))) {
+        if (df$sustainable[i] & df$energy_usage[i] > 20) {
+          writeLines(paste0("Region: ", df$region[i], ", Energy: ", df$energy_usage[i]))
+        }
+      }
+
+      cumulative <- 0
+      i <- 1
+
+      while (cumulative <= 50 & i <= nrow(df)) {
+        if (df$sustainable[i]) {
+          cumulative <- cumulative + df$energy_usage[i]
+        }
+        i <- i + 1
+      }
+
+      print(cumulative)
+
+  - id: renewable_classify
+    title: "Classifying Data: Loop or case_when()?"
+    instructions: |
+      A common task: calculate a metric, and then put each row into a category based on thresholds.
+
+      With a loop, you first create an empty column, and then fill it **row by row**. `df$category[i] <- "..."` puts a value in row `i` of the column:
+
+      ```r
+      df$size <- NA
+      for (i in seq_len(nrow(df))) {
+        if (df$n[i] > 100) {
+          df$size[i] <- "big"
+        } else {
+          df$size[i] <- "small"
+        }
+      }
+      ```
+
+      In lesson 6 you did the same without a loop, with `case_when()` inside `mutate()`. Both give the same result; `case_when()` is shorter and is what you'll see in most R code.
+
+      **Your task:**
+      1. Add `renewable_percentage` (`renewable_energy / total_energy * 100`) with `mutate()`
+      2. Complete the loop that fills `renewable_category`:
+         - above 50 → `"High Renewable"`
+         - 20 or more → `"Medium Renewable"`
+         - otherwise → `"Low Renewable"`
+      3. Do the same with `case_when()`, in a column `category_2`
+
+      The last lines print `df`, and count how many countries are in each category with `count()`.
+    starter_code: |
+      library(tidyverse)
+
+      df <- tibble(
+        country          = c("NL", "DE", "FR", "ES", "PL"),
+        renewable_energy = c(15, 40, 60, 25, 5),
+        total_energy     = c(100, 100, 100, 100, 100)
+      )
+
+      # 1. renewable_percentage
+      df <- df |> mutate()
+
+      # 2. With a loop
+      df$renewable_category <- NA
+      for (i in seq_len(nrow(df))) {
+        if (df$renewable_percentage[i] > 50) {
+          df$renewable_category[i] <- "High Renewable"
+        } else if (df$renewable_percentage[i] >= 20) {
+          # Medium
+
+        } else {
+          # Low
+
+        }
+      }
+
+      # 3. With case_when()
+      df <- df |>
+        mutate(category_2 = case_when(
+
+        ))
+
+      print(df, width = Inf)
+      print(df |> count(renewable_category))
+    tests:
+      - type: output_contains
+        value: "Medium Renewable"
+      - type: assert
+        code: |
+          .check("renewable_percentage" %in% names(df) && isTRUE(all.equal(df$renewable_percentage, c(15, 40, 60, 25, 5))), "renewable_percentage should be renewable_energy / total_energy * 100")
+          .check(identical(df$renewable_category, c("Low Renewable", "Medium Renewable", "High Renewable", "Medium Renewable", "Low Renewable")), "renewable_category is not right yet: FR (60%) should be High, DE and ES Medium, NL and PL Low")
+          .check(identical(df$category_2, df$renewable_category), "category_2 (with case_when) should be the same as renewable_category (with the loop)")
+        description: "FR = High, DE and ES = Medium, NL and PL = Low, with both the loop and case_when()"
+    hints:
+      - "df <- df |> mutate(renewable_percentage = renewable_energy / total_energy * 100)"
+      - "In the loop: df$renewable_category[i] <- \"Medium Renewable\" and df$renewable_category[i] <- \"Low Renewable\""
+      - "case_when(renewable_percentage > 50 ~ \"High Renewable\", renewable_percentage >= 20 ~ \"Medium Renewable\", .default = \"Low Renewable\")"
+    solution: |
+      library(tidyverse)
+
+      df <- tibble(
+        country          = c("NL", "DE", "FR", "ES", "PL"),
+        renewable_energy = c(15, 40, 60, 25, 5),
+        total_energy     = c(100, 100, 100, 100, 100)
+      )
+
+      df <- df |> mutate(renewable_percentage = renewable_energy / total_energy * 100)
+
+      df$renewable_category <- NA
+      for (i in seq_len(nrow(df))) {
+        if (df$renewable_percentage[i] > 50) {
+          df$renewable_category[i] <- "High Renewable"
+        } else if (df$renewable_percentage[i] >= 20) {
+          df$renewable_category[i] <- "Medium Renewable"
+        } else {
+          df$renewable_category[i] <- "Low Renewable"
+        }
+      }
+
+      df <- df |>
+        mutate(category_2 = case_when(
+          renewable_percentage > 50 ~ "High Renewable",
+          renewable_percentage >= 20 ~ "Medium Renewable",
+          .default = "Low Renewable"
+        ))
+
+      print(df, width = Inf)
+      print(df |> count(renewable_category))
+
+  - id: map_files
+    title: "Reading Many Files: a Loop and map()"
+    instructions: |
+      A situation where you really need to repeat something: your data comes in **one file per year**, and you want it all in one table.
+
+      `list.files()` gives you the names of the files in a folder. `pattern` keeps only the names that match, and `full.names = TRUE` gives the full path:
+
+      ```r
+      files <- list.files("data", pattern = "^solar_", full.names = TRUE)
+      # "data/solar_2021.csv" "data/solar_2022.csv" "data/solar_2023.csv"
+      ```
+
+      **With a for loop**, you read the files one by one and stack them with `bind_rows()`, which puts tables with the same columns under each other:
+
+      ```r
+      all_data <- tibble()
+      for (file in files) {
+        one_year <- read_csv(file, show_col_types = FALSE)
+        all_data <- bind_rows(all_data, one_year)
+      }
+      ```
+
+      **With `map()`** (from the purrr package, part of the tidyverse) it's one line. `map()` runs a function on **every element** of a vector and gives you a list with the results. Any extra arguments are passed on to that function:
+
+      ```r
+      all_data <- files |>
+        map(read_csv, show_col_types = FALSE) |>
+        bind_rows()
+      ```
+
+      Read it as: "take the files, **and then** run `read_csv()` on each of them, **and then** stack the results".
+
+      **Your task:**
+      The first part of the code creates three yearly files in a temporary folder (you don't need to change it).
+      1. Read and stack all files with a **for loop** into `all_data`
+      2. Do the same with **`map()`** into `all_data_2`
+      3. `totals`: the total `solar_twh` per country, over all years. Print it.
+    starter_code: |
+      library(tidyverse)
+
+      # Setup: three yearly files in a temporary folder
+      folder <- tempdir()
+      write_csv(tibble(country = c("NL", "DE"), year = 2021, solar_twh = c(11, 49)), file.path(folder, "solar_2021.csv"))
+      write_csv(tibble(country = c("NL", "DE"), year = 2022, solar_twh = c(17, 60)), file.path(folder, "solar_2022.csv"))
+      write_csv(tibble(country = c("NL", "DE"), year = 2023, solar_twh = c(21, 62)), file.path(folder, "solar_2023.csv"))
+
+      files <- list.files(folder, pattern = "^solar_", full.names = TRUE)
+
+      # 1. With a for loop
+      all_data <- tibble()
+      for (file in files) {
+
+      }
+
+      # 2. With map()
+      all_data_2 <-
+
+      # 3. Total per country
+      totals <-
+      print(totals)
+    tests:
+      - type: output_contains
+        value: "171"
+      - type: assert
+        code: |
+          .check(is.data.frame(all_data) && nrow(all_data) == 6, "all_data should contain the 6 rows of all three files: all_data <- bind_rows(all_data, ...) inside the loop")
+          .check(is.data.frame(all_data_2) && nrow(all_data_2) == 6, "all_data_2 should contain the 6 rows of all three files: files |> map(read_csv) |> bind_rows()")
+          .check(is.data.frame(totals) && identical(sort(totals$country), c("DE", "NL")), "totals should have one row per country: group_by(country) |> summarise(...)")
+          .t <- totals[[ncol(totals)]]
+          .check(isTRUE(all.equal(sort(.t), c(49, 171))), "the totals should be 49 TWh for NL and 171 TWh for DE")
+        description: "all_data and all_data_2 should have 6 rows; NL total 49, DE total 171"
+    hints:
+      - "Inside the loop: all_data <- bind_rows(all_data, read_csv(file, show_col_types = FALSE))"
+      - "all_data_2 <- files |> map(read_csv, show_col_types = FALSE) |> bind_rows()"
+      - "totals <- all_data |> group_by(country) |> summarise(total_twh = sum(solar_twh))"
+    solution: |
+      library(tidyverse)
+
+      folder <- tempdir()
+      write_csv(tibble(country = c("NL", "DE"), year = 2021, solar_twh = c(11, 49)), file.path(folder, "solar_2021.csv"))
+      write_csv(tibble(country = c("NL", "DE"), year = 2022, solar_twh = c(17, 60)), file.path(folder, "solar_2022.csv"))
+      write_csv(tibble(country = c("NL", "DE"), year = 2023, solar_twh = c(21, 62)), file.path(folder, "solar_2023.csv"))
+
+      files <- list.files(folder, pattern = "^solar_", full.names = TRUE)
+
+      all_data <- tibble()
+      for (file in files) {
+        one_year <- read_csv(file, show_col_types = FALSE)
+        all_data <- bind_rows(all_data, one_year)
+      }
+
+      all_data_2 <- files |>
+        map(read_csv, show_col_types = FALSE) |>
+        bind_rows()
+
+      totals <- all_data |>
+        group_by(country) |>
+        summarise(total_twh = sum(solar_twh))
+      print(totals)
