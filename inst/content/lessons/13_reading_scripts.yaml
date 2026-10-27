@@ -1,0 +1,413 @@
+title: "Reading and Modifying Scripts"
+description: "Practice reading R scripts and understanding what each line does — a key skill for the exam. You will then modify each script to extend its functionality."
+
+exercises:
+
+  - id: co2_emissions
+    title: "CO₂ Emissions — Read and Extend"
+    instructions: |
+      These are the types of questions you might encounter in the exam.
+
+      Below is a script that calculates the total CO₂ emissions for a trip using three modes of transport. Read through it carefully and make sure you understand what each line does.
+
+      ```r
+      library(glue)
+
+      distance_by_car  <- 50   # Distance traveled by car in km
+      distance_by_bus  <- 30   # Distance traveled by bus in km
+      distance_by_bike <- 10   # Distance traveled by bike in km
+
+      emission_car  <- 120  # CO₂ per km for a car (grams)
+      emission_bus  <- 68   # CO₂ per km for a bus (grams)
+      emission_bike <- 0    # CO₂ per km for a bike (grams)
+
+      total_emission_car  <- distance_by_car  * emission_car
+      total_emission_bus  <- distance_by_bus  * emission_bus
+      total_emission_bike <- distance_by_bike * emission_bike
+
+      total_emission <- total_emission_car + total_emission_bus + total_emission_bike
+      print(glue("The total CO2 emissions for the trip are {total_emission} grams."))
+      ```
+
+      The original script gives a total of **8040 grams**.
+
+      **Your task:**
+      Extend the script by adding a **train journey** of **20 km** with an emission factor of **60 grams per km**. Include the train's emissions in `total_emission` and print the updated total.
+
+      The expected new total is **9240 grams**.
+    starter_code: |
+      library(glue)
+
+      distance_by_car  <- 50
+      distance_by_bus  <- 30
+      distance_by_bike <- 10
+
+      emission_car  <- 120
+      emission_bus  <- 68
+      emission_bike <- 0
+
+      total_emission_car  <- distance_by_car  * emission_car
+      total_emission_bus  <- distance_by_bus  * emission_bus
+      total_emission_bike <- distance_by_bike * emission_bike
+
+      # Add your train variables here
+      distance_by_train <-
+      emission_train <-
+      total_emission_train <-
+
+      total_emission <- total_emission_car + total_emission_bus + total_emission_bike  # add train here
+      print(glue("The total CO2 emissions for the trip are {total_emission} grams."))
+    tests:
+      - type: output_contains
+        value: "9240"
+      - type: assert
+        code: |
+          .check(distance_by_train == 20, "distance_by_train should be 20")
+          .check(emission_train == 60, "emission_train should be 60")
+          .check(total_emission_train == 1200, "total_emission_train should be distance_by_train * emission_train")
+          .check(total_emission == 9240, "total_emission should include the train: 9240")
+        description: "total_emission should be 9240 grams"
+    hints:
+      - "distance_by_train <- 20  and  emission_train <- 60"
+      - "total_emission_train <- distance_by_train * emission_train  →  1200"
+      - "Add total_emission_train to the total_emission calculation"
+    solution: |
+      library(glue)
+
+      distance_by_car  <- 50
+      distance_by_bus  <- 30
+      distance_by_bike <- 10
+
+      emission_car  <- 120
+      emission_bus  <- 68
+      emission_bike <- 0
+
+      total_emission_car  <- distance_by_car  * emission_car
+      total_emission_bus  <- distance_by_bus  * emission_bus
+      total_emission_bike <- distance_by_bike * emission_bike
+
+      distance_by_train    <- 20
+      emission_train       <- 60
+      total_emission_train <- distance_by_train * emission_train
+
+      total_emission <- total_emission_car + total_emission_bus + total_emission_bike + total_emission_train
+      print(glue("The total CO2 emissions for the trip are {total_emission} grams."))
+
+  - id: energy_savings
+    title: "Energy Savings — Read and Call"
+    instructions: |
+      Below is a function that calculates the annual energy savings from switching from incandescent light bulbs to LED bulbs. Read each line carefully and make sure you understand what it computes.
+
+      ```r
+      calculate_energy_savings <- function(incandescent_wattage, led_wattage, hours_per_day, number_of_bulbs) {
+        daily_energy_incandescent <- incandescent_wattage * hours_per_day * number_of_bulbs
+        daily_energy_led          <- led_wattage          * hours_per_day * number_of_bulbs
+        daily_energy_savings      <- daily_energy_incandescent - daily_energy_led
+        annual_energy_savings     <- (daily_energy_savings * 365) / 1000
+        return(annual_energy_savings)
+      }
+      ```
+
+      The function:
+      1. Calculates daily energy use for incandescent bulbs (in watt-hours)
+      2. Calculates daily energy use for LED bulbs
+      3. Computes the daily saving
+      4. Converts to kilowatt-hours per year (× 365, ÷ 1000)
+      5. Returns the annual saving in kWh
+
+      The variables inside the function (`daily_energy_led` and so on) only exist **while the function runs**. After the call, only the returned value is left, so you need to store it in a variable of your own.
+
+      **Your task:**
+      The function is already defined below. Call it with these values, and store the result in `annual_savings`:
+      - `incandescent_wattage = 60`
+      - `led_wattage = 10`
+      - `hours_per_day = 5`
+      - `number_of_bulbs = 10`
+
+      The expected output is:
+      `The household saves 912.5 kilowatt-hours annually by switching to LED bulbs.`
+    starter_code: |
+      library(glue)
+
+      calculate_energy_savings <- function(incandescent_wattage, led_wattage, hours_per_day, number_of_bulbs) {
+        daily_energy_incandescent <- incandescent_wattage * hours_per_day * number_of_bulbs
+        daily_energy_led          <- led_wattage          * hours_per_day * number_of_bulbs
+        daily_energy_savings      <- daily_energy_incandescent - daily_energy_led
+        annual_energy_savings     <- (daily_energy_savings * 365) / 1000
+        return(annual_energy_savings)
+      }
+
+      # Call the function with the values above
+      annual_savings <-
+
+      print(glue("The household saves {annual_savings} kilowatt-hours annually by switching to LED bulbs."))
+    tests:
+      - type: output_contains
+        value: "saves 912.5 kilowatt-hours"
+      - type: assert
+        code: |
+          .check(isTRUE(all.equal(annual_savings, 912.5)), "annual_savings should be 912.5")
+        description: "annual_savings should be 912.5"
+    hints:
+      - "Give the four values in the same order as the arguments of the function"
+      - "annual_savings <- calculate_energy_savings(60, 10, 5, 10)"
+    solution: |
+      library(glue)
+
+      calculate_energy_savings <- function(incandescent_wattage, led_wattage, hours_per_day, number_of_bulbs) {
+        daily_energy_incandescent <- incandescent_wattage * hours_per_day * number_of_bulbs
+        daily_energy_led          <- led_wattage          * hours_per_day * number_of_bulbs
+        daily_energy_savings      <- daily_energy_incandescent - daily_energy_led
+        annual_energy_savings     <- (daily_energy_savings * 365) / 1000
+        return(annual_energy_savings)
+      }
+
+      annual_savings <- calculate_energy_savings(60, 10, 5, 10)
+
+      print(glue("The household saves {annual_savings} kilowatt-hours annually by switching to LED bulbs."))
+
+  - id: water_usage
+    title: "Water Usage — Read and Experiment"
+    instructions: |
+      Below is a function that checks whether a household's daily water usage meets a sustainability target.
+
+      ```r
+      evaluate_water_usage <- function(daily_usage, target_usage) {
+        meets_target <- daily_usage <= target_usage
+        print(glue("Using {daily_usage} liters a day, it is {meets_target} that the household meets the target of {target_usage} liters."))
+      }
+      ```
+
+      The function uses `<=` to check if `daily_usage` is less than or equal to `target_usage`. The result is a **logical** value (`TRUE` or `FALSE`) stored in `meets_target`, which is then put in a sentence with `glue()`.
+
+      Notice that this function doesn't return a value to work with: it **shows** a sentence. So you just call it, without storing the result.
+
+      **Your task — two calls:**
+      1. Call the function with `daily_usage = 100` and `target_usage = 120`. The household is below the target, so `meets_target` should be `TRUE`.
+      2. Call the function with `daily_usage = 150` and `target_usage = 120`. The household is above the target, so `meets_target` should be `FALSE`.
+    starter_code: |
+      library(glue)
+
+      evaluate_water_usage <- function(daily_usage, target_usage) {
+        meets_target <- daily_usage <= target_usage
+        print(glue("Using {daily_usage} liters a day, it is {meets_target} that the household meets the target of {target_usage} liters."))
+      }
+
+      # Call 1: usage below target (should show TRUE)
+
+
+      # Call 2: usage above target (should show FALSE)
+
+    tests:
+      - type: output_equals
+        value: "Using 100 liters a day, it is TRUE that the household meets the target of 120 liters.\nUsing 150 liters a day, it is FALSE that the household meets the target of 120 liters."
+    hints:
+      - "evaluate_water_usage(100, 120)  →  TRUE (100 is below 120)"
+      - "evaluate_water_usage(150, 120)  →  FALSE (150 is above 120)"
+    solution: |
+      library(glue)
+
+      evaluate_water_usage <- function(daily_usage, target_usage) {
+        meets_target <- daily_usage <= target_usage
+        print(glue("Using {daily_usage} liters a day, it is {meets_target} that the household meets the target of {target_usage} liters."))
+      }
+
+      evaluate_water_usage(100, 120)
+
+      evaluate_water_usage(150, 120)
+
+  - id: practice_energy_cost
+    title: "Electricity Cost — Read and Extend"
+    instructions: |
+      More practice reading and extending a script — same skill, a new scenario.
+
+      Below is a script that calculates the total daily electricity cost of running three appliances. Read through it carefully and make sure you understand what each line does.
+
+      ```r
+      library(glue)
+
+      usage_fridge <- 1.5   # kWh per day
+      usage_tv     <- 0.3   # kWh per day
+      usage_washer <- 0.8   # kWh per day
+
+      cost_per_kwh <- 0.25  # euros
+
+      cost_fridge <- usage_fridge * cost_per_kwh
+      cost_tv     <- usage_tv     * cost_per_kwh
+      cost_washer <- usage_washer * cost_per_kwh
+
+      total_cost <- cost_fridge + cost_tv + cost_washer
+      print(glue("The total daily electricity cost is {total_cost} euros."))
+      ```
+
+      The original script gives a total of **0.65 euros**.
+
+      **Your task:**
+      Extend the script by adding a **dryer** that uses **1.2 kWh per day**, at the same `cost_per_kwh`. Include the dryer's cost in `total_cost` and print the updated total.
+
+      The expected new total is **0.95 euros**.
+    starter_code: |
+      library(glue)
+
+      usage_fridge <- 1.5
+      usage_tv     <- 0.3
+      usage_washer <- 0.8
+
+      cost_per_kwh <- 0.25
+
+      cost_fridge <- usage_fridge * cost_per_kwh
+      cost_tv     <- usage_tv     * cost_per_kwh
+      cost_washer <- usage_washer * cost_per_kwh
+
+      # Add your dryer variables here
+      usage_dryer <-
+      cost_dryer <-
+
+      total_cost <- cost_fridge + cost_tv + cost_washer  # add dryer here
+      print(glue("The total daily electricity cost is {total_cost} euros."))
+    tests:
+      - type: output_contains
+        value: "0.95 euros"
+      - type: assert
+        code: |
+          .check(usage_dryer == 1.2, "usage_dryer should be 1.2")
+          .check(isTRUE(all.equal(cost_dryer, 0.3)), "cost_dryer should be usage_dryer * cost_per_kwh")
+          .check(isTRUE(all.equal(total_cost, 0.95)), "total_cost should include the dryer: 0.95")
+        description: "total_cost should be 0.95 euros"
+    hints:
+      - "usage_dryer <- 1.2"
+      - "cost_dryer <- usage_dryer * cost_per_kwh  →  0.3"
+      - "Add cost_dryer to the total_cost calculation"
+    solution: |
+      library(glue)
+
+      usage_fridge <- 1.5
+      usage_tv     <- 0.3
+      usage_washer <- 0.8
+
+      cost_per_kwh <- 0.25
+
+      cost_fridge <- usage_fridge * cost_per_kwh
+      cost_tv     <- usage_tv     * cost_per_kwh
+      cost_washer <- usage_washer * cost_per_kwh
+
+      usage_dryer <- 1.2
+      cost_dryer  <- usage_dryer * cost_per_kwh
+
+      total_cost <- cost_fridge + cost_tv + cost_washer + cost_dryer
+      print(glue("The total daily electricity cost is {total_cost} euros."))
+
+  - id: practice_co2_savings
+    title: "CO₂ Savings — Read and Call"
+    instructions: |
+      Below is a function that calculates the CO₂ saved by taking the bus instead of the car for a given distance. Read each line carefully and make sure you understand what it computes.
+
+      ```r
+      calculate_co2_savings <- function(car_emission, bus_emission, distance_km) {
+        car_total <- car_emission * distance_km
+        bus_total <- bus_emission * distance_km
+        savings   <- car_total - bus_total
+        return(savings)
+      }
+      ```
+
+      The function:
+      1. Calculates total car emissions for the trip
+      2. Calculates total bus emissions for the trip
+      3. Returns the difference: the CO₂ saved by choosing the bus
+
+      **Your task:**
+      The function is already defined below. Call it with these values, and store the result in `savings`. This time, give the arguments **by name** (as in lesson 5), so the call is easy to read:
+      - `car_emission = 120`
+      - `bus_emission = 68`
+      - `distance_km = 50` (already stored in the variable `distance_km`)
+
+      The expected output is:
+      `Taking the bus instead of the car saves 2600 grams of CO2 over 50 km.`
+    starter_code: |
+      library(glue)
+
+      calculate_co2_savings <- function(car_emission, bus_emission, distance_km) {
+        car_total <- car_emission * distance_km
+        bus_total <- bus_emission * distance_km
+        savings   <- car_total - bus_total
+        return(savings)
+      }
+
+      # Call the function with the values above, by name
+      distance_km <- 50
+      savings <-
+
+      print(glue("Taking the bus instead of the car saves {savings} grams of CO2 over {distance_km} km."))
+    tests:
+      - type: output_contains
+        value: "saves 2600 grams"
+      - type: assert
+        code: |
+          .check(isTRUE(all.equal(savings, 2600)), "savings should be 2600")
+        description: "savings should be 2600"
+    hints:
+      - "Inside the call, write name = value for each argument"
+      - "savings <- calculate_co2_savings(car_emission = 120, bus_emission = 68, distance_km = distance_km)"
+    solution: |
+      library(glue)
+
+      calculate_co2_savings <- function(car_emission, bus_emission, distance_km) {
+        car_total <- car_emission * distance_km
+        bus_total <- bus_emission * distance_km
+        savings   <- car_total - bus_total
+        return(savings)
+      }
+
+      distance_km <- 50
+      savings <- calculate_co2_savings(car_emission = 120, bus_emission = 68, distance_km = distance_km)
+
+      print(glue("Taking the bus instead of the car saves {savings} grams of CO2 over {distance_km} km."))
+
+  - id: practice_energy_usage
+    title: "Energy Usage — Read and Experiment"
+    instructions: |
+      Below is a function that checks whether a household's daily energy usage meets a sustainability target.
+
+      ```r
+      evaluate_energy_usage <- function(daily_kwh, target_kwh) {
+        meets_target <- daily_kwh <= target_kwh
+        print(glue("Using {daily_kwh} kWh a day, it is {meets_target} that the household meets the target of {target_kwh} kWh."))
+      }
+      ```
+
+      The function uses `<=` to check if `daily_kwh` is less than or equal to `target_kwh`. The result is a **logical** value (`TRUE` or `FALSE`) stored in `meets_target`, which is then put in a sentence with `glue()`.
+
+      **Your task — two calls:**
+      1. Call the function with `daily_kwh = 8` and `target_kwh = 10`. The household is below the target, so `meets_target` should be `TRUE`.
+      2. Call the function with `daily_kwh = 15` and `target_kwh = 10`. The household is above the target, so `meets_target` should be `FALSE`.
+    starter_code: |
+      library(glue)
+
+      evaluate_energy_usage <- function(daily_kwh, target_kwh) {
+        meets_target <- daily_kwh <= target_kwh
+        print(glue("Using {daily_kwh} kWh a day, it is {meets_target} that the household meets the target of {target_kwh} kWh."))
+      }
+
+      # Call 1: usage below target (should show TRUE)
+
+
+      # Call 2: usage above target (should show FALSE)
+
+    tests:
+      - type: output_equals
+        value: "Using 8 kWh a day, it is TRUE that the household meets the target of 10 kWh.\nUsing 15 kWh a day, it is FALSE that the household meets the target of 10 kWh."
+    hints:
+      - "evaluate_energy_usage(8, 10)  →  TRUE (8 is below 10)"
+      - "evaluate_energy_usage(15, 10)  →  FALSE (15 is above 10)"
+    solution: |
+      library(glue)
+
+      evaluate_energy_usage <- function(daily_kwh, target_kwh) {
+        meets_target <- daily_kwh <= target_kwh
+        print(glue("Using {daily_kwh} kWh a day, it is {meets_target} that the household meets the target of {target_kwh} kWh."))
+      }
+
+      evaluate_energy_usage(8, 10)
+
+      evaluate_energy_usage(15, 10)
