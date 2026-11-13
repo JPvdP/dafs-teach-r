@@ -120,7 +120,8 @@ so a typo or a nickname means your codes won't match.
 ## Working through a lesson
 
 1. On the home page, pick a lesson and click **Open**. Lessons are numbered in
-   the order we cover them in class.
+   the order we cover them in class, and grouped by week: each week shows the
+   lessons to finish before that week's deadline.
 2. Read the instructions, then write your code in the editor.
 3. Click **▶ Run** to run your code. You see what your code printed under
    **Output**, and whether your answer passes the checks under **Feedback**.

@@ -9,32 +9,32 @@
 # The ids start with "r-" so R reports can be told apart from the
 # Python track's reports in the same Google Sheet.
 #
-# TODO: replace the placeholder dates with the real course schedule
-# (ISO format, local time: YYYY-MM-DDTHH:MM:SS). Never leave dates in
-# the past before the course starts: a deadline that has already
-# passed when a student first opens the app is marked as "sent"
-# without reporting anything.
+# Dates are ISO format, local time: YYYY-MM-DDTHH:MM:SS. The home
+# page groups the lessons by these weeks, in deadline order, and shows
+# each week's deadline. A deadline that has already passed when a
+# student first opens the app is marked as "sent" without reporting
+# anything.
 # ─────────────────────────────────────────────────────────────
 
 - id: r-week1
-  deadline: "2099-01-01T23:59:00"
+  deadline: "2026-11-25T23:59:00"
   lessons:
     - 01_r_basics
     - 02_data_frames_intro
     - 03_data_types_and_logic
     - 04_installing_packages
+    - 05_print_and_functions
 
 - id: r-week2
-  deadline: "2099-01-08T23:59:00"
+  deadline: "2026-12-02T23:59:00"
   lessons:
-    - 05_print_and_functions
     - 06_if_else
     - 07_vectors_and_lists
     - 08_importing_data
     - 09_dataframe_operations
 
 - id: r-week3
-  deadline: "2099-01-15T23:59:00"
+  deadline: "2026-12-09T23:59:00"
   lessons:
     - 10_for_loops
     - 11_while_loops

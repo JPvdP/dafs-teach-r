@@ -221,14 +221,14 @@ app_server <- function(lessons, db, deadlines) {
           icon <- if (ex$id %in% done) "✅" else if (i == rv$ex_idx) "▶️" else "⭕"
           event_button(paste(icon, ex$title), "go_exercise", i, class = "btn-light nav-exercise")
         })
-        htmltools::tagList(header, htmltools::strong(lesson$title), htmltools::div(class = "mt-2", items))
+        htmltools::tagList(header, htmltools::strong(lesson_label(lesson)), htmltools::div(class = "mt-2", items))
       } else {
         progress <- get_all_progress(db, rv$student)
         items <- lapply(lessons, function(lesson) {
           ex_ids <- vapply(lesson$exercises, `[[`, "", "id")
           n_done <- sum(ex_ids %in% progress$exercise_id[progress$lesson_id == lesson$id & progress$completed == 1])
           icon <- if (n_done == length(ex_ids)) "✅" else "⭕"
-          htmltools::div(sprintf("%s %s (%d/%d)", icon, lesson$title, n_done, length(ex_ids)))
+          htmltools::div(sprintf("%s %s (%d/%d)", icon, lesson_label(lesson), n_done, length(ex_ids)))
         })
         htmltools::tagList(header, htmltools::strong("Lessons"), htmltools::div(class = "mt-2", items))
       }
@@ -253,7 +253,7 @@ app_server <- function(lessons, db, deadlines) {
     render_lesson_browser <- function() {
       rv$progress_version
       progress <- get_all_progress(db, rv$student)
-      cards <- lapply(lessons, function(lesson) {
+      lesson_card <- function(lesson) {
         rows <- progress[progress$lesson_id == lesson$id, , drop = FALSE]
         ex_ids <- vapply(lesson$exercises, `[[`, "", "id")
         n_done <- sum(ex_ids %in% rows$exercise_id[rows$completed == 1])
@@ -275,7 +275,7 @@ app_server <- function(lessons, db, deadlines) {
           bslib::card_body(
             bslib::layout_columns(col_widths = c(9, 3),
               htmltools::div(
-                htmltools::h4(lesson$title),
+                htmltools::h4(lesson_label(lesson)),
                 htmltools::p(class = "text-muted", lesson$description),
                 progress_bar(n_done, n_total), extra),
               htmltools::div(class = "d-flex align-items-center",
@@ -283,8 +283,13 @@ app_server <- function(lessons, db, deadlines) {
             )
           )
         )
+      }
+      weeks <- lapply(lessons_by_week(lessons, deadlines), function(week) {
+        htmltools::tagList(
+          htmltools::h3(class = "mt-4 pb-2 border-bottom", week$heading),
+          lapply(week$lessons, lesson_card))
       })
-      htmltools::tagList(htmltools::h2("Choose a Lesson"), cards)
+      htmltools::tagList(htmltools::h2("Choose a Lesson"), weeks)
     }
 
     render_exercise <- function() {
@@ -380,7 +385,7 @@ app_server <- function(lessons, db, deadlines) {
 
       htmltools::tagList(
         htmltools::div(class = "course-banner", COURSE_BANNER),
-        htmltools::h5(sprintf("%s  ›  Exercise %d/%d", lesson$title, idx, n)),
+        htmltools::h5(sprintf("%s  ›  Exercise %d/%d", lesson_label(lesson), idx, n)),
         htmltools::h3(ex$title),
         htmltools::hr(),
         bslib::layout_columns(col_widths = c(6, 6), gap = "2rem", left, right),

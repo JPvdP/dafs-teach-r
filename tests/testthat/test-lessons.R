@@ -38,3 +38,15 @@ test_that("outdated or missing lesson packages are detected", {
   expect_equal(outdated_packages(c(notapackage = "1.0.0")), "notapackage")
   expect_match(outdated_message(c("dplyr", "readr")), 'install.packages(c("dplyr", "readr"))', fixed = TRUE)
 })
+
+test_that("lessons are numbered and every lesson belongs to exactly one week", {
+  lessons <- load_lessons()
+  deadlines <- load_deadlines(file.path(content_dir(), "deadlines.yaml"))
+  expect_equal(lesson_label(lessons[[5]]), "Lesson 5: Printing, Text and Functions")
+  weeks <- lessons_by_week(lessons, deadlines)
+  expect_equal(weeks[[1]]$heading, "Week 1 · deadline Wednesday 25 November 2026")
+  placed <- unlist(lapply(weeks, function(w) vapply(w$lessons, `[[`, "", "id")))
+  expect_setequal(placed, vapply(lessons, `[[`, "", "id"))
+  expect_false(anyDuplicated(placed) > 0)
+  expect_false("More lessons" %in% vapply(weeks, `[[`, "", "heading"))
+})
