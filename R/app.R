@@ -70,6 +70,9 @@ pre.script .ln { display: inline-block; width: 2em; margin-right: .75em; text-al
 
 app_ui <- function() {
   bslib::page_sidebar(
+    # Not fillable: otherwise the lesson cards shrink to fit the window height,
+    # until they're too thin to show their content and Open button.
+    fillable = FALSE,
     title = htmltools::tags$span(
       htmltools::tags$img(src = "dafs-assets/logo_uu_en.png", height = "34px", class = "me-3"),
       "DAFS Teaching App"
@@ -228,7 +231,8 @@ app_server <- function(lessons, db, deadlines) {
           ex_ids <- vapply(lesson$exercises, `[[`, "", "id")
           n_done <- sum(ex_ids %in% progress$exercise_id[progress$lesson_id == lesson$id & progress$completed == 1])
           icon <- if (n_done == length(ex_ids)) "✅" else "⭕"
-          htmltools::div(sprintf("%s %s (%d/%d)", icon, lesson_label(lesson), n_done, length(ex_ids)))
+          event_button(sprintf("%s %s (%d/%d)", icon, lesson_label(lesson), n_done, length(ex_ids)),
+                       "open_lesson", lesson$id, class = "btn-light nav-exercise")
         })
         htmltools::tagList(header, htmltools::strong("Lessons"), htmltools::div(class = "mt-2", items))
       }
