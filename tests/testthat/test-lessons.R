@@ -50,3 +50,10 @@ test_that("lessons are numbered and every lesson belongs to exactly one week", {
   expect_false(anyDuplicated(placed) > 0)
   expect_false("More lessons" %in% vapply(weeks, `[[`, "", "heading"))
 })
+
+test_that("package startup messages stay out of the output when the app runs in RStudio", {
+  # RStudio sets this for its R session; student code runs in a child process
+  withr::local_envvar(RSTUDIO = "1", RSTUDIO_SESSION_PID = Sys.getpid())
+  ex <- load_lessons()[[1]]$exercises[[1]]
+  expect_true(run_code(ex$solution, ex$tests)$passed)
+})

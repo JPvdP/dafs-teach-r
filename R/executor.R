@@ -11,6 +11,16 @@ rscript_path <- function() {
   file.path(R.home("bin"), if (.Platform$OS.type == "windows") "Rscript.exe" else "Rscript")
 }
 
+# The environment for student code, without RStudio's session variables. When
+# the app runs in RStudio, the student's R process is a child of the RStudio
+# session, so rlang would think it runs in RStudio too, and print messages
+# (like the tidyverse startup banner) to stdout, where they break the checks.
+child_env <- function() {
+  env <- Sys.getenv()
+  env <- env[!names(env) %in% c("RSTUDIO", "RSTUDIO_SESSION_PID")]
+  stats::setNames(as.character(env), names(env))
+}
+
 # Returns list(stdout, stderr, crashed, timed_out). `crashed` is based on the
 # exit status, not on stderr, so warnings and package startup messages
 # (which also go to stderr) don't count as errors.
@@ -18,7 +28,7 @@ run_file <- function(path, timeout = TIMEOUT_SECONDS) {
   res <- tryCatch(
     processx::run(
       rscript_path(), c("--no-init-file", path),
-      error_on_status = FALSE, timeout = timeout, encoding = "UTF-8"
+      error_on_status = FALSE, timeout = timeout, encoding = "UTF-8", env = child_env()
     ),
     system_command_timeout_error = function(e) NULL
   )
