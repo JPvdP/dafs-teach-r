@@ -17,7 +17,7 @@ exercises:
 
       Don't put `install.packages()` in your script: it would download the package again every time you run it, which is slow and fails without internet. Run it once in the Console instead. In RStudio you can also use the **Install** button in the **Packages** tab. And when you open a script that uses a package you don't have yet, RStudio often shows a yellow bar at the top offering to install it.
 
-      In this app the tidyverse is already installed, so you won't need to install anything for the exercises.
+      In this app the tidyverse is already installed, so you won't need to install anything for the exercises. The app doesn't let you install packages from its editor: when you need a new package later, install it in the RStudio Console while the app isn't running.
 
       **When R can't find a package**
 

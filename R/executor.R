@@ -45,11 +45,30 @@ run_file <- function(path, timeout = TIMEOUT_SECONDS) {
        crashed = res$status != 0, timed_out = FALSE)
 }
 
+# Runs before the student's code:
+# - Text help: with HTML help (R's default on Windows), help() starts a help
+#   server and opens a browser tab, which shows a connection error because the
+#   process has already ended, and nothing is printed in the app.
+# - Installing from student code would fail anyway (Rscript has no CRAN mirror
+#   set), could be killed halfway by the timeout and leave a broken package, and
+#   would reinstall on every Run. So explain where to install instead. Attached
+#   rather than assigned, so it doesn't show up in the student's ls().
+child_setup <- c(
+  'options(help_type = "text")',
+  paste(
+    'attach(list(install.packages = function(pkgs, ...) stop(paste0(',
+    '"Install packages in the RStudio Console, not in the app. The Console is busy while ",',
+    '"the app runs, so: stop the app (red Stop sign), run install.packages(",',
+    'paste(deparse(pkgs), collapse = ""), ") in the Console, and start the app again ",',
+    '"with dafsteach::run_app()."), call. = FALSE)), name = "dafsteach:app", warn.conflicts = FALSE)'
+  )
+)
+
 run_source <- function(code, timeout = TIMEOUT_SECONDS) {
   path <- tempfile(fileext = ".R")
   on.exit(unlink(path))
   con <- file(path, open = "w", encoding = "UTF-8")
-  writeLines(code, con)
+  writeLines(c(child_setup, code), con)
   close(con)
   run_file(path, timeout)
 }

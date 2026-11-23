@@ -57,3 +57,19 @@ test_that("package startup messages stay out of the output when the app runs in 
   ex <- load_lessons()[[1]]$exercises[[1]]
   expect_true(run_code(ex$solution, ex$tests)$passed)
 })
+
+test_that("install.packages() in student code explains where to install instead", {
+  res <- run_code('install.packages("writexl")\nprint(1)', list())
+  expect_false(res$passed)
+  expect_match(res$feedback, 'run install.packages("writexl") in the Console', fixed = TRUE)
+  expect_true(run_code("x <- 1\nprint(ls())", list(list(type = "output_equals", value = '[1] "x"')))$passed)
+})
+
+test_that("help() prints text help even where R defaults to HTML help (Windows)", {
+  profile <- withr::local_tempfile(lines = 'options(help_type = "html")')
+  withr::local_envvar(R_PROFILE = profile)   # site profile, read even with --no-init-file
+  ex <- load_lessons()[[4]]$exercises[[2]]
+  res <- run_code(ex$solution, ex$tests)
+  expect_true(res$passed)
+  expect_no_match(res$stderr, "httpd")
+})
