@@ -1,4 +1,6 @@
 COURSE_BANNER <- "Data Analytics For Sustainability || R Track || 2026"
+THANKS_NOTE <- paste("\U0001F64F A big thank you to the students of the 2026 class for reporting",
+                     "errors and helping to make this app better!")
 
 #' Start the DAFS teaching app
 #'
@@ -293,7 +295,8 @@ app_server <- function(lessons, db, deadlines) {
           htmltools::h3(class = "mt-4 pb-2 border-bottom", week$heading),
           lapply(week$lessons, lesson_card))
       })
-      htmltools::tagList(htmltools::h2("Choose a Lesson"), weeks)
+      htmltools::tagList(htmltools::h2("Choose a Lesson"), weeks,
+        htmltools::hr(class = "mt-4"), htmltools::p(class = "small text-muted", THANKS_NOTE))
     }
 
     render_exercise <- function() {
