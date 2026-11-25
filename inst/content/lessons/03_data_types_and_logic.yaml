@@ -1,5 +1,5 @@
 title: Data Types and Logic Operators
-description: Check and convert the type of a value, and use comparisons and logic operators to ask yes/no questions about your data — the basis of every filter.
+description: Check and convert the type of a value, and use comparisons and logic operators to ask yes/no questions about your data, the basis of every filter.
 
 exercises:
 
@@ -20,8 +20,8 @@ exercises:
       You'll rarely need to create integers yourself: when you type `42`, R makes it a `numeric`. Integers appear when you count, for example `1:3` (the numbers 1, 2, 3), or when R reads a file with whole numbers. The `L` in `42L` is how you'd write one explicitly.
 
       You can check the type of a value in two ways:
-      - `class(x)` — returns the name of the type, like `"numeric"`
-      - `is.numeric(x)`, `is.character(x)`, `is.logical(x)` — return `TRUE` or `FALSE`
+      - `class(x)`, returns the name of the type, like `"numeric"`
+      - `is.numeric(x)`, `is.character(x)`, `is.logical(x)`, return `TRUE` or `FALSE`
 
       ```r
       class("42")          # "character"
@@ -190,7 +190,7 @@ exercises:
       temperature > 20      # TRUE FALSE TRUE
       ```
 
-      And `&` and `|` combine two vectors value by value — the first with the first, the second with the second. That's how you ask a question about **every row** of a dataset at once.
+      And `&` and `|` combine two vectors value by value, the first with the first, the second with the second. That's how you ask a question about **every row** of a dataset at once.
 
       Two useful tricks:
       - **Counting with `sum()`:** when you add up `TRUE`/`FALSE` values, R counts `TRUE` as 1 and `FALSE` as 0. So `sum(temperature > 20)` tells you *how many* values are above 20.
@@ -264,7 +264,7 @@ exercises:
   - id: practice_checking_types
     title: "Practice: Checking Types"
     instructions: |
-      More practice checking types — this time with a decimal number and a piece of text.
+      More practice checking types, this time with a decimal number and a piece of text.
 
       **Your task:**
       1. Create a variable `temperature` with the value `21.5`
@@ -297,7 +297,7 @@ exercises:
   - id: practice_type_conversion
     title: "Practice: Converting Between Types"
     instructions: |
-      More practice converting types — this time going the other way: from text to a number.
+      More practice converting types, this time going the other way: from text to a number.
 
       **Your task:**
       1. `count_text <- "150"` is already created for you
@@ -380,7 +380,7 @@ exercises:
   - id: practice_multiple_conditions
     title: "Practice: Conditions on a Whole Column"
     instructions: |
-      More practice with conditions on vectors — this time with **or**.
+      More practice with conditions on vectors, this time with **or**.
 
       You're planning outdoor measurements for the next six days. A day is **unsuitable** if there is 10 mm of rain or more, **or** if the wind speed is 20 km/h or more.
 

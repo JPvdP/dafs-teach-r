@@ -1,5 +1,5 @@
 title: Printing, Text and Functions
-description: Display results in readable sentences with paste(), cat() and glue(), generate random numbers, and call functions — including ones defined in the script itself.
+description: Display results in readable sentences with paste(), cat() and glue(), generate random numbers, and call functions, including ones defined in the script itself.
 
 exercises:
 
@@ -20,7 +20,7 @@ exercises:
 
       **Showing text: `print()` or `cat()`**
 
-      `print()` shows text the way R stores it — with `[1]` in front and quotes around it. `cat()` (short for *concatenate*) shows just the text itself, which is nicer for messages:
+      `print()` shows text the way R stores it, with `[1]` in front and quotes around it. `cat()` (short for *concatenate*) shows just the text itself, which is nicer for messages:
 
       ```r
       sentence <- paste("The value is", plop)
@@ -128,8 +128,8 @@ exercises:
     instructions: |
       Random numbers are useful for simulations, for picking a random sample from your data, or for making up test data. Two functions you'll use a lot:
 
-      - `runif(n, min, max)` — `n` random **decimal** numbers between `min` and `max` (the name comes from *random uniform*)
-      - `sample(x, size)` — picks `size` random values from the vector `x`. For a random **whole** number between 1 and 70: `sample(1:70, 1)`
+      - `runif(n, min, max)`, `n` random **decimal** numbers between `min` and `max` (the name comes from *random uniform*)
+      - `sample(x, size)`, picks `size` random values from the vector `x`. For a random **whole** number between 1 and 70: `sample(1:70, 1)`
 
       ```r
       x <- runif(1, min = 4, max = 87)    # one random decimal, e.g. 26.03722
@@ -138,7 +138,7 @@ exercises:
 
       Notice that the first argument of `runif()` is **how many** numbers you want. Since R works with vectors, getting one number or a thousand is the same function call.
 
-      Every time you run the code you get different numbers. If you want the **same** "random" numbers every time — for example so others can repeat your analysis — put `set.seed()` with any number before them: `set.seed(42)`.
+      Every time you run the code you get different numbers. If you want the **same** "random" numbers every time, for example so others can repeat your analysis, put `set.seed()` with any number before them: `set.seed(42)`.
 
       **Your task:**
       1. Generate one random decimal number between `4` and `87` with `runif()`, stored in `x`
@@ -188,7 +188,7 @@ exercises:
   - id: call_function
     title: "Calling a Function From the Script"
     instructions: |
-      So far you've used functions that come with R or a package. You can also make your own. In R, you create a function with `function()`, and store it in a variable with `<-` — just like any other value:
+      So far you've used functions that come with R or a package. You can also make your own. In R, you create a function with `function()`, and store it in a variable with `<-`, just like any other value:
 
       ```r
       greet <- function(name) {
@@ -201,7 +201,7 @@ exercises:
       - Between the curly brackets `{ }` is the code that runs each time you use the function.
       - The **last value** calculated inside the curly brackets is what the function gives back (*returns*). You can also write it explicitly: `return(paste0("Hi, ", name, "!"))`.
 
-      You don't need to write your own functions yet, but you do need to be able to **use** one when you see it in a script. You call it like any other function — with a value for its argument between the brackets:
+      You don't need to write your own functions yet, but you do need to be able to **use** one when you see it in a script. You call it like any other function, with a value for its argument between the brackets:
 
       ```r
       greet("Alice")
@@ -250,7 +250,7 @@ exercises:
   - id: practice_paste_and_cat
     title: "Practice: paste() and cat()"
     instructions: |
-      More practice building sentences — this time with `paste0()`, which doesn't add spaces.
+      More practice building sentences, this time with `paste0()`, which doesn't add spaces.
 
       **Your task:**
       Using `country` and `share` (already created for you):
@@ -287,7 +287,7 @@ exercises:
   - id: practice_glue_sentences
     title: "Practice: Calculations in Sentences"
     instructions: |
-      More practice with `glue()` — this time with a calculation on a vector.
+      More practice with `glue()`, this time with a calculation on a vector.
 
       **Your task:**
       The vector `daily_kwh` contains a household's solar production for one week. Print two sentences with `glue()`:
@@ -322,7 +322,7 @@ exercises:
   - id: practice_random_numbers
     title: "Practice: Random Numbers"
     instructions: |
-      More practice with random numbers — this time simulating sensor readings, with `set.seed()` so the result is the same every time.
+      More practice with random numbers, this time simulating sensor readings, with `set.seed()` so the result is the same every time.
 
       **Your task:**
       1. Set the seed to `123` with `set.seed()`
@@ -369,7 +369,7 @@ exercises:
   - id: practice_call_function
     title: "Practice: Calling a Function From the Script"
     instructions: |
-      More practice calling a function that is defined in the script — this time one with **two** arguments.
+      More practice calling a function that is defined in the script, this time one with **two** arguments.
 
       The function `co2_saved` calculates how many kilograms of CO₂ you save by cycling instead of driving: `km` is the distance, and `kg_per_km` is how much CO₂ the car would emit per km. Give the arguments in the same order as they appear in `function(km, kg_per_km)`, or use their names.
 

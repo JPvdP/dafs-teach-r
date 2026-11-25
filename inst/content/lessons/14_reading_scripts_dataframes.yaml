@@ -1,5 +1,5 @@
 title: "Reading Scripts: Working With Data Frames"
-description: "Practice reading and extending R scripts that combine tibbles, mutate, filter, group_by and joins — the types of questions you may encounter in the exam."
+description: "Practice reading and extending R scripts that combine tibbles, mutate, filter, group_by and joins, the types of questions you may encounter in the exam."
 
 exercises:
 

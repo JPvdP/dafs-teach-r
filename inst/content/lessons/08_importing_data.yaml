@@ -421,7 +421,7 @@ exercises:
   - id: practice_read_csv_separator
     title: "Practice: Semicolons and Decimal Commas"
     instructions: |
-      More practice with semicolon files — this time waste data per person.
+      More practice with semicolon files, this time waste data per person.
 
       **Your task:**
       1. Run the code first. `read_delim()` gets the columns right, but look at the `waste_kg` values: they are 10 times too large. Why?
@@ -465,7 +465,7 @@ exercises:
   - id: practice_read_tsv
     title: "Practice: Reading a TSV File (Tab-Separated)"
     instructions: |
-      More practice with tab-separated data — this time recycling rates.
+      More practice with tab-separated data, this time recycling rates.
 
       **Your task:**
       `tsv_data` is tab-separated. Load it into `df` with `read_delim()` and the right `delim`. The code prints the size of `df` and the `country` column.
@@ -505,7 +505,7 @@ exercises:
   - id: practice_export_csv
     title: "Practice: Exporting Data to CSV"
     instructions: |
-      More practice adding a computed column and exporting the result — this time water usage.
+      More practice adding a computed column and exporting the result, this time water usage.
 
       **Your task:**
       1. Add a column `water_per_capita` (`water_liters / population`) to `df`

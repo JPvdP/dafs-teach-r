@@ -1,5 +1,5 @@
 title: While Loops
-description: Learn how while loops repeat code as long as a condition holds — when you don't know in advance how many rounds you need — and how to control them with next, break and repeat.
+description: Learn how while loops repeat code as long as a condition holds, when you don't know in advance how many rounds you need, and how to control them with next, break and repeat.
 
 exercises:
 
@@ -213,7 +213,7 @@ exercises:
       print(result)
 
   - id: while_growth
-    title: "When Is a While Loop Useful? — Forest Growth"
+    title: "When Is a While Loop Useful?, Forest Growth"
     instructions: |
       A `while` loop is the right choice when you **don't know in advance** how many steps you need, but you do know when to stop. Some typical questions:
 

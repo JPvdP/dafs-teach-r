@@ -1,10 +1,10 @@
 title: "Reading and Modifying Scripts"
-description: "Practice reading R scripts and understanding what each line does — a key skill for the exam. You will then modify each script to extend its functionality."
+description: "Practice reading R scripts and understanding what each line does, a key skill for the exam. You will then modify each script to extend its functionality."
 
 exercises:
 
   - id: co2_emissions
-    title: "CO₂ Emissions — Read and Extend"
+    title: "CO₂ Emissions, Read and Extend"
     instructions: |
       These are the types of questions you might encounter in the exam.
 
@@ -94,7 +94,7 @@ exercises:
       print(glue("The total CO2 emissions for the trip are {total_emission} grams."))
 
   - id: energy_savings
-    title: "Energy Savings — Read and Call"
+    title: "Energy Savings, Read and Call"
     instructions: |
       Below is a function that calculates the annual energy savings from switching from incandescent light bulbs to LED bulbs. Read each line carefully and make sure you understand what it computes.
 
@@ -167,7 +167,7 @@ exercises:
       print(glue("The household saves {annual_savings} kilowatt-hours annually by switching to LED bulbs."))
 
   - id: water_usage
-    title: "Water Usage — Read and Experiment"
+    title: "Water Usage, Read and Experiment"
     instructions: |
       Below is a function that checks whether a household's daily water usage meets a sustainability target.
 
@@ -182,7 +182,7 @@ exercises:
 
       Notice that this function doesn't return a value to work with: it **shows** a sentence. So you just call it, without storing the result.
 
-      **Your task — two calls:**
+      **Your task, two calls:**
       1. Call the function with `daily_usage = 100` and `target_usage = 120`. The household is below the target, so `meets_target` should be `TRUE`.
       2. Call the function with `daily_usage = 150` and `target_usage = 120`. The household is above the target, so `meets_target` should be `FALSE`.
     starter_code: |
@@ -217,9 +217,9 @@ exercises:
       evaluate_water_usage(150, 120)
 
   - id: practice_energy_cost
-    title: "Electricity Cost — Read and Extend"
+    title: "Electricity Cost, Read and Extend"
     instructions: |
-      More practice reading and extending a script — same skill, a new scenario.
+      More practice reading and extending a script, same skill, a new scenario.
 
       Below is a script that calculates the total daily electricity cost of running three appliances. Read through it carefully and make sure you understand what each line does.
 
@@ -298,7 +298,7 @@ exercises:
       print(glue("The total daily electricity cost is {total_cost} euros."))
 
   - id: practice_co2_savings
-    title: "CO₂ Savings — Read and Call"
+    title: "CO₂ Savings, Read and Call"
     instructions: |
       Below is a function that calculates the CO₂ saved by taking the bus instead of the car for a given distance. Read each line carefully and make sure you understand what it computes.
 
@@ -365,7 +365,7 @@ exercises:
       print(glue("Taking the bus instead of the car saves {savings} grams of CO2 over {distance_km} km."))
 
   - id: practice_energy_usage
-    title: "Energy Usage — Read and Experiment"
+    title: "Energy Usage, Read and Experiment"
     instructions: |
       Below is a function that checks whether a household's daily energy usage meets a sustainability target.
 
@@ -378,7 +378,7 @@ exercises:
 
       The function uses `<=` to check if `daily_kwh` is less than or equal to `target_kwh`. The result is a **logical** value (`TRUE` or `FALSE`) stored in `meets_target`, which is then put in a sentence with `glue()`.
 
-      **Your task — two calls:**
+      **Your task, two calls:**
       1. Call the function with `daily_kwh = 8` and `target_kwh = 10`. The household is below the target, so `meets_target` should be `TRUE`.
       2. Call the function with `daily_kwh = 15` and `target_kwh = 10`. The household is above the target, so `meets_target` should be `FALSE`.
     starter_code: |

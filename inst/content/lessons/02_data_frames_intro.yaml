@@ -1,12 +1,12 @@
 title: Introduction to Data Frames
-description: Create, explore, select, filter and summarise data tables with the tidyverse — the core of data analysis in R.
+description: Create, explore, select, filter and summarise data tables with the tidyverse, the core of data analysis in R.
 
 exercises:
 
   - id: create_df
     title: "Creating a Data Frame"
     instructions: |
-      A **data frame** is R's version of a spreadsheet: a table with rows and columns. Each column can hold a different kind of data — one column of text, one of numbers, one of `TRUE`/`FALSE`.
+      A **data frame** is R's version of a spreadsheet: a table with rows and columns. Each column can hold a different kind of data, one column of text, one of numbers, one of `TRUE`/`FALSE`.
 
       In the previous lesson you saw that a data frame is built from vectors of the same length, one per column. The tidyverse has its own, improved version of a data frame, called a **tibble**. You create one with `tibble()`, in exactly the same way: each **name** becomes a column name, and each **vector** becomes the values in that column.
 
@@ -39,7 +39,7 @@ exercises:
 
       A few details to watch:
       - Notice the two kinds of brackets: `tibble( ... )` is a function call, and each `c( ... )` inside it creates one column.
-      - All columns must have the same length — every column needs a value for every row.
+      - All columns must have the same length, every column needs a value for every row.
       - Don't put a comma after the last column. `tibble()` happens to accept it, but many other R functions, like `data.frame()`, give an error: `argument is missing, with no default`.
 
       **Your task:**
@@ -165,7 +165,7 @@ exercises:
       df$product
       ```
 
-      Just like with a list, `$` gives you one column. A single column is simply a **vector** — exactly like the vectors from the previous lesson:
+      Just like with a list, `$` gives you one column. A single column is simply a **vector**, exactly like the vectors from the previous lesson:
 
       ```
       [1] "Laptop"   "Mouse"    "Keyboard" "Monitor"  "Webcam"
@@ -197,7 +197,7 @@ exercises:
 
       **Doing several steps: the pipe `|>`**
 
-      Often you want to do one step after another — first filter, then select. The **pipe** `|>` passes the result of one step on to the next. Read it as **"and then"**:
+      Often you want to do one step after another, first filter, then select. The **pipe** `|>` passes the result of one step on to the next. Read it as **"and then"**:
 
       ```r
       df |>
@@ -276,7 +276,7 @@ exercises:
 
       **Summarising**
 
-      R has functions for all the common summary statistics. You give them a vector — for example a column:
+      R has functions for all the common summary statistics. You give them a vector, for example a column:
 
       | Function | Result |
       |----------|--------|
@@ -295,7 +295,7 @@ exercises:
       df |> summarise(most_sold = max(sold), average_price = mean(price))
       ```
 
-      `summarise()` gives you a **tibble** back (with one row), not a single number. To take the number out of it, add `|> pull()` at the end: `pull()` gives you a column as a vector. And remember that a printed tibble rounds its numbers — `pull()` or `$` shows you the exact value.
+      `summarise()` gives you a **tibble** back (with one row), not a single number. To take the number out of it, add `|> pull()` at the end: `pull()` gives you a column as a vector. And remember that a printed tibble rounds its numbers, `pull()` or `$` shows you the exact value.
 
       **Functions inside functions**
 
@@ -395,7 +395,7 @@ exercises:
   - id: practice_explore
     title: "Practice: Exploring a Data Frame"
     instructions: |
-      Let's practice exploring a tibble, and add one more function to your toolkit: `tail(df, n)` — just like `head(df, n)`, but it shows the **last** `n` rows instead of the first.
+      Let's practice exploring a tibble, and add one more function to your toolkit: `tail(df, n)`, just like `head(df, n)`, but it shows the **last** `n` rows instead of the first.
 
       **Your task:**
       The tibble `df` below contains weather data for several cities.
@@ -448,7 +448,7 @@ exercises:
   - id: practice_select_filter
     title: "Practice: Selecting and Filtering"
     instructions: |
-      More practice with filtering rows and selecting a column — this time with employee data, and using the pipe.
+      More practice with filtering rows and selecting a column, this time with employee data, and using the pipe.
 
       Reminder:
       ```r
@@ -503,13 +503,13 @@ exercises:
   - id: practice_aggregation
     title: "Practice: Summarising Data"
     instructions: |
-      More practice with summary statistics — this time using `mean()`, `max()` and `min()` instead of `sum()`.
+      More practice with summary statistics, this time using `mean()`, `max()` and `min()` instead of `sum()`.
 
       **Your task:**
       Using the trips tibble below (distances in km):
-      1. Create `avg_distance` — the mean of `distance_km`. Print it rounded to 1 decimal place.
-      2. Create `max_distance` — the longest trip. Print it.
-      3. Create `min_distance` — the shortest trip. Print it.
+      1. Create `avg_distance`, the mean of `distance_km`. Print it rounded to 1 decimal place.
+      2. Create `max_distance`, the longest trip. Print it.
+      3. Create `min_distance`, the shortest trip. Print it.
 
       Each of the three should be a single number.
     starter_code: |

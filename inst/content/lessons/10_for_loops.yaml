@@ -1,5 +1,5 @@
 title: For Loops
-description: Learn how to automate repetitive tasks with for loops — looping over numbers and vectors, using positions, stopping early with break, collecting results, and knowing when you don't need a loop at all.
+description: Learn how to automate repetitive tasks with for loops, looping over numbers and vectors, using positions, stopping early with break, collecting results, and knowing when you don't need a loop at all.
 
 exercises:
 
@@ -227,7 +227,7 @@ exercises:
       writeLines("Done")
 
   - id: accumulator_loop
-    title: "Accumulating Results — Total and Maximum"
+    title: "Accumulating Results, Total and Maximum"
     instructions: |
       A very common loop pattern is the **accumulator**: you give a variable a starting value **before** the loop, and update it in **every** round:
 
@@ -311,7 +311,7 @@ exercises:
       cat("Wettest month:", max_month, "with", max_rain, "mm\n")
 
   - id: nested_combinations
-    title: "Nested For Loops — All Combinations"
+    title: "Nested For Loops, All Combinations"
     instructions: |
       A loop inside another loop pairs every value of one vector with every value of another. The inner loop runs **completely** for every single round of the outer loop:
 
@@ -380,7 +380,7 @@ exercises:
       cat("Total combinations:", count, "\n")
 
   - id: loop_or_vector
-    title: "Collecting Results — and Do You Need a Loop?"
+    title: "Collecting Results, and Do You Need a Loop?"
     instructions: |
       In lesson 7 you built a vector step by step with `x <- c(x, new_value)`. Inside a loop, that's how you **collect results**: start with an empty vector before the loop, and add to it inside the loop.
 

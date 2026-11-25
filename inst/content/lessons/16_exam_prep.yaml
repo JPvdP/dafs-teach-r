@@ -4,7 +4,7 @@ description: "Practice the exam question types: reading code, tracing output, fi
 exercises:
 
   - id: dice_script
-    title: "Reading Code — Dice Roll While Loop"
+    title: "Reading Code, Dice Roll While Loop"
     instructions: |
       In the exam you will be asked to read a script and explain what each line does, and/or deduce the output.
 
@@ -100,7 +100,7 @@ exercises:
       writeLines(paste("Even sums before finding 7:", even_sums))
 
   - id: student_grades
-    title: "Reading and Extending Code — Student Grades"
+    title: "Reading and Extending Code, Student Grades"
     instructions: |
       Another exam question type asks you to **extend** a script. Read the following code carefully, predict what it does, then run it:
 
@@ -191,7 +191,7 @@ exercises:
       print(students, width = Inf)
 
   - id: login_function
-    title: "Writing Code — Login System"
+    title: "Writing Code, Login System"
     instructions: |
       Another exam question type asks you to **write a short script** from scratch.
 
@@ -279,7 +279,7 @@ exercises:
       login_system(c("x", "y", "z"), "secret")
 
   - id: debug_the_script
-    title: "Finding Errors — Debug the Script"
+    title: "Finding Errors, Debug the Script"
     instructions: |
       A key exam skill is **finding and fixing bugs in existing code**. The script below runs without any error message, but its results are wrong. Read it carefully and find the two errors:
 
@@ -368,9 +368,9 @@ exercises:
       cat("Highest:", highest, "\n")
 
   - id: unfamiliar_function
-    title: "Using an Unfamiliar Function — Handling Missing Data"
+    title: "Using an Unfamiliar Function, Handling Missing Data"
     instructions: |
-      In the exam — and in real datasets — you will sometimes need to use a function you haven't seen before. The skill being tested isn't memorisation: it's reading a short explanation of what a function does, and correctly slotting it into existing code — the right package, the right call, the right arguments, in the right place.
+      In the exam, and in real datasets, you will sometimes need to use a function you haven't seen before. The skill being tested isn't memorisation: it's reading a short explanation of what a function does, and correctly slotting it into existing code, the right package, the right call, the right arguments, in the right place.
 
       Real-world data almost always has **missing values**: a sensor that failed, a field nobody filled in. In R, missing values show up as `NA`. Here is the function you'll need, explained the way you'd find it in documentation:
 
@@ -422,7 +422,7 @@ exercises:
       - type: assert
         code: |
           .check(isTRUE(all.equal(mean_pollution, 21.12)), "clean_and_average(df) should return 21.12: only the rows missing pollution should be dropped")
-        description: "clean_and_average(df) should return 21.12 — only rows missing pollution should be dropped"
+        description: "clean_and_average(df) should return 21.12, only rows missing pollution should be dropped"
     hints:
       - "The function you need is drop_na(), applied to df"
       - "Give it the column pollution, so it only checks that column. Otherwise the rows that miss a note are dropped too"
@@ -450,7 +450,7 @@ exercises:
       writeLines(paste("Mean pollution:", mean_pollution))
 
   - id: unfamiliar_function_2
-    title: "Using an Unfamiliar Function — Removing Duplicate Readings"
+    title: "Using an Unfamiliar Function, Removing Duplicate Readings"
     instructions: |
       Another common data-cleaning problem: **duplicate rows**. A sensor might log the same reading twice, or a spreadsheet might get merged with itself by accident. Here's the function for it, again explained the way you'd find it in documentation:
 
@@ -502,7 +502,7 @@ exercises:
       - type: assert
         code: |
           .check(isTRUE(all.equal(mean_energy, 165)), "dedupe_and_average(df) should return 165: keep only the first reading per city")
-        description: "dedupe_and_average(df) should return 165 — only the first reading per city should be kept"
+        description: "dedupe_and_average(df) should return 165, only the first reading per city should be kept"
     hints:
       - "The function you need is distinct(), applied to df"
       - "Give it the column city, so duplicates are found by city alone. Otherwise only rows that match on every column are removed"

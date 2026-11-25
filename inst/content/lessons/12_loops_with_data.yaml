@@ -1,5 +1,5 @@
 title: Loops with Data
-description: Apply for and while loops to real analytical tasks — collecting numbers, going through a data frame row by row, classifying data — and learn the tidyverse alternatives, including map() for reading many files at once.
+description: Apply for and while loops to real analytical tasks, collecting numbers, going through a data frame row by row, classifying data, and learn the tidyverse alternatives, including map() for reading many files at once.
 
 exercises:
 
@@ -147,9 +147,9 @@ exercises:
 
       **Your task:**
 
-      **Part 1 — for loop:** go through every row. If `sustainable` is `TRUE` **and** `energy_usage` is above 20, show `Region: A, Energy: 30` (with the values of that row).
+      **Part 1, for loop:** go through every row. If `sustainable` is `TRUE` **and** `energy_usage` is above 20, show `Region: A, Energy: 30` (with the values of that row).
 
-      **Part 2 — while loop:** go through the rows from the top, and add the `energy_usage` of the **sustainable** rows to `cumulative`. Stop as soon as `cumulative` is above 50, or when you run out of rows. Print `cumulative`.
+      **Part 2, while loop:** go through the rows from the top, and add the `energy_usage` of the **sustainable** rows to `cumulative`. Stop as soon as `cumulative` is above 50, or when you run out of rows. Print `cumulative`.
 
       (Part 1 without a loop is just `df |> filter(sustainable, energy_usage > 20)`. A loop over rows is useful when you need to **do** something per row, like download a file or make a graph, rather than calculate something.)
     starter_code: |

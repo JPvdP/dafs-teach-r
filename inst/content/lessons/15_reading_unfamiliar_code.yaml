@@ -1,5 +1,5 @@
 title: "Reading Unfamiliar Code"
-description: "Explain in your own words what a script does — including functions you haven't seen before. Each new function is explained in the exercise, just like it would be on the exam."
+description: "Explain in your own words what a script does, including functions you haven't seen before. Each new function is explained in the exercise, just like it would be on the exam."
 
 exercises:
 
@@ -22,12 +22,12 @@ exercises:
       print(readings)
       cat("Average PM2.5:", round(mean(readings$pm25), 1), "\n")
     instructions: |
-      In this lesson you won't write code. Instead, you'll **read** a script and **explain in your own words** what it does. Each script mixes things you already know with a few functions you haven't seen before. Those new functions are explained below the script — just like on the exam, where you'll also meet functions you don't know yet.
+      In this lesson you won't write code. Instead, you'll **read** a script and **explain in your own words** what it does. Each script mixes things you already know with a few functions you haven't seen before. Those new functions are explained below the script, just like on the exam, where you'll also meet functions you don't know yet.
 
       **A strategy that works:**
       1. Read the explanation of the new functions first.
       2. Go through the script top to bottom. After each line, ask yourself: *which variable changes, and what is in it now?*
-      3. Write down what you think gets printed — work out the actual values.
+      3. Write down what you think gets printed, work out the actual values.
 
       ---
 
@@ -35,11 +35,11 @@ exercises:
 
       **New functions in this script**
 
-      - **`replace_na(x, value)`** (from the tidyr package, loaded with the tidyverse) — replaces every missing value (`NA`) in `x` with `value`. All other values stay the same.
+      - **`replace_na(x, value)`** (from the tidyr package, loaded with the tidyverse), replaces every missing value (`NA`) in `x` with `value`. All other values stay the same.
         ```r
         replace_na(c(1, NA, 3), 0)    # 1 0 3
         ```
-      - **`pmax(x, value)`** and **`pmin(x, value)`** — the *parallel* maximum and minimum: they compare **every** value of `x` with `value`, and keep the larger (`pmax`) or the smaller (`pmin`) one.
+      - **`pmax(x, value)`** and **`pmin(x, value)`**, the *parallel* maximum and minimum: they compare **every** value of `x` with `value`, and keep the larger (`pmax`) or the smaller (`pmin`) one.
         ```r
         pmax(c(-5, 10, 99), 0)     # 0 10 99   → nothing below 0
         pmin(c(-5, 10, 99), 50)    # -5 10 50  → nothing above 50
@@ -113,7 +113,7 @@ exercises:
 
       **New functions in this script**
 
-      - **`cut(x, breaks, labels)`** — puts every number into a **bin**. `breaks` are the borders between the bins, and `labels` the names of the bins. By default, each bin includes its **upper** border but not its lower border.
+      - **`cut(x, breaks, labels)`**, puts every number into a **bin**. `breaks` are the borders between the bins, and `labels` the names of the bins. By default, each bin includes its **upper** border but not its lower border.
         ```r
         cut(c(5, 10, 15), breaks = c(0, 10, 20), labels = c("low", "high"))
         # low low high
@@ -121,7 +121,7 @@ exercises:
         Here the bins are "above 0 up to and including 10" (`low`) and "above 10 up to and including 20" (`high`), so 10 is still `low`. `Inf` means infinity: a border that no number is above.
 
         `cut()` gives back a **factor**, shown as `<fct>` in a tibble: R's type for categories with a fixed set of possible values.
-      - **`sep = ""`** in `cat()` — `cat()` normally puts a space between its pieces. `sep = ""` tells it to put nothing between them.
+      - **`sep = ""`** in `cat()`, `cat()` normally puts a space between its pieces. `sep = ""` tells it to put nothing between them.
         ```r
         cat(50, "%")             # 50 %
         cat(50, "%", sep = "")   # 50%
@@ -198,15 +198,15 @@ exercises:
 
       **New functions in this script**
 
-      - **`cumsum(x)`** — the *cumulative sum*, or running total: each value is added to everything that came before it.
+      - **`cumsum(x)`**, the *cumulative sum*, or running total: each value is added to everything that came before it.
         ```r
         cumsum(c(5, 3, 2))    # 5 8 10
         ```
-      - **`lag(x)`** (from dplyr) — shifts the values one position down, so each position gets the **previous** value. The first position has no previous value, so it gets `NA`.
+      - **`lag(x)`** (from dplyr), shifts the values one position down, so each position gets the **previous** value. The first position has no previous value, so it gets `NA`.
         ```r
         lag(c(100, 150, 120))    # NA 100 150
         ```
-      - **`first(x)`** (from dplyr) — gives the first value of a vector. It does the same as `x[1]`, but fits nicely at the end of a pipe.
+      - **`first(x)`** (from dplyr), gives the first value of a vector. It does the same as `x[1]`, but fits nicely at the end of a pipe.
         ```r
         first(c("b", "a", "c"))    # "b"
         ```
@@ -282,8 +282,8 @@ exercises:
 
       **New functions in this script**
 
-      - **`.by = city`** inside `summarise()` — a short way to summarise per group, without a separate `group_by()`. `summarise(total = sum(km), .by = city)` does the same as `group_by(city) |> summarise(total = sum(km))`, with one difference: the groups stay in the order in which they **first appear** in the data, instead of being sorted alphabetically.
-      - **`n_distinct(x)`** — counts how many **different** values there are in `x`.
+      - **`.by = city`** inside `summarise()`, a short way to summarise per group, without a separate `group_by()`. `summarise(total = sum(km), .by = city)` does the same as `group_by(city) |> summarise(total = sum(km))`, with one difference: the groups stay in the order in which they **first appear** in the data, instead of being sorted alphabetically.
+      - **`n_distinct(x)`**, counts how many **different** values there are in `x`.
         ```r
         n_distinct(c("bike", "car", "bike", "bike"))    # 2
         ```
@@ -374,16 +374,16 @@ exercises:
 
       **New functions in this script**
 
-      - **`str_to_title(x)`** — makes the first letter of every word a capital letter, and the rest lowercase. (You've already seen `str_to_upper()`, which works the same way.)
+      - **`str_to_title(x)`**, makes the first letter of every word a capital letter, and the rest lowercase. (You've already seen `str_to_upper()`, which works the same way.)
         ```r
         str_to_title(c("new york", "PARIS"))    # "New York" "Paris"
         ```
-      - **`map_chr(x, f)`** — like `map()` from lesson 12, it calls the function `f` once for **every** value of `x`. `map()` gives back a list; `map_chr()` gives back a vector of text (*chr*), which you can put straight into a column. Note that you write the function's name **without** parentheses: `map_chr()` does the calling for you.
+      - **`map_chr(x, f)`**, like `map()` from lesson 12, it calls the function `f` once for **every** value of `x`. `map()` gives back a list; `map_chr()` gives back a vector of text (*chr*), which you can put straight into a column. Note that you write the function's name **without** parentheses: `map_chr()` does the calling for you.
         ```r
         shout <- function(word) paste0(word, "!")
         map_chr(c("hi", "bye"), shout)    # "hi!" "bye!"
         ```
-      - **`count(x, sort = TRUE)`** — counts the rows per value, like in lesson 9. With `sort = TRUE`, the most common value comes first.
+      - **`count(x, sort = TRUE)`**, counts the rows per value, like in lesson 9. With `sort = TRUE`, the most common value comes first.
 
       **Your task:**
       Explain what this script does. Explain what the function on lines 4–12 does, which category every country gets, and what the loop on lines 28–30 prints.

@@ -1,5 +1,5 @@
 title: Data Frame Operations
-description: Go deeper into dplyr — select columns, filter rows, add computed columns, join datasets, summarise per group, sort, and work with text columns. The core skills of data analysis in R.
+description: Go deeper into dplyr, select columns, filter rows, add computed columns, join datasets, summarise per group, sort, and work with text columns. The core skills of data analysis in R.
 
 exercises:
 
@@ -616,7 +616,7 @@ exercises:
   - id: practice_select_columns
     title: "Practice: Selecting Columns"
     instructions: |
-      More practice with `select()` — this time energy data per province.
+      More practice with `select()`, this time energy data per province.
 
       **Your task:**
       1. `by_name`: select `province` and `solar_mw` by name
@@ -678,7 +678,7 @@ exercises:
   - id: practice_filter_rows
     title: "Practice: Filtering Rows"
     instructions: |
-      More practice with `filter()` — this time air quality readings.
+      More practice with `filter()`, this time air quality readings.
 
       **Your task:**
       1. `readings_2023`: only the readings from 2023
@@ -789,7 +789,7 @@ exercises:
   - id: practice_add_column
     title: "Practice: Adding Computed Columns"
     instructions: |
-      More practice with `mutate()` — this time CO₂ emissions (in Mt) and population (in millions).
+      More practice with `mutate()`, this time CO₂ emissions (in Mt) and population (in millions).
 
       **Your task:**
       1. In one `mutate()`, add `emissions_per_capita` (`emissions / population`) **and** `above_8` (`TRUE` when `emissions_per_capita` is above 8). Store the result back in `df` and print it.
@@ -843,7 +843,7 @@ exercises:
   - id: practice_groupby_agg
     title: "Practice: Grouping and Summarising"
     instructions: |
-      More practice with `group_by()`, `summarise()` and `count()` — this time per pollutant.
+      More practice with `group_by()`, `summarise()` and `count()`, this time per pollutant.
 
       **Your task:**
       1. `year_range`: per pollutant, the first and last year (columns `first` and `last`), **and** the number of readings in a column `n`, using `n()`. Print it.
@@ -897,7 +897,7 @@ exercises:
   - id: practice_merge_dataframes
     title: "Practice: Joining Data Frames"
     instructions: |
-      More practice with joins — this time the other way around: the **main** table has a country that's missing from the second one.
+      More practice with joins, this time the other way around: the **main** table has a country that's missing from the second one.
 
       **Your task:**
       1. Join `df_emissions` and `df_area` on `country` so that **all four** countries of `df_emissions` are kept. Store it in `merged`.
@@ -963,7 +963,7 @@ exercises:
   - id: practice_sort_and_rank
     title: "Practice: Sorting and Top-N Selection"
     instructions: |
-      More practice with `arrange()` and `slice_max()` — this time recycling rates.
+      More practice with `arrange()` and `slice_max()`, this time recycling rates.
 
       **Your task:**
       1. `df_sorted`: `df` sorted by `recycling_rate` from **high to low**. Print it.
@@ -1022,7 +1022,7 @@ exercises:
   - id: practice_string_operations
     title: "Practice: Working With Text Columns"
     instructions: |
-      More practice with stringr — this time Dutch provinces.
+      More practice with stringr, this time Dutch provinces.
 
       **Your task:**
       1. Add `region_upper` (the name in capitals) and `name_length` (the number of characters) to `df` in one `mutate()`

@@ -1,5 +1,5 @@
 title: "If, Else If and Else"
-description: "Learn to make decisions in code — run different actions depending on whether a condition is TRUE or FALSE, for a single value and for a whole column."
+description: "Learn to make decisions in code, run different actions depending on whether a condition is TRUE or FALSE, for a single value and for a whole column."
 
 exercises:
 
@@ -70,9 +70,9 @@ exercises:
       }
 
   - id: if_else
-    title: "If / Else — Two Outcomes"
+    title: "If / Else, Two Outcomes"
     instructions: |
-      The `if` statement only runs code when the condition is `TRUE` — but what about when it is `FALSE`? That is where `else` comes in.
+      The `if` statement only runs code when the condition is `TRUE`, but what about when it is `FALSE`? That is where `else` comes in.
 
       For example, if we grade students, we want the result to be `"Admitted"` if the grade is ≥ 5.5 and `"Fail"` when the grade is lower:
 
@@ -119,7 +119,7 @@ exercises:
       }
 
   - id: carbon_categories
-    title: "If / Else If / Else — Carbon Emissions"
+    title: "If / Else If / Else, Carbon Emissions"
     instructions: |
       When you need more than two outcomes, add `else if`. R checks the conditions **in order** and runs the first one that is `TRUE`; the rest is skipped:
 
@@ -207,7 +207,7 @@ exercises:
       print(categorize_emissions(8.5))
 
   - id: water_conservation
-    title: "If / Else If / Else — Water Conservation"
+    title: "If / Else If / Else, Water Conservation"
     instructions: |
       Now write a whole if / else if / else chain yourself.
 
@@ -275,13 +275,13 @@ exercises:
 
       In data analysis you usually want to make a decision for **every row** of a column. The tidyverse has two functions for that, which you use inside `mutate()`:
 
-      **`if_else(condition, value_if_TRUE, value_if_FALSE)`** — two outcomes, like if/else:
+      **`if_else(condition, value_if_TRUE, value_if_FALSE)`**, two outcomes, like if/else:
 
       ```r
       df |> mutate(warm = if_else(temp >= 20, "yes", "no"))
       ```
 
-      **`case_when()`** — more outcomes, like if / else if / else. Each line is `condition ~ value`. Just like with `else if`, the conditions are checked **in order** and each row gets the value of the first condition that is `TRUE`. `.default` is the value for rows where no condition is `TRUE` (like `else`):
+      **`case_when()`**, more outcomes, like if / else if / else. Each line is `condition ~ value`. Just like with `else if`, the conditions are checked **in order** and each row gets the value of the first condition that is `TRUE`. `.default` is the value for rows where no condition is `TRUE` (like `else`):
 
       ```r
       df |> mutate(size = case_when(
@@ -363,7 +363,7 @@ exercises:
   - id: practice_basic_if
     title: "Practice: The If Statement"
     instructions: |
-      More practice with nested `if` statements — this time checking growing conditions.
+      More practice with nested `if` statements, this time checking growing conditions.
 
       **Your task:**
       Complete the nested `if` statement: if `rainfall > 10` **and** `temperature > 20`, print `"Good growing conditions"`.
@@ -396,9 +396,9 @@ exercises:
       }
 
   - id: practice_if_else
-    title: "Practice: If / Else — Two Outcomes"
+    title: "Practice: If / Else, Two Outcomes"
     instructions: |
-      More practice with if/else — this time grading an energy efficiency audit.
+      More practice with if/else, this time grading an energy efficiency audit.
 
       An audit `score` (out of 100) results in `"Pass"` if it's ≥ 60, and `"Fail"` otherwise.
 
@@ -429,9 +429,9 @@ exercises:
       }
 
   - id: practice_carbon_categories
-    title: "Practice: If / Else If / Else — Recycling Rates"
+    title: "Practice: If / Else If / Else, Recycling Rates"
     instructions: |
-      More practice with `else if` chains — this time categorising a recycling rate.
+      More practice with `else if` chains, this time categorising a recycling rate.
 
       **Your task:**
       Complete the function `categorize_recycling(rate)`, which takes a recycling rate in percent and returns a category:
@@ -491,7 +491,7 @@ exercises:
       print(categorize_recycling(65))
 
   - id: practice_water_conservation
-    title: "Practice: If / Else If / Else — Energy Efficiency"
+    title: "Practice: If / Else If / Else, Energy Efficiency"
     instructions: |
       **Your task:**
       Write a function `rate_energy_usage(daily_kwh)` that takes daily household energy use in kWh and returns an efficiency rating:
@@ -541,9 +541,9 @@ exercises:
       print(rate_energy_usage(7))
 
   - id: practice_temperature_advice
-    title: "Practice: if_else() and case_when() — Air Quality"
+    title: "Practice: if_else() and case_when(), Air Quality"
     instructions: |
-      More practice with decisions for a whole column — this time air quality measurements from five cities.
+      More practice with decisions for a whole column, this time air quality measurements from five cities.
 
       **Your task:**
       1. Add a column `alert` with `if_else()`: `TRUE` when `aqi` is 100 or more, `FALSE` otherwise. (Tip: the condition `aqi >= 100` itself is already `TRUE` or `FALSE`, so `alert = aqi >= 100` gives the same result. Use `if_else()` anyway for practice.)

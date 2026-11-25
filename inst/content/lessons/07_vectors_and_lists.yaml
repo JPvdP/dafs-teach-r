@@ -355,7 +355,7 @@ exercises:
   - id: list_slicing
     title: "Ranges, Conditions and Sorting"
     instructions: |
-      **A range of positions** — `1:3` is short for `c(1, 2, 3)`, so you can take a whole stretch of a vector at once:
+      **A range of positions**, `1:3` is short for `c(1, 2, 3)`, so you can take a whole stretch of a vector at once:
 
       ```r
       temps <- c(22, 15, 30, 8, 25)
@@ -367,7 +367,7 @@ exercises:
 
       You know `head()` and `tail()` from data frames: they work on vectors too.
 
-      **Selecting with a condition** — you can also put a condition between the brackets. R keeps the values where the condition is `TRUE`:
+      **Selecting with a condition**, you can also put a condition between the brackets. R keeps the values where the condition is `TRUE`:
 
       ```r
       temps > 20          # TRUE FALSE TRUE FALSE TRUE
@@ -376,7 +376,7 @@ exercises:
 
       This is what `filter()` does for the rows of a data frame.
 
-      **Sorting** — `sort(temps)` gives a sorted copy, from small to large; `sort(temps, decreasing = TRUE)` from large to small. The original `temps` doesn't change.
+      **Sorting**, `sort(temps)` gives a sorted copy, from small to large; `sort(temps, decreasing = TRUE)` from large to small. The original `temps` doesn't change.
 
       **Your task:**
       Given 12 monthly average temperatures (Jan–Dec):
@@ -638,7 +638,7 @@ exercises:
   - id: practice_dict_iteration
     title: "Practice: Working With All Values at Once"
     instructions: |
-      More practice with `paste()`, `writeLines()` and `sum()` on a named vector — this time annual rainfall (in mm).
+      More practice with `paste()`, `writeLines()` and `sum()` on a named vector, this time annual rainfall (in mm).
 
       **Your task:**
       1. Create `sentences` in the form `"DE received 700 mm of rain"`, and show them with `writeLines()`
@@ -682,7 +682,7 @@ exercises:
   - id: practice_list_slicing
     title: "Practice: Ranges, Conditions and Sorting"
     instructions: |
-      More practice with ranges, conditions, `sort()`, `max()` and `min()` — this time with monthly rainfall.
+      More practice with ranges, conditions, `sort()`, `max()` and `min()`, this time with monthly rainfall.
 
       **Your task:**
       Given 12 monthly rainfall totals (Jan–Dec, in mm):
